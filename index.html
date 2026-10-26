@@ -43,20 +43,35 @@
     </div>
 
     <!-- Presets & Controls -->
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="text-xs text-slate-400 font-medium">Load Preset:</span>
-      <button onclick="loadPreset('config1')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
-        Config 1 (3 Shows: Sat E, Sat L, Sun L)
-      </button>
-      <button onclick="loadPreset('config2')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
-        Config 2 (3 Shows: Sat L, Sun E, Sun L)
-      </button>
-      <button onclick="loadPreset('config3')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
-        Config 3 (All 4 Shows)
-      </button>
-      <button onclick="resetCurrentShow()" class="px-3 py-1.5 text-xs font-semibold rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition">
-        ↺ Reset Show
-      </button>
+    <div class="flex flex-col items-start md:items-end gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs text-slate-400 font-medium">Presets:</span>
+        <div id="preset-buttons-container" class="flex flex-wrap items-center gap-1.5">
+          <!-- Populated by JS -->
+        </div>
+        <button onclick="toggleSavePresetPanel()" class="px-3 py-1.5 text-xs font-semibold rounded bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 transition flex items-center gap-1">
+          <span>💾</span>
+          <span>Save Preset</span>
+        </button>
+        <button onclick="resetCurrentShow()" class="px-3 py-1.5 text-xs font-semibold rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition">
+          ↺ Clear Show
+        </button>
+      </div>
+
+      <!-- Inline Save Preset Panel -->
+      <div id="save-preset-panel" class="hidden bg-slate-900 border border-emerald-700/50 rounded-lg p-2.5 shadow-xl flex flex-wrap items-center gap-2 text-xs">
+        <input id="new-preset-name" type="text" placeholder="Preset name (e.g. Draft A)..." 
+          class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-48">
+        <button onclick="saveNewPreset()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition">
+          + Save New
+        </button>
+        <button id="overwrite-preset-btn" onclick="overwriteCurrentPreset()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded transition">
+          Update Current
+        </button>
+        <button onclick="toggleSavePresetPanel()" class="px-2 py-1 text-slate-400 hover:text-white">
+          ✕
+        </button>
+      </div>
     </div>
   </header>
 
@@ -89,20 +104,27 @@
           </div>
 
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
-            <span class="text-slate-400">Conflicts Detected:</span>
+            <span class="text-slate-400">Alerts:</span>
             <span id="stat-conflict-count" class="font-bold text-emerald-400 text-sm">0</span>
           </div>
         </div>
       </div>
 
-      <!-- Conflicts Alert Drawer (if any) -->
-      <div id="conflicts-alert-container" class="mt-4 hidden">
-        <div class="bg-rose-950/40 border border-rose-500/40 rounded-lg p-3 text-xs text-rose-200">
+      <!-- Conflicts & Preference Flags Alert Drawer (if any) -->
+      <div id="conflicts-alert-container" class="mt-4 hidden space-y-2">
+        <div id="hard-conflicts-box" class="hidden bg-rose-950/40 border border-rose-500/40 rounded-lg p-3 text-xs text-rose-200">
           <div class="font-bold flex items-center gap-2 mb-1 text-rose-300">
-            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            <span>Attention Required in this Lineup:</span>
+            <span>⚠️</span>
+            <span>Hard Conflicts (Availability, Max Shows, or 0-Act Buffer):</span>
           </div>
           <ul id="conflicts-list" class="list-disc list-inside space-y-1"></ul>
+        </div>
+        <div id="pref-conflicts-box" class="hidden bg-fuchsia-950/40 border border-fuchsia-500/40 rounded-lg p-3 text-xs text-fuchsia-200">
+          <div class="font-bold flex items-center gap-2 mb-1 text-fuchsia-300">
+            <span>🗓️</span>
+            <span>Day Preference Flags (2 Shows Same Day vs. 1 Show Per Day):</span>
+          </div>
+          <ul id="pref-conflicts-list" class="list-disc list-inside space-y-1"></ul>
         </div>
       </div>
     </div>
@@ -218,6 +240,8 @@
         performers: ["Angel"],
         cameos: ["Brian F"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Paired with Act 5 (precedes Act 5). Separated from Luna (Act 29)."
       },
       2: {
@@ -230,6 +254,8 @@
         performers: ["Lisa Z", "Dorothy T"],
         cameos: ["Alyx J", "Lara A"],
         availability: ["sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "same_day",
         notes: "Prefers 2 shows same day (Sunday)."
       },
       3: {
@@ -242,6 +268,8 @@
         performers: ["Rissa", "Asia"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Available all 4 shows."
       },
       4: {
@@ -254,7 +282,9 @@
         performers: ["Elly Z"],
         cameos: ["Angel"],
         availability: ["sat_late", "sun_early"],
-        notes: "Prefers separate days. Angel is human prop."
+        maxShows: 2,
+        dayPref: "separate_days",
+        notes: "Prefers 1 show per day (separate days). Angel is human prop."
       },
       5: {
         id: 5,
@@ -266,6 +296,8 @@
         performers: ["Brian F"],
         cameos: ["Angel"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Paired with Act 1 (after Act 1). Separated from Luna."
       },
       6: {
@@ -278,6 +310,8 @@
         performers: ["Christina W"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
+        maxShows: 2,
+        dayPref: "same_day",
         notes: "Available Sat only. Prefers 2 shows same day."
       },
       7: {
@@ -290,6 +324,8 @@
         performers: ["Jonathan M"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Separates Act 9 and Act 11 with 0 changeovers."
       },
       8: {
@@ -302,7 +338,9 @@
         performers: ["Alice K"],
         cameos: ["Summer"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
-        notes: "Available all 4 shows."
+        maxShows: 2,
+        dayPref: "separate_days",
+        notes: "Available all 4 shows; prefers 1 show per day (separate days)."
       },
       9: {
         id: 9,
@@ -315,7 +353,8 @@
         cameos: ["Andy P", "Cat T", "Anna"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         maxShows: 2,
-        notes: "Available all 4 shows (prefers separate days). Cameos: Andy P, Cat T, Anna."
+        dayPref: "separate_days",
+        notes: "Available all 4 shows; prefers 1 show per day (separate days). Cameos: Andy P, Cat T, Anna."
       },
       10: {
         id: 10,
@@ -327,6 +366,8 @@
         performers: ["Ye W", "Jie Z"],
         cameos: [],
         availability: ["sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "same_day",
         notes: "Prefers 2 shows same day (Sunday)."
       },
       11: {
@@ -339,7 +380,9 @@
         performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"],
         cameos: ["Amiel", "Austin T"],
         availability: ["sat_early", "sat_late", "sun_late"],
-        notes: "Front Floor, Mid Floor, Back Pole. Requires 1-act buffer from Act 9 & Act 14."
+        maxShows: 2,
+        dayPref: "separate_days",
+        notes: "Prefers 1 show per day (separate days). Requires 1-act buffer from Act 9 & Act 14."
       },
       12: {
         id: 12,
@@ -351,6 +394,8 @@
         performers: ["Patricia H"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
+        maxShows: 1,
+        dayPref: "1_show",
         notes: "1 show only."
       },
       13: {
@@ -363,6 +408,8 @@
         performers: ["Paige L"],
         cameos: ["Jenn L"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Cameo by Jenn L (buffer with Act 20)."
       },
       14: {
@@ -375,7 +422,9 @@
         performers: ["Austin T"],
         cameos: ["Andy P", "Cat T"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
-        notes: "Cameos: Andy P & Cat T. Buffer with Act 9 & Act 11."
+        maxShows: 2,
+        dayPref: "separate_days",
+        notes: "Prefers 1 show per day (separate days). Cameos: Andy P & Cat T."
       },
       15: {
         id: 15,
@@ -387,6 +436,8 @@
         performers: ["Emily C", "Erica C", "Zoe", "Kim G"],
         cameos: ["Selina"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Continuation act immediately after Act 21 (Mama Morton)."
       },
@@ -400,6 +451,8 @@
         performers: ["Kim N", "Jen J"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
+        maxShows: 1,
+        dayPref: "1_show",
         notes: "1 show only."
       },
       17: {
@@ -412,6 +465,8 @@
         performers: ["Louise", "Amiel", "Claudelle"],
         cameos: ["Bobbie"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Amiel is a prop in Act 11 (requires 1-act buffer)."
       },
@@ -425,6 +480,8 @@
         performers: ["Karen S"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
+        maxShows: 2,
+        dayPref: "same_day",
         notes: "Prefers 2 shows same day (Saturday)."
       },
       19: {
@@ -437,6 +494,8 @@
         performers: ["Cece", "Josh J"],
         cameos: [],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Josh J is distinct from Josh P (Act 22)."
       },
@@ -450,6 +509,8 @@
         performers: ["Jenn L"],
         cameos: ["Celeste"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Needs buffer with Act 13 (Jenn L cameo in Act 13)."
       },
       21: {
@@ -462,6 +523,8 @@
         performers: ["Selina"],
         cameos: ["Emily C", "Zoe"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Immediately precedes Act 15 (Prison Break)."
       },
@@ -475,6 +538,8 @@
         performers: ["Josh P"],
         cameos: ["Cheng J"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Cheng J cameos here (needs buffer with Act 24)."
       },
@@ -488,6 +553,8 @@
         performers: ["Christine S"],
         cameos: [],
         availability: ["sat_late", "sun_late"],
+        maxShows: 1,
+        dayPref: "1_show",
         notes: "1 show only."
       },
       24: {
@@ -500,6 +567,8 @@
         performers: ["Cheng J"],
         cameos: ["Elly Z"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Elly Z is human prop (needs buffer with Act 4)."
       },
@@ -513,6 +582,8 @@
         performers: ["Kitty", "Derikka", "Heartley", "Emma", "Chloe", "Anna", "Anne", "Mackenzie"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Floor only. Zero rigging changeover."
       },
       26: {
@@ -525,7 +596,9 @@
         performers: ["Kristine G", "Scott S"],
         cameos: ["Cat T"],
         availability: ["sat_early", "sat_late", "sun_late"],
-        notes: "Cameo: Cat T. Buffer with Acts 9, 11, 14."
+        maxShows: 2,
+        dayPref: "separate_days",
+        notes: "Prefers 1 show per day (separate days). Cameo: Cat T."
       },
       27: {
         id: 27,
@@ -537,6 +610,8 @@
         performers: ["Sal"],
         cameos: ["Britt C", "Lauren G", "Seema", "Jon", "Rissa"],
         availability: [],
+        maxShows: 2,
+        dayPref: "pending",
         pending: true,
         notes: "Shares Rissa with Act 3 (needs 1-act buffer)."
       },
@@ -550,6 +625,8 @@
         performers: ["Masa"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        dayPref: "no_pref",
         notes: "Grand Finale closer."
       },
       29: {
@@ -562,16 +639,27 @@
         performers: ["Luna"],
         cameos: [],
         availability: ["sat_late"],
+        maxShows: 1,
+        dayPref: "1_show",
         notes: "1 show only (Sat Late). Must be separated from Brian F."
       }
     };
 
+    const DAY_PREF_LABELS = {
+      same_day: "Pref: 2 Shows Same Day",
+      separate_days: "Pref: 1 Show/Day",
+      no_pref: "Pref: Any 2 Shows",
+      "1_show": "Pref: 1 Show Only",
+      pending: "Pref: Pending"
+    };
+
     // ==========================================
-    // 2. CONFIG PRESETS (From target conversation)
+    // 2. CONFIG PRESETS & CUSTOM PRESET STORAGE
     // ==========================================
-    const PRESETS = {
+    const DEFAULT_PRESETS = {
       config1: {
         name: "Config 1 (Sat E, Sat L, Sun L)",
+        builtIn: true,
         shows: {
           sat_early: [11, 7, 8, 12, 6, 1, 18, "INTERMISSION", 25, 13, 14, 20, 5],
           sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 13, 16, 23, 20, 28],
@@ -581,6 +669,7 @@
       },
       config2: {
         name: "Config 2 (Sat L, Sun E, Sun L)",
+        builtIn: true,
         shows: {
           sat_early: [],
           sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 14, 28],
@@ -590,6 +679,7 @@
       },
       config3: {
         name: "Config 3 (All 4 Shows)",
+        builtIn: true,
         shows: {
           sat_early: [11, 8, 12, 6, 1, 18, "INTERMISSION", 25, 14, 5],
           sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 16, 20, 28],
@@ -599,6 +689,39 @@
       }
     };
 
+    const PRESET_STORAGE_KEY = "revel_hv_saved_presets_v1";
+    let PRESETS = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+
+    function loadStoredPresets() {
+      try {
+        const raw = localStorage.getItem(PRESET_STORAGE_KEY);
+        if (raw) {
+          const saved = JSON.parse(raw);
+          for (const [k, v] of Object.entries(saved)) {
+            PRESETS[k] = v;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load presets from localStorage:", e);
+      }
+    }
+
+    function persistPresetsToStorage() {
+      try {
+        const toSave = {};
+        for (const [k, v] of Object.entries(PRESETS)) {
+          if (v.custom || v.modified) {
+            toSave[k] = v;
+          }
+        }
+        localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(toSave));
+      } catch (e) {
+        console.warn("Could not save presets to localStorage:", e);
+      }
+    }
+
+    loadStoredPresets();
+
     const SHOW_INFO = {
       sat_early: { title: "Saturday Early (3:00 PM)", short: "Sat Early (3PM)" },
       sat_late:  { title: "Saturday Late (7:00 PM)",  short: "Sat Late (7PM)" },
@@ -607,6 +730,7 @@
     };
 
     // State
+    let currentPresetKey = "config1";
     let currentShowKey = "sat_early";
     let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
     let draggedIndex = null;
@@ -683,6 +807,7 @@
         if (act.pending) {
           conflicts.push({
             type: "availability",
+            severity: "conflict",
             actId: act.id,
             slot: slot,
             message: `Act ${act.id} (${act.title}): Pending availability survey response.`
@@ -690,26 +815,60 @@
         } else if (!act.availability.includes(showKey)) {
           conflicts.push({
             type: "availability",
+            severity: "conflict",
             actId: act.id,
             slot: slot,
             message: `Act ${act.id} (${act.title}): Not marked available for ${SHOW_INFO[showKey].short}!`
           });
         }
 
-        // Max 2 Shows check across all shows
-        let scheduledInShows = [];
+        // Max Shows & Day Preference checks across all shows
+        let scheduledShowKeys = [];
         for (const [sKey, sList] of Object.entries(showLineups)) {
           if ((sList || []).includes(act.id)) {
-            scheduledInShows.push(SHOW_INFO[sKey].short);
+            scheduledShowKeys.push(sKey);
           }
         }
-        if (scheduledInShows.length > 2) {
+        let scheduledInShows = scheduledShowKeys.map(k => SHOW_INFO[k].short);
+        const maxShows = act.maxShows || 2;
+
+        if (scheduledShowKeys.length > maxShows) {
           conflicts.push({
             type: "max_shows",
+            severity: "conflict",
             actId: act.id,
             slot: slot,
-            message: `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — acts can only be in up to 2 shows!`
+            message: maxShows === 1
+              ? `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — requested 1 show only (max 1/1 Shows)!`
+              : `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — acts can only be in up to 2 shows!`
           });
+        }
+
+        // Day Preference check (2 shows in one day vs. 1 show per day)
+        if (scheduledShowKeys.length >= 2) {
+          const satShows = scheduledShowKeys.filter(k => k.startsWith("sat_"));
+          const sunShows = scheduledShowKeys.filter(k => k.startsWith("sun_"));
+
+          if (act.dayPref === "separate_days" && (satShows.length >= 2 || sunShows.length >= 2)) {
+            const sameDayName = satShows.length >= 2
+              ? "Saturday (Sat Early & Sat Late)"
+              : "Sunday (Sun Early & Sun Late)";
+            conflicts.push({
+              type: "day_pref",
+              severity: "preference",
+              actId: act.id,
+              slot: slot,
+              message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 1 show per day (separate days), but scheduled for 2 shows on ${sameDayName}!`
+            });
+          } else if (act.dayPref === "same_day" && satShows.length >= 1 && sunShows.length >= 1) {
+            conflicts.push({
+              type: "day_pref",
+              severity: "preference",
+              actId: act.id,
+              slot: slot,
+              message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 2 shows in one day, but scheduled across separate days (${scheduledInShows.join(" & ")})!`
+            });
+          }
         }
 
         // Resolve rigging points
@@ -763,6 +922,7 @@
             if (diff < 2) {
               conflicts.push({
                 type: "buffer",
+                severity: "conflict",
                 performer: name,
                 act1: app1.actId,
                 act2: app2.actId,
@@ -787,6 +947,62 @@
     // ==========================================
     // 4. UI RENDERING
     // ==========================================
+
+    function renderPresetButtons() {
+      const container = document.getElementById("preset-buttons-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      for (const [key, preset] of Object.entries(PRESETS)) {
+        const isActive = key === currentPresetKey;
+        const wrapper = document.createElement("div");
+        wrapper.className = "inline-flex items-center rounded overflow-hidden border " + (
+          isActive
+            ? "border-indigo-500 bg-indigo-950/80 shadow-sm shadow-indigo-500/20"
+            : "border-slate-700 bg-slate-800 hover:bg-slate-700"
+        );
+
+        const btn = document.createElement("button");
+        btn.onclick = () => loadPreset(key);
+        btn.className = `px-2.5 py-1.5 text-xs font-semibold transition flex items-center gap-1.5 ${
+          isActive ? "text-indigo-200" : "text-slate-200 hover:text-white"
+        }`;
+        btn.innerHTML = `
+          <span>${preset.name}</span>
+          ${preset.modified ? '<span class="text-[9px] text-amber-300 font-normal">(edited)</span>' : ''}
+        `;
+        wrapper.appendChild(btn);
+
+        if (preset.custom) {
+          const delBtn = document.createElement("button");
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deletePreset(key);
+          };
+          delBtn.className = "px-1.5 py-1.5 text-[10px] text-rose-400 hover:bg-rose-950 hover:text-rose-200 border-l border-slate-700/80 transition";
+          delBtn.title = `Delete saved preset "${preset.name}"`;
+          delBtn.textContent = "✕";
+          wrapper.appendChild(delBtn);
+        } else if (preset.modified) {
+          const restoreBtn = document.createElement("button");
+          restoreBtn.onclick = (e) => {
+            e.stopPropagation();
+            restoreDefaultPreset(key);
+          };
+          restoreBtn.className = "px-1.5 py-1.5 text-[10px] text-amber-300 hover:bg-amber-950 border-l border-slate-700/80 transition";
+          restoreBtn.title = `Restore original "${preset.name}"`;
+          restoreBtn.textContent = "↺";
+          wrapper.appendChild(restoreBtn);
+        }
+
+        container.appendChild(wrapper);
+      }
+
+      const overwriteBtn = document.getElementById("overwrite-preset-btn");
+      if (overwriteBtn && PRESETS[currentPresetKey]) {
+        overwriteBtn.textContent = `Update "${PRESETS[currentPresetKey].name}"`;
+      }
+    }
 
     function renderTabs() {
       const container = document.getElementById("show-tabs");
@@ -832,18 +1048,47 @@
       document.getElementById("stat-groups").textContent = `${groups} Group${groups === 1 ? '' : 's'}`;
       document.getElementById("stat-changeovers").textContent = analysis.changeovers;
 
-      // Update conflicts banner
+      // Update conflicts & preference flags banners
       const conflictsContainer = document.getElementById("conflicts-alert-container");
+      const hardBox = document.getElementById("hard-conflicts-box");
+      const prefBox = document.getElementById("pref-conflicts-box");
       const conflictsList = document.getElementById("conflicts-list");
+      const prefConflictsList = document.getElementById("pref-conflicts-list");
       const conflictStat = document.getElementById("stat-conflict-count");
+
+      const hardConflicts = analysis.conflicts.filter(c => c.severity !== "preference");
+      const prefConflicts = analysis.conflicts.filter(c => c.severity === "preference");
 
       if (analysis.conflicts.length > 0) {
         conflictsContainer.classList.remove("hidden");
-        conflictsList.innerHTML = analysis.conflicts.map(c => `<li>${c.message}</li>`).join("");
-        conflictStat.textContent = `${analysis.conflicts.length} Alert${analysis.conflicts.length === 1 ? '' : 's'}`;
-        conflictStat.className = "font-bold text-rose-400 text-sm";
+
+        if (hardConflicts.length > 0) {
+          hardBox.classList.remove("hidden");
+          conflictsList.innerHTML = hardConflicts.map(c => `<li>${c.message}</li>`).join("");
+        } else {
+          hardBox.classList.add("hidden");
+          conflictsList.innerHTML = "";
+        }
+
+        if (prefConflicts.length > 0) {
+          prefBox.classList.remove("hidden");
+          prefConflictsList.innerHTML = prefConflicts.map(c => `<li>${c.message}</li>`).join("");
+        } else {
+          prefBox.classList.add("hidden");
+          prefConflictsList.innerHTML = "";
+        }
+
+        const statParts = [];
+        if (hardConflicts.length > 0) statParts.push(`${hardConflicts.length} Conflict${hardConflicts.length === 1 ? '' : 's'}`);
+        if (prefConflicts.length > 0) statParts.push(`${prefConflicts.length} Pref Flag${prefConflicts.length === 1 ? '' : 's'}`);
+        conflictStat.textContent = statParts.join(" • ");
+        conflictStat.className = hardConflicts.length > 0
+          ? "font-bold text-rose-400 text-sm"
+          : "font-bold text-fuchsia-400 text-sm";
       } else {
         conflictsContainer.classList.add("hidden");
+        hardBox.classList.add("hidden");
+        prefBox.classList.add("hidden");
         conflictStat.textContent = "0 (All Clear)";
         conflictStat.className = "font-bold text-emerald-400 text-sm";
       }
@@ -953,7 +1198,26 @@
         
         // Check if this specific act has an alert
         const actConflicts = analysis.conflicts.filter(c => c.actId === act.id || c.act1 === act.id || c.act2 === act.id);
+        const hasHardConflict = actConflicts.some(c => c.severity !== "preference");
+        const hasPrefConflict = actConflicts.some(c => c.severity === "preference");
         const hasConflict = actConflicts.length > 0;
+
+        // Show count across all tabs for this act
+        const maxShows = act.maxShows || 2;
+        const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id)).length;
+        const showCountBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
+          scheduledShowsCount > maxShows
+            ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
+            : scheduledShowsCount === maxShows
+            ? 'bg-indigo-950 text-indigo-300 border border-indigo-700/50'
+            : 'bg-slate-800 text-slate-400 border border-slate-700'
+        }" title="Scheduled in ${scheduledShowsCount} of max ${maxShows} shows (${DAY_PREF_LABELS[act.dayPref] || ''})">${scheduledShowsCount}/${maxShows} Shows</span>`;
+
+        const borderClass = hasHardConflict
+          ? "border-rose-500/70 shadow-rose-950/50 shadow-md"
+          : hasPrefConflict
+          ? "border-fuchsia-500/70 shadow-fuchsia-950/50 shadow-md"
+          : "border-slate-800 hover:border-slate-700";
 
         actCard.draggable = true;
         actCard.dataset.index = item.index;
@@ -964,9 +1228,7 @@
         actCard.ondragend = handleDragEnd;
 
         if (isCompactView) {
-          actCard.className = `group bg-slate-900 border ${
-            hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
-          } rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition cursor-grab active:cursor-grabbing`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition cursor-grab active:cursor-grabbing`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info in single row -->
@@ -982,10 +1244,16 @@
                     act.type === 'Instructor-led Series' ? 'bg-teal-950 text-teal-300 border border-teal-800/50' :
                     'bg-purple-950 text-purple-300 border border-purple-800/50'
                   }">${act.type}</span>
+                  ${showCountBadge}
                   <span class="text-[11px] text-slate-400 truncate hidden sm:inline">• ${act.apparatus}</span>
                   ${act.cameos && act.cameos.length > 0 ? `<span class="text-[10px] text-amber-300/80 hidden md:inline">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
-                ${hasConflict ? actConflicts.map(c => `
+                ${hasConflict ? actConflicts.map(c => c.severity === "preference" ? `
+                  <div class="text-[10px] text-fuchsia-300 font-medium truncate flex items-center gap-1">
+                    <span>🗓️</span>
+                    <span>${c.message}</span>
+                  </div>
+                ` : `
                   <div class="text-[10px] text-rose-400 font-medium truncate flex items-center gap-1">
                     <span>⚠️</span>
                     <span>${c.message}</span>
@@ -1009,9 +1277,7 @@
             </div>
           `;
         } else {
-          actCard.className = `group bg-slate-900 border ${
-            hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
-          } rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info -->
@@ -1029,12 +1295,19 @@
                     act.type === 'Instructor-led Series' ? 'bg-teal-950 text-teal-300 border border-teal-800/50' :
                     'bg-purple-950 text-purple-300 border border-purple-800/50'
                   }">${act.type}</span>
+                  ${showCountBadge}
+                  <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800/90 text-slate-300 border border-slate-700/60">${DAY_PREF_LABELS[act.dayPref] || ''}</span>
                 </div>
                 <div class="text-xs text-slate-400 mt-0.5">
                   <span class="text-slate-300 font-medium">${act.apparatus}</span>
                   ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
-                ${hasConflict ? actConflicts.map(c => `
+                ${hasConflict ? actConflicts.map(c => c.severity === "preference" ? `
+                  <div class="text-[11px] text-fuchsia-300 bg-fuchsia-950/50 border border-fuchsia-700/50 rounded px-2 py-0.5 font-medium mt-1.5 inline-flex items-center gap-1.5">
+                    <span>🗓️</span>
+                    <span>${c.message}</span>
+                  </div>
+                ` : `
                   <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
                     <span>⚠️</span>
                     <span>${c.message}</span>
@@ -1136,16 +1409,23 @@
 
         const isPending = !!act.pending;
         const isMarkedAvail = act.availability.includes(currentShowKey);
+        const maxShows = act.maxShows || 2;
 
         // Count how many shows this act is currently scheduled in across all tabs
         const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(id)).length;
         const showCountBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
-          scheduledShowsCount > 2
+          scheduledShowsCount > maxShows
             ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
-            : scheduledShowsCount === 2
+            : scheduledShowsCount === maxShows
             ? 'bg-indigo-950 text-indigo-300 border border-indigo-700/50'
             : 'bg-slate-900 text-slate-400 border border-slate-800'
-        }" title="Scheduled in ${scheduledShowsCount} of max 2 shows across all tabs">${scheduledShowsCount}/2 Shows</span>`;
+        }" title="Scheduled in ${scheduledShowsCount} of max ${maxShows} shows across all tabs (${DAY_PREF_LABELS[act.dayPref] || ''})">${scheduledShowsCount}/${maxShows} Shows</span>`;
+
+        const prefBadge = act.dayPref === "same_day"
+          ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-fuchsia-950/60 text-fuchsia-300 border border-fuchsia-800/40">Same Day</span>`
+          : act.dayPref === "separate_days"
+          ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-950/60 text-sky-300 border border-sky-800/40">1/Day</span>`
+          : "";
 
         let statusBadge = "";
         if (isPending) {
@@ -1164,6 +1444,7 @@
               <span class="font-bold text-xs text-white">Act ${act.id}: ${act.title}</span>
               ${statusBadge}
               ${showCountBadge}
+              ${prefBadge}
             </div>
             <div class="text-[11px] text-slate-400 truncate mt-0.5">
               ${act.apparatus}${act.cameos && act.cameos.length > 0 ? ` • Cameo: ${act.cameos.join(", ")}` : ""}
@@ -1306,10 +1587,82 @@
       renderLineup();
     }
 
+    function toggleSavePresetPanel() {
+      const panel = document.getElementById("save-preset-panel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+      if (!panel.classList.contains("hidden")) {
+        const input = document.getElementById("new-preset-name");
+        if (input) input.focus();
+      }
+    }
+
+    function saveNewPreset() {
+      const input = document.getElementById("new-preset-name");
+      const rawName = (input ? input.value : "").trim();
+      const name = rawName || `Custom Preset ${Object.keys(PRESETS).length - 2}`;
+      const key = "custom_" + Date.now();
+
+      PRESETS[key] = {
+        name: name,
+        custom: true,
+        shows: JSON.parse(JSON.stringify(showLineups))
+      };
+      currentPresetKey = key;
+      persistPresetsToStorage();
+      renderPresetButtons();
+
+      if (input) input.value = "";
+      document.getElementById("save-preset-panel").classList.add("hidden");
+      showToast(`Saved new preset "${name}"!`);
+    }
+
+    function overwriteCurrentPreset() {
+      const preset = PRESETS[currentPresetKey];
+      if (!preset) return;
+
+      preset.shows = JSON.parse(JSON.stringify(showLineups));
+      if (preset.builtIn) {
+        preset.modified = true;
+      }
+      persistPresetsToStorage();
+      renderPresetButtons();
+      document.getElementById("save-preset-panel").classList.add("hidden");
+      showToast(`Updated preset "${preset.name}"!`);
+    }
+
+    function deletePreset(key) {
+      const preset = PRESETS[key];
+      if (!preset || !preset.custom) return;
+      const name = preset.name;
+      delete PRESETS[key];
+      persistPresetsToStorage();
+
+      if (currentPresetKey === key) {
+        loadPreset("config1");
+      } else {
+        renderPresetButtons();
+      }
+      showToast(`Deleted preset "${name}"`);
+    }
+
+    function restoreDefaultPreset(key) {
+      if (!DEFAULT_PRESETS[key]) return;
+      PRESETS[key] = JSON.parse(JSON.stringify(DEFAULT_PRESETS[key]));
+      persistPresetsToStorage();
+      if (currentPresetKey === key) {
+        loadPreset(key);
+      } else {
+        renderPresetButtons();
+      }
+      showToast(`Restored default "${PRESETS[key].name}"`);
+    }
+
     function loadPreset(presetKey) {
       const preset = PRESETS[presetKey];
       if (!preset) return;
 
+      currentPresetKey = presetKey;
       showLineups = JSON.parse(JSON.stringify(preset.shows));
       
       // Auto-select first non-empty show in preset
@@ -1320,6 +1673,7 @@
         }
       }
 
+      renderPresetButtons();
       renderTabs();
       renderLineup();
       renderBench();
@@ -1331,7 +1685,7 @@
       renderTabs();
       renderLineup();
       renderBench();
-      showToast(`Reset ${SHOW_INFO[currentShowKey].short}`);
+      showToast(`Cleared ${SHOW_INFO[currentShowKey].short}`);
     }
 
     function filterBench() {
@@ -1372,6 +1726,7 @@
 
     // Initialize
     window.addEventListener("DOMContentLoaded", () => {
+      renderPresetButtons();
       renderTabs();
       renderLineup();
       renderBench();

@@ -849,7 +849,7 @@
                 title="${pointName}: Flexible (Any). Adapts to current stage (${resolvedStageState}) with 0 changeover">
             <span class="text-[10px] text-slate-400">${pointName}:</span>
             <span class="text-indigo-300 font-semibold">Any</span>
-            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : 'Air'})</span>
+            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : 'Aerial/Floor'})</span>
           </span>
         `;
       }
@@ -861,7 +861,7 @@
             : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
         }" title="${pointName}: Requires ${actReq}">
           <span class="text-[10px] text-slate-400">${pointName}:</span>
-          <span>${isPole ? 'Pole' : 'Aerial'}</span>
+          <span>${isPole ? 'Pole' : 'Aerial/Floor'}</span>
         </span>
       `;
     }
@@ -875,7 +875,7 @@
             : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
         }" title="${pointName}: ${state}${isFlexible ? ' (Flexible Any)' : ''}">
           <span class="text-[10px] text-slate-400">${pointName}:</span>
-          <span>${isPole ? 'Pole' : 'Aerial'}</span>
+          <span>${isPole ? 'Pole' : 'Aerial/Floor'}</span>
           ${isFlexible ? '<span class="text-[9px] opacity-70">✦</span>' : ''}
         </span>
       `;

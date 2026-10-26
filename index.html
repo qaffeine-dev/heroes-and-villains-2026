@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heroes & Villains Showcase — Interactive Lineup & Rigging Scheduler</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Custom subtle styling */
+    .drag-over {
+      border-top: 3px solid #3b82f6 !important;
+      transform: translateY(2px);
+    }
+    .dragging {
+      opacity: 0.45;
+      transform: scale(0.98);
+    }
+    .apparatus-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased p-4 md:p-6 lg:p-8">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-5">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">Revel 2026</span>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          Heroes & Villains
+          <span class="text-slate-400 font-normal text-lg md:text-xl">| Interactive Lineup & Rigging Scheduler</span>
+        </h1>
+      </div>
+      <p class="text-slate-400 text-sm mt-1">
+        Drag and reorder acts to dynamically compute rigging state transitions, cameo buffers, and performer availability.
+      </p>
+    </div>
+
+    <!-- Presets & Controls -->
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-400 font-medium">Load Preset:</span>
+      <button onclick="loadPreset('config1')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
+        Config 1 (3 Shows: Sat E, Sat L, Sun L)
+      </button>
+      <button onclick="loadPreset('config2')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
+        Config 2 (3 Shows: Sat L, Sun E, Sun L)
+      </button>
+      <button onclick="loadPreset('config3')" class="preset-btn px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition">
+        Config 3 (All 4 Shows)
+      </button>
+      <button onclick="resetCurrentShow()" class="px-3 py-1.5 text-xs font-semibold rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition">
+        ↺ Reset Show
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- Show Selector Tabs & Top Stats Bar -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg backdrop-blur">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        
+        <!-- Tabs -->
+        <div class="flex flex-wrap items-center gap-2" id="show-tabs">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Rigging & Stats Snapshot -->
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+          <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+            <span class="text-slate-400">Total Acts:</span>
+            <span id="stat-total-acts" class="font-bold text-white text-sm">0</span>
+            <span class="text-slate-500">|</span>
+            <span id="stat-solos" class="text-sky-400 font-semibold">0 Solos</span>
+            <span class="text-slate-500">|</span>
+            <span id="stat-groups" class="text-purple-400 font-semibold">0 Groups</span>
+          </div>
+
+          <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+            <span class="text-slate-400">Rigging Changeovers:</span>
+            <span id="stat-changeovers" class="font-bold text-amber-400 text-sm">0</span>
+            <span id="stat-pole-strikes" class="text-emerald-400 font-medium"></span>
+          </div>
+
+          <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+            <span class="text-slate-400">Conflicts Detected:</span>
+            <span id="stat-conflict-count" class="font-bold text-emerald-400 text-sm">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conflicts Alert Drawer (if any) -->
+      <div id="conflicts-alert-container" class="mt-4 hidden">
+        <div class="bg-rose-950/40 border border-rose-500/40 rounded-lg p-3 text-xs text-rose-200">
+          <div class="font-bold flex items-center gap-2 mb-1 text-rose-300">
+            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <span>Attention Required in this Lineup:</span>
+          </div>
+          <ul id="conflicts-list" class="list-disc list-inside space-y-1"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace: Lineup Column & Side Tools -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: Show Lineup (Drag-and-Drop) -->
+      <div class="lg:col-span-8 space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-2">
+            <h2 id="current-show-title" class="text-lg font-bold text-white">Saturday Early (3:00 PM) Lineup</h2>
+            <span class="text-xs text-slate-400">(Drag acts or use ▲ ▼ buttons)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
+              ⏸️ Toggle / Move Intermission
+            </button>
+            <button onclick="exportLineupMarkdown()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition">
+              📋 Copy Lineup
+            </button>
+          </div>
+        </div>
+
+        <!-- Initial Setup Banner -->
+        <div id="initial-setup-banner" class="bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-300">Initial Setup:</span>
+            <span id="initial-setup-text" class="text-slate-400">Rigging: Front: Aerial/Floor | Mid: Aerial/Floor | Back: Pole</span>
+          </div>
+          <div class="flex items-center gap-1.5" id="initial-setup-badges">
+            <!-- Badges -->
+          </div>
+        </div>
+
+        <!-- Lineup Container -->
+        <div id="lineup-list" class="space-y-2.5 min-h-[400px]">
+          <!-- Acts & Changeovers rendered here by JS -->
+        </div>
+      </div>
+
+      <!-- RIGHT: Bench / Act Pool & Details Sidebar -->
+      <div class="lg:col-span-4 space-y-4">
+
+        <!-- Available Acts Bench -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+            <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+              <span>Acts Available for this Show</span>
+              <span id="bench-count" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs">0</span>
+            </h3>
+            <span class="text-[11px] text-slate-500">Click + to add to lineup</span>
+          </div>
+
+          <div class="mb-3">
+            <input type="text" id="bench-search" oninput="filterBench()" placeholder="Search act, name, or apparatus..." 
+                   class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+          </div>
+
+          <div id="bench-list" class="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+            <!-- Bench cards rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Rigging Rules & Apparatus Legend -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg text-xs space-y-3">
+          <h4 class="font-bold text-slate-200 flex items-center gap-2 border-b border-slate-800 pb-2">
+            <span>Rigging & Production Guidelines</span>
+          </h4>
+          <div class="space-y-2 text-slate-400">
+            <p><strong class="text-slate-300">Binary Rigging Points:</strong> The stage has 3 main rigging lines: <span class="text-indigo-300 font-semibold">Front</span>, <span class="text-indigo-300 font-semibold">Mid</span>, and <span class="text-indigo-300 font-semibold">Back</span>. Each point is either <strong class="text-emerald-400">Aerial/Floor</strong> or <strong class="text-amber-400">Pole</strong>.</p>
+            <p><strong class="text-slate-300">Minimizing Changeovers:</strong> Physical poles require time and labor to put up or strike. Acts requiring poles should be clustered together. Once struck, all points remain Aerial/Floor.</p>
+            <p><strong class="text-slate-300">Cameo & Performer Buffer:</strong> Performers with cameos, human prop roles, or multiple acts require at least a <strong class="text-rose-400">1-act buffer</strong> (e.g., Slot 1 and Slot 3 is OK; Slot 1 and Slot 2 causes a conflict!).</p>
+          </div>
+          
+          <div class="pt-2 border-t border-slate-800">
+            <div class="text-[11px] font-semibold text-slate-400 mb-1.5">Rigging Point Badges:</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded text-[11px] bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">Aerial / Floor</span>
+              <span class="px-2 py-0.5 rounded text-[11px] bg-amber-950/80 text-amber-300 border border-amber-700/50">Pole</span>
+              <span class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">Any (Flexible)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-semibold opacity-0 transition-opacity pointer-events-none duration-300 z-50">
+      Copied!
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. DATA: Master Acts Catalog
+    // ==========================================
+    const ACTS = {
+      1: {
+        id: 1,
+        title: "Angel and (cameo) Brian",
+        type: "Solo",
+        apparatus: "Pole (No Heels), Floor",
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        performers: ["Angel Bonbright"],
+        cameos: ["Brian Forbes"],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Paired with Act 5 (precedes Act 5). Separated from Luna (Act 29)."
+      },
+      2: {
+        id: 2,
+        title: "Lisa Zacarias, Dorothy Thai, Alyx Jeong, Lara Abaya",
+        type: "Group",
+        apparatus: "Straps, Pole (No Heels), Skates",
+        rigging: { front: "Pole", mid: "Pole", back: "Aerial/Floor" },
+        performers: ["Lisa Zacarias", "Dorothy Thai", "Alyx Jeong", "Lara Abaya"],
+        cameos: [],
+        availability: ["sun_early", "sun_late"],
+        notes: "Prefers 2 shows same day (Sunday)."
+      },
+      3: {
+        id: 3,
+        title: "Rissa, Asia",
+        type: "Group",
+        apparatus: "Pole w/ Heels, Silks, Floor",
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        performers: ["Rissa", "Asia"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Available all 4 shows."
+      },
+      4: {
+        id: 4,
+        title: "Elly Zhen",
+        type: "Solo",
+        apparatus: "Silks, Lyra",
+        rigging: { front: "Aerial/Floor", mid: "Any", back: "Aerial/Floor" },
+        performers: ["Elly Zhen"],
+        cameos: ["Angel Bonbright"], // Angel is human prop
+        availability: ["sat_late", "sun_early"],
+        notes: "Prefers separate days. Angel is human prop."
+      },
+      5: {
+        id: 5,
+        title: "Brian Forbes",
+        type: "Solo",
+        apparatus: "Straps",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Brian Forbes"],
+        cameos: ["Angel Bonbright"], // Angel helps
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Paired with Act 1 (after Act 1). Separated from Luna."
+      },
+      6: {
+        id: 6,
+        title: "Christina Wu",
+        type: "Solo",
+        apparatus: "Pole (No Heels)",
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Pole" },
+        performers: ["Christina Wu"],
+        cameos: [],
+        availability: ["sat_early", "sat_late"],
+        notes: "Available Sat only. Prefers 2 shows same day."
+      },
+      7: {
+        id: 7,
+        title: "Jonathan Mao",
+        type: "Solo",
+        apparatus: "Floor, Chair",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Any" },
+        performers: ["Jonathan Mao"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Separates Act 9 and Act 11 with 0 changeovers."
+      },
+      8: {
+        id: 8,
+        title: "Alice Kutsyy",
+        type: "Solo",
+        apparatus: "Pole (No Heels), Floor",
+        rigging: { front: "Pole", mid: "Pole", back: "Any" },
+        performers: ["Alice Kutsyy"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Available all 4 shows."
+      },
+      9: {
+        id: 9,
+        title: "Ashley Chan, Quan Tran",
+        type: "Group",
+        apparatus: "Pole w/ Heels, Lyra",
+        rigging: { front: "Any", mid: "Aerial/Floor", back: "Pole" },
+        performers: ["Ashley Chan", "Quan Tran"],
+        cameos: ["Andy Pham", "Cat Tang", "Anna Lee"],
+        availability: ["sat_late", "sun_late"],
+        notes: "Cameos: Andy Pham & Cat Tang."
+      },
+      10: {
+        id: 10,
+        title: "Ye Wang, Jie Zou",
+        type: "Group",
+        apparatus: "Silks, Lyra",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Ye Wang", "Jie Zou"],
+        cameos: [],
+        availability: ["sun_early", "sun_late"],
+        notes: "Prefers 2 shows same day (Sunday)."
+      },
+      11: {
+        id: 11,
+        title: "Andy Pham, Charlotte C., Cat T., Michelle L., Sandy W. (Sailor Scouts)",
+        type: "Group",
+        apparatus: "Floor, Chair, Heels",
+        rigging: { front: "Any", mid: "Any", back: "Pole" },
+        performers: ["Andy Pham", "Charlotte C", "Cat Tang", "Michelle Leu", "Sandy Wong"],
+        cameos: ["Austin Truong", "Amiel"],
+        availability: ["sat_early", "sat_late", "sun_late"],
+        notes: "Needs Back Pole. Requires 1-act buffer from Act 9 & Act 14."
+      },
+      12: {
+        id: 12,
+        title: "Patricia Hsuan",
+        type: "Solo",
+        apparatus: "Pole w/ Heels",
+        rigging: { front: "Pole", mid: "Pole", back: "Pole" },
+        performers: ["Patricia Hsuan"],
+        cameos: [],
+        availability: ["sat_early", "sat_late"],
+        notes: "1 show only."
+      },
+      13: {
+        id: 13,
+        title: "Paige Leeds",
+        type: "Solo",
+        apparatus: "Lyra, Floor",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Paige Leeds"],
+        cameos: ["Jenn Lee Tanaka"],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Cameo by Jenn Lee Tanaka (buffer with Act 20)."
+      },
+      14: {
+        id: 14,
+        title: "Austin Truong, Andy Pham, Cat Tang",
+        type: "Group",
+        apparatus: "Silks, Straps",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Austin Truong", "Andy Pham", "Cat Tang"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Andy & Cat perform here. Buffer with Act 9 & Act 11."
+      },
+      16: {
+        id: 16,
+        title: "Kim Ngo, Jen Jaing",
+        type: "Group",
+        apparatus: "Lyra, Straps, Fly Pole",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Kim Ngo", "Jen Jaing"],
+        cameos: [],
+        availability: ["sat_early", "sat_late"],
+        notes: "1 show only."
+      },
+      18: {
+        id: 18,
+        title: "Karen Sanders",
+        type: "Solo",
+        apparatus: "Lyra",
+        rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
+        performers: ["Karen Sanders"],
+        cameos: [],
+        availability: ["sat_early", "sat_late"],
+        notes: "Prefers 2 shows same day (Saturday)."
+      },
+      20: {
+        id: 20,
+        title: "Jenn Lee Tanaka, Celeste",
+        type: "Solo",
+        apparatus: "Sphere",
+        rigging: { front: "Any", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Jenn Lee Tanaka", "Celeste"],
+        cameos: ["3 extras"],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Needs buffer with Act 13 (Jenn Lee Tanaka cameo in Act 13)."
+      },
+      23: {
+        id: 23,
+        title: "Christine Sun",
+        type: "Solo",
+        apparatus: "Lyra",
+        rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
+        performers: ["Christine Sun"],
+        cameos: [],
+        availability: ["sat_late", "sun_late"],
+        notes: "1 show only."
+      },
+      25: {
+        id: 25,
+        title: "Medusa & Her Snakes (Kitty, Derika, Heartley, Emma, Chloe, Anna Lee, Anne, Mackenzie)",
+        type: "Group",
+        apparatus: "Chair, Sensual Heels",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Kitty", "Derika", "Heartley", "Emma", "Chloe", "Anna Lee", "Anne", "Mackenzie"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Floor only. Zero rigging changeover."
+      },
+      26: {
+        id: 26,
+        title: "Kristine Gonzaga, Scott Suh",
+        type: "Group",
+        apparatus: "Pole w/ Heels, Chair, Sensual Heels",
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Any" },
+        performers: ["Kristine Gonzaga", "Scott Suh"],
+        cameos: ["Cat Tang"],
+        availability: ["sat_early", "sat_late", "sun_late"],
+        notes: "Cameo: Cat Tang. Buffer with Acts 9, 11, 14."
+      },
+      28: {
+        id: 28,
+        title: "Masa",
+        type: "Solo",
+        apparatus: "Straps",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Masa"],
+        cameos: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        notes: "Grand Finale closer."
+      },
+      29: {
+        id: 29,
+        title: "Luna",
+        type: "Solo",
+        apparatus: "Hammock",
+        rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
+        performers: ["Luna"],
+        cameos: [],
+        availability: ["sat_late"],
+        notes: "1 show only (Sat Late). Must be separated from Brian."
+      }
+    };
+
+    // ==========================================
+    // 2. CONFIG PRESETS (From target conversation)
+    // ==========================================
+    const PRESETS = {
+      config1: {
+        name: "Config 1 (Sat E, Sat L, Sun L)",
+        shows: {
+          sat_early: [11, 7, 8, 12, 6, 1, 18, "INTERMISSION", 25, 13, 14, 20, 5],
+          sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 13, 16, 23, 20, 28],
+          sun_early: [],
+          sun_late:  [9, 7, 11, 8, 2, 3, 1, 26, "INTERMISSION", 25, 10, 14, 5, 28]
+        }
+      },
+      config2: {
+        name: "Config 2 (Sat L, Sun E, Sun L)",
+        shows: {
+          sat_early: [],
+          sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 14, 28],
+          sun_early: [8, 2, 3, 1, "INTERMISSION", 25, 13, 10, 4, 14, 20, 5],
+          sun_late:  [9, 7, 11, 2, 3, 1, 26, "INTERMISSION", 25, 13, 5, 10, 20, 23, 28]
+        }
+      },
+      config3: {
+        name: "Config 3 (All 4 Shows)",
+        shows: {
+          sat_early: [11, 8, 12, 6, 1, 18, "INTERMISSION", 25, 14, 5],
+          sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 16, 20, 28],
+          sun_early: [7, 8, 2, 1, "INTERMISSION", 25, 13, 10, 4, 20, 5],
+          sun_late:  [9, 7, 11, 2, 3, 26, 23, "INTERMISSION", 13, 10, 14, 28]
+        }
+      }
+    };
+
+    const SHOW_INFO = {
+      sat_early: { title: "Saturday Early (3:00 PM)", short: "Sat Early (3PM)" },
+      sat_late:  { title: "Saturday Late (7:00 PM)",  short: "Sat Late (7PM)" },
+      sun_early: { title: "Sunday Early (3:00 PM)",   short: "Sun Early (3PM)" },
+      sun_late:  { title: "Sunday Late (7:00 PM)",    short: "Sun Late (7PM)" }
+    };
+
+    // State
+    let currentShowKey = "sat_early";
+    let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
+    let draggedIndex = null;
+
+    // ==========================================
+    // 3. RIGGING ENGINE & CONFLICT DETECTION
+    // ==========================================
+
+    // Resolves stage rigging state for an act given the prior state
+    function resolveStagePoint(actPoint, prevPoint, defaultPoint) {
+      if (actPoint === "Pole") return "Pole";
+      if (actPoint === "Aerial/Floor") return "Aerial/Floor";
+      // If "Any"
+      if (prevPoint && prevPoint !== "Any") return prevPoint;
+      return defaultPoint || "Aerial/Floor";
+    }
+
+    function calculateShowRiggingAndConflicts(lineup, showKey) {
+      let resolvedActs = [];
+      let changeovers = 0;
+      let conflicts = [];
+
+      // Map performers to act positions in this show for buffer checks
+      let performerAppearances = {}; // person -> array of { actId, slot, role }
+
+      // Initial show rigging default
+      // If first act has Back Pole, initial setup has Back Pole
+      let firstActId = lineup.find(item => typeof item === "number");
+      let initialStage = { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Pole" };
+      if (firstActId && ACTS[firstActId]) {
+        let firstR = ACTS[firstActId].rigging;
+        if (firstR.front === "Pole") initialStage.front = "Pole";
+        if (firstR.mid === "Pole") initialStage.mid = "Pole";
+        if (firstR.back === "Aerial/Floor") initialStage.back = "Aerial/Floor";
+      }
+
+      let currentStage = { ...initialStage };
+      let actSlotCounter = 1;
+
+      for (let i = 0; i < lineup.length; i++) {
+        let item = lineup[i];
+
+        if (item === "INTERMISSION") {
+          resolvedActs.push({
+            type: "intermission",
+            index: i
+          });
+          continue;
+        }
+
+        let act = ACTS[item];
+        if (!act) continue;
+
+        let slot = actSlotCounter++;
+
+        // Track performer appearances (performers + cameos + props)
+        let allPeople = [];
+        (act.performers || []).forEach(p => allPeople.push({ name: p, role: "Performer" }));
+        (act.cameos || []).forEach(c => allPeople.push({ name: c, role: "Cameo/Prop" }));
+
+        allPeople.forEach(person => {
+          let cleanName = person.name.trim();
+          if (!performerAppearances[cleanName]) performerAppearances[cleanName] = [];
+          performerAppearances[cleanName].push({
+            actId: act.id,
+            actTitle: act.title,
+            slot: slot,
+            role: person.role
+          });
+        });
+
+        // Availability check
+        if (!act.availability.includes(showKey)) {
+          conflicts.push({
+            type: "availability",
+            actId: act.id,
+            slot: slot,
+            message: `Act ${act.id} (${act.title.split('—')[0]}): Not marked available for ${SHOW_INFO[showKey].short}!`
+          });
+        }
+
+        // Resolve rigging points
+        let nextStage = {
+          front: resolveStagePoint(act.rigging.front, currentStage.front, "Aerial/Floor"),
+          mid: resolveStagePoint(act.rigging.mid, currentStage.mid, "Aerial/Floor"),
+          back: resolveStagePoint(act.rigging.back, currentStage.back, "Pole")
+        };
+
+        // Determine if changeover happened
+        let changes = [];
+        if (nextStage.front !== currentStage.front) {
+          changes.push(`Front: ${currentStage.front} → ${nextStage.front}`);
+        }
+        if (nextStage.mid !== currentStage.mid) {
+          changes.push(`Mid: ${currentStage.mid} → ${nextStage.mid}`);
+        }
+        if (nextStage.back !== currentStage.back) {
+          changes.push(`Back: ${currentStage.back} → ${nextStage.back}`);
+        }
+
+        let hasChangeover = changes.length > 0;
+        if (hasChangeover) {
+          changeovers++;
+        }
+
+        resolvedActs.push({
+          type: "act",
+          act: act,
+          slot: slot,
+          index: i,
+          stageRigging: { ...nextStage },
+          hasChangeover: hasChangeover,
+          changeoverDetails: changes
+        });
+
+        currentStage = { ...nextStage };
+      }
+
+      // Check Performer buffer conflicts (at least 1 act buffer: |slot1 - slot2| >= 2)
+      for (const [name, apps] of Object.entries(performerAppearances)) {
+        if (apps.length > 1) {
+          for (let a = 0; a < apps.length - 1; a++) {
+            let app1 = apps[a];
+            let app2 = apps[a + 1];
+            let diff = Math.abs(app1.slot - app2.slot);
+            if (diff < 2) {
+              conflicts.push({
+                type: "buffer",
+                performer: name,
+                act1: app1.actId,
+                act2: app2.actId,
+                slot1: app1.slot,
+                slot2: app2.slot,
+                message: `Performer Buffer Conflict: "${name}" performs in Act ${app1.actId} (Slot #${app1.slot}) and Act ${app2.actId} (Slot #${app2.slot}) with 0 buffer acts!`
+              });
+            }
+          }
+        }
+      }
+
+      return {
+        resolvedActs,
+        initialStage,
+        changeovers,
+        conflicts,
+        totalActs: actSlotCounter - 1
+      };
+    }
+
+    // ==========================================
+    // 4. UI RENDERING
+    // ==========================================
+
+    function renderTabs() {
+      const container = document.getElementById("show-tabs");
+      container.innerHTML = "";
+
+      for (const [key, info] of Object.entries(SHOW_INFO)) {
+        const count = (showLineups[key] || []).filter(x => typeof x === "number").length;
+        const isActive = key === currentShowKey;
+
+        const btn = document.createElement("button");
+        btn.onclick = () => selectShow(key);
+        btn.className = `px-3.5 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition ${
+          isActive 
+            ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
+            : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+        }`;
+
+        btn.innerHTML = `
+          <span>${info.short}</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? "bg-indigo-800 text-indigo-100" : "bg-slate-900 text-slate-400"}">${count}</span>
+        `;
+        container.appendChild(btn);
+      }
+    }
+
+    function renderLineup() {
+      const lineup = showLineups[currentShowKey] || [];
+      const analysis = calculateShowRiggingAndConflicts(lineup, currentShowKey);
+
+      document.getElementById("current-show-title").textContent = `${SHOW_INFO[currentShowKey].title} Lineup`;
+      
+      // Update Top Stats
+      document.getElementById("stat-total-acts").textContent = analysis.totalActs;
+      
+      let solos = 0, groups = 0;
+      lineup.forEach(id => {
+        if (ACTS[id]) {
+          if (ACTS[id].type === "Solo") solos++;
+          else groups++;
+        }
+      });
+      document.getElementById("stat-solos").textContent = `${solos} Solo${solos === 1 ? '' : 's'}`;
+      document.getElementById("stat-groups").textContent = `${groups} Group${groups === 1 ? '' : 's'}`;
+      document.getElementById("stat-changeovers").textContent = analysis.changeovers;
+
+      // Update conflicts banner
+      const conflictsContainer = document.getElementById("conflicts-alert-container");
+      const conflictsList = document.getElementById("conflicts-list");
+      const conflictStat = document.getElementById("stat-conflict-count");
+
+      if (analysis.conflicts.length > 0) {
+        conflictsContainer.classList.remove("hidden");
+        conflictsList.innerHTML = analysis.conflicts.map(c => `<li>${c.message}</li>`).join("");
+        conflictStat.textContent = `${analysis.conflicts.length} Alert${analysis.conflicts.length === 1 ? '' : 's'}`;
+        conflictStat.className = "font-bold text-rose-400 text-sm";
+      } else {
+        conflictsContainer.classList.add("hidden");
+        conflictStat.textContent = "0 (All Clear)";
+        conflictStat.className = "font-bold text-emerald-400 text-sm";
+      }
+
+      // Initial Setup Banner
+      const initText = `Rigging: Front: ${analysis.initialStage.front} | Mid: ${analysis.initialStage.mid} | Back: ${analysis.initialStage.back}`;
+      document.getElementById("initial-setup-text").textContent = initText;
+      document.getElementById("initial-setup-badges").innerHTML = `
+        ${renderRiggingBadge('Front', analysis.initialStage.front)}
+        ${renderRiggingBadge('Mid', analysis.initialStage.mid)}
+        ${renderRiggingBadge('Back', analysis.initialStage.back)}
+      `;
+
+      // Render Lineup Items
+      const listContainer = document.getElementById("lineup-list");
+      listContainer.innerHTML = "";
+
+      if (lineup.length === 0) {
+        listContainer.innerHTML = `
+          <div class="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center text-slate-500">
+            <p class="font-medium text-sm">No acts scheduled for this show yet.</p>
+            <p class="text-xs mt-1">Select a preset above or add acts from the bench on the right.</p>
+          </div>
+        `;
+        return;
+      }
+
+      analysis.resolvedActs.forEach((item, rIdx) => {
+        // Changeover Alert Banner (if preceding act required a rigging shift)
+        if (item.type === "act" && item.hasChangeover && rIdx > 0) {
+          const changeEl = document.createElement("div");
+          changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between";
+          changeEl.innerHTML = `
+            <div class="flex items-center gap-2 text-amber-300 font-semibold">
+              <span class="text-sm">⚠️</span>
+              <span>Rigging Changeover:</span>
+              <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
+          `;
+          listContainer.appendChild(changeEl);
+        }
+
+        if (item.type === "intermission") {
+          const interEl = document.createElement("div");
+          interEl.className = "bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-indigo-400";
+          interEl.draggable = true;
+          interEl.dataset.index = item.index;
+          interEl.ondragstart = handleDragStart;
+          interEl.ondragover = handleDragOver;
+          interEl.ondragleave = handleDragLeave;
+          interEl.ondrop = handleDrop;
+          interEl.ondragend = handleDragEnd;
+
+          interEl.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-base">⏸️</span>
+                <span class="font-bold text-indigo-300 text-xs tracking-wider uppercase">Intermission</span>
+                <span class="text-[11px] text-slate-400">(Major changeovers & pole strikes occur here)</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
+                <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
+                <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
+              </div>
+            </div>
+          `;
+          listContainer.appendChild(interEl);
+          return;
+        }
+
+        // Normal Act Card
+        const act = item.act;
+        const actCard = document.createElement("div");
+        
+        // Check if this specific act has an alert
+        const actConflicts = analysis.conflicts.filter(c => c.actId === act.id || c.act1 === act.id || c.act2 === act.id);
+        const hasConflict = actConflicts.length > 0;
+
+        actCard.className = `group bg-slate-900 border ${
+          hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
+        } rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
+        actCard.draggable = true;
+        actCard.dataset.index = item.index;
+        actCard.ondragstart = handleDragStart;
+        actCard.ondragover = handleDragOver;
+        actCard.ondragleave = handleDragLeave;
+        actCard.ondrop = handleDrop;
+        actCard.ondragend = handleDragEnd;
+
+        actCard.innerHTML = `
+          <!-- Left: Order & Act Info -->
+          <div class="flex items-start gap-3">
+            <div class="flex flex-col items-center justify-center bg-slate-800/80 border border-slate-700/60 rounded-lg w-9 h-9 shrink-0">
+              <span class="text-xs text-slate-400 font-medium">#</span>
+              <span class="text-sm font-extrabold text-white leading-none">${item.slot}</span>
+            </div>
+
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-sm text-white">Act ${act.id}: ${act.title}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
+                  act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                }">${act.type}</span>
+              </div>
+              <div class="text-xs text-slate-400 mt-0.5">
+                <span class="text-slate-300 font-medium">${act.apparatus}</span>
+                ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameos/Props: ${act.cameos.join(", ")}</span>` : ""}
+              </div>
+              ${hasConflict ? `
+                <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  <span>${actConflicts[0].message}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Right: Rigging Point Badges & Controls -->
+          <div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
+            <!-- Stage Points for this Act -->
+            <div class="flex items-center gap-1.5">
+              ${renderRiggingBadge('Front', item.stageRigging.front, act.rigging.front === 'Any')}
+              ${renderRiggingBadge('Mid', item.stageRigging.mid, act.rigging.mid === 'Any')}
+              ${renderRiggingBadge('Back', item.stageRigging.back, act.rigging.back === 'Any')}
+            </div>
+
+            <!-- Up / Down / Remove buttons -->
+            <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+              <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
+              <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
+              <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
+            </div>
+          </div>
+        `;
+
+        listContainer.appendChild(actCard);
+      });
+    }
+
+    function renderRiggingBadge(pointName, state, isFlexible = false) {
+      const isPole = state === "Pole";
+      return `
+        <span class="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 ${
+          isPole 
+            ? 'bg-amber-950/80 text-amber-300 border border-amber-700/60' 
+            : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
+        }" title="${pointName}: ${state}${isFlexible ? ' (Flexible Any)' : ''}">
+          <span class="text-[10px] text-slate-400">${pointName}:</span>
+          <span>${isPole ? 'Pole' : 'Aerial'}</span>
+          ${isFlexible ? '<span class="text-[9px] opacity-70">✦</span>' : ''}
+        </span>
+      `;
+    }
+
+    function renderBench() {
+      const benchContainer = document.getElementById("bench-list");
+      const currentLineup = showLineups[currentShowKey] || [];
+      const scheduledIds = new Set(currentLineup.filter(x => typeof x === "number"));
+      const query = (document.getElementById("bench-search").value || "").toLowerCase();
+
+      benchContainer.innerHTML = "";
+      let availableCount = 0;
+
+      for (const [idStr, act] of Object.entries(ACTS)) {
+        const id = parseInt(idStr);
+        if (scheduledIds.has(id)) continue;
+
+        // Search filter
+        const matchQuery = !query || 
+          act.title.toLowerCase().includes(query) || 
+          act.apparatus.toLowerCase().includes(query) ||
+          act.id.toString() === query;
+
+        if (!matchQuery) continue;
+
+        availableCount++;
+
+        const isMarkedAvail = act.availability.includes(currentShowKey);
+
+        const card = document.createElement("div");
+        card.className = "bg-slate-950 border border-slate-800/80 hover:border-slate-700 rounded-lg p-2.5 flex items-center justify-between gap-2 transition";
+        card.innerHTML = `
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-xs text-white">Act ${act.id}: ${act.title.split('—')[0]}</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded ${
+                isMarkedAvail ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/40' : 'bg-rose-950 text-rose-300 border border-rose-800/40'
+              }">${isMarkedAvail ? 'Avail' : 'Unavail'}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 truncate mt-0.5">
+              ${act.apparatus}
+            </div>
+          </div>
+          <button onclick="addActToLineup(${act.id})" class="shrink-0 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold transition" title="Add to Lineup">
+            + Add
+          </button>
+        `;
+        benchContainer.appendChild(card);
+      }
+
+      document.getElementById("bench-count").textContent = availableCount;
+
+      if (availableCount === 0) {
+        benchContainer.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs">
+            All acts are either in this lineup or do not match search.
+          </div>
+        `;
+      }
+    }
+
+    // ==========================================
+    // 5. DRAG AND DROP HANDLERS
+    // ==========================================
+
+    function handleDragStart(e) {
+      draggedIndex = parseInt(this.dataset.index);
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", draggedIndex);
+      this.classList.add("dragging");
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      this.classList.add("drag-over");
+    }
+
+    function handleDragLeave() {
+      this.classList.remove("drag-over");
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove("drag-over");
+      const targetIndex = parseInt(this.dataset.index);
+
+      if (draggedIndex !== null && draggedIndex !== targetIndex) {
+        const lineup = showLineups[currentShowKey];
+        const movedItem = lineup.splice(draggedIndex, 1)[0];
+        lineup.splice(targetIndex, 0, movedItem);
+
+        renderLineup();
+        renderTabs();
+        showToast("Lineup reordered & rigging updated!");
+      }
+    }
+
+    function handleDragEnd() {
+      this.classList.remove("dragging");
+      document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+      draggedIndex = null;
+    }
+
+    // ==========================================
+    // 6. ACTIONS & CONTROLS
+    // ==========================================
+
+    function selectShow(key) {
+      currentShowKey = key;
+      renderTabs();
+      renderLineup();
+      renderBench();
+    }
+
+    function moveItem(index, direction) {
+      const lineup = showLineups[currentShowKey];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= lineup.length) return;
+
+      const item = lineup.splice(index, 1)[0];
+      lineup.splice(targetIndex, 0, item);
+
+      renderLineup();
+      renderTabs();
+    }
+
+    function removeLineupItem(index) {
+      const lineup = showLineups[currentShowKey];
+      lineup.splice(index, 1);
+      renderLineup();
+      renderTabs();
+      renderBench();
+    }
+
+    function addActToLineup(actId) {
+      const lineup = showLineups[currentShowKey];
+      lineup.push(actId);
+      renderLineup();
+      renderTabs();
+      renderBench();
+      showToast(`Act ${actId} added to ${SHOW_INFO[currentShowKey].short}`);
+    }
+
+    function toggleIntermission() {
+      const lineup = showLineups[currentShowKey];
+      const existingIdx = lineup.indexOf("INTERMISSION");
+
+      if (existingIdx > -1) {
+        // Already exists, ask or toggle to middle
+        lineup.splice(existingIdx, 1);
+        showToast("Intermission removed");
+      } else {
+        // Place around halfway
+        const mid = Math.floor(lineup.length / 2);
+        lineup.splice(mid, 0, "INTERMISSION");
+        showToast("Intermission inserted at halfway point");
+      }
+
+      renderLineup();
+    }
+
+    function loadPreset(presetKey) {
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+
+      showLineups = JSON.parse(JSON.stringify(preset.shows));
+      
+      // Auto-select first non-empty show in preset
+      for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
+        if (showLineups[key] && showLineups[key].length > 0) {
+          currentShowKey = key;
+          break;
+        }
+      }
+
+      renderTabs();
+      renderLineup();
+      renderBench();
+      showToast(`Loaded ${preset.name}`);
+    }
+
+    function resetCurrentShow() {
+      showLineups[currentShowKey] = [];
+      renderTabs();
+      renderLineup();
+      renderBench();
+      showToast(`Reset ${SHOW_INFO[currentShowKey].short}`);
+    }
+
+    function filterBench() {
+      renderBench();
+    }
+
+    function exportLineupMarkdown() {
+      const lineup = showLineups[currentShowKey];
+      const analysis = calculateShowRiggingAndConflicts(lineup, currentShowKey);
+
+      let text = `### ${SHOW_INFO[currentShowKey].title} Lineup\n`;
+      text += `Initial Setup: Rigging: Front: ${analysis.initialStage.front} | Mid: ${analysis.initialStage.mid} | Back: ${analysis.initialStage.back}\n\n`;
+
+      analysis.resolvedActs.forEach(item => {
+        if (item.type === "intermission") {
+          text += `⏸️ INTERMISSION\n`;
+        } else {
+          if (item.hasChangeover) {
+            text += `⚠️ Change: Rigging: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;
+          }
+          text += `${item.slot}. Act ${item.act.id}: ${item.act.title} — ${item.act.apparatus}\n`;
+        }
+      });
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Lineup Markdown copied to clipboard!");
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+      }, 2500);
+    }
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      renderTabs();
+      renderLineup();
+      renderBench();
+    });
+  </script>
+</body>
+</html>

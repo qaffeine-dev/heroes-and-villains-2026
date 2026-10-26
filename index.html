@@ -380,11 +380,11 @@
         apparatus: "Chair, Heels",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Pole" },
         performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"],
-        cameos: ["Amiel", "Austin T"],
+        cameos: ["Amiel R", "Austin T"],
         availability: ["sat_early", "sat_late", "sun_late"],
         maxShows: 2,
         dayPref: "separate_days",
-        notes: "Prefers 1 show per day (separate days). Requires 1-act buffer from Act 9 & Act 14."
+        notes: "Prefers 1 show per day (separate days). Requires 1-act buffer from Act 9, Act 14 & Act 17."
       },
       12: {
         id: 12,
@@ -437,11 +437,11 @@
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
         performers: ["Emily C", "Erica C", "Zoe", "Kim G"],
         cameos: ["Selina"],
-        availability: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Continuation act immediately after Act 21 (Mama Morton)."
+        dayPref: "same_day",
+        pending: false,
+        notes: "Available all 4 shows; prefers 2 shows same day. Continuation act immediately after Act 21 (Mama Morton)."
       },
       16: {
         id: 16,
@@ -459,18 +459,18 @@
       },
       17: {
         id: 17,
-        title: "PowerPuff Girls (Louise, Amiel, Claudelle)",
+        title: "PowerPuff Girls (Louise R, Amiel R, Claudelle V, Joyi L)",
         concept: "PowerPuff Girls",
         type: "Group",
         apparatus: "Pole (No Heels), Pole w/ Heels",
         rigging: { front: "Pole", mid: "Pole", back: "Pole" },
-        performers: ["Louise", "Amiel", "Claudelle"],
-        cameos: ["Bobbie"],
-        availability: [],
+        performers: ["Louise R", "Amiel R", "Claudelle V", "Joyi L"],
+        cameos: ["Bobbi U"],
+        availability: ["sat_early", "sat_late", "sun_early"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Amiel is a prop in Act 11 (requires 1-act buffer)."
+        dayPref: "no_pref",
+        pending: false,
+        notes: "Available Sat Early, Sat Late & Sun Early; requested 2 shows (no pref). Amiel R is a prop in Act 11 (requires 1-act buffer)."
       },
       18: {
         id: 18,
@@ -492,14 +492,14 @@
         concept: "Lois & Clark",
         type: "Group",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Pole", mid: "Pole", back: "Pole" },
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
         performers: ["Cece", "Josh J"],
         cameos: [],
-        availability: [],
-        maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Josh J is distinct from Josh P (Act 22)."
+        availability: ["sat_early", "sat_late", "sun_early"],
+        maxShows: 1,
+        dayPref: "1_show",
+        pending: false,
+        notes: "Available Sat Early, Sat Late & Sun Early; requested 1 show only. Josh J is distinct from Josh P (Act 22)."
       },
       20: {
         id: 20,
@@ -524,11 +524,11 @@
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
         performers: ["Selina"],
         cameos: ["Emily C", "Zoe"],
-        availability: [],
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Immediately precedes Act 15 (Prison Break)."
+        dayPref: "same_day",
+        pending: false,
+        notes: "Available all 4 shows; prefers 2 shows same day. Immediately precedes Act 15 (Prison Break)."
       },
       22: {
         id: 22,
@@ -536,7 +536,7 @@
         concept: "Ratatouille",
         type: "Solo",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Any", mid: "Pole", back: "Pole" },
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
         performers: ["Josh P"],
         cameos: ["Cheng J"],
         availability: [],
@@ -565,7 +565,7 @@
         concept: "Masked Assassin",
         type: "Solo",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Pole", mid: "Any", back: "Pole" },
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
         performers: ["Cheng J"],
         cameos: ["Elly Z"],
         availability: [],
@@ -612,10 +612,10 @@
         performers: ["Sal"],
         cameos: ["Britt C", "Lauren G", "Seema", "Jon", "Rissa"],
         availability: ["sat_late", "sun_early", "sun_late"],
-        maxShows: 2,
-        dayPref: "no_pref",
+        maxShows: 1,
+        dayPref: "1_show",
         pending: false,
-        notes: "Available Sat Late, Sun Early & Sun Late. Shares Rissa with Act 3 (needs 1-act buffer)."
+        notes: "Available Sat Late, Sun Early & Sun Late; requested 1 show only. Shares Rissa with Act 3 (needs 1-act buffer)."
       },
       28: {
         id: 28,
@@ -663,10 +663,10 @@
         name: "Config 1 (Sat E, Sat L, Sun L)",
         builtIn: true,
         shows: {
-          sat_early: [11, 7, 8, 12, 6, 3, 1, "INTERMISSION", 18, 25, 13, 14, 20, 5],
-          sat_late:  [9, 6, 3, 26, 18, 27, "INTERMISSION", 4, 29, 13, 16, 23, 20, 28],
+          sat_early: [11, 8, 12, 17, 6, 18, 19, 1, "INTERMISSION", 21, 15, 13, 7, 14, 20, 5],
+          sat_late:  [9, 17, 6, 3, 18, 4, 29, 26, "INTERMISSION", 16, 21, 15, 25, 13, 28, 20],
           sun_early: [],
-          sun_late:  [9, 7, 11, 1, 26, 27, "INTERMISSION", 8, 2, 25, 10, 14, 5, 28]
+          sun_late:  [9, 7, 11, 3, 1, 23, 26, 27, "INTERMISSION", 8, 2, 25, 10, 14, 5, 28]
         }
       },
       config2: {
@@ -674,19 +674,19 @@
         builtIn: true,
         shows: {
           sat_early: [],
-          sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 23, 14, 28],
-          sun_early: [8, 2, 3, 1, 27, 4, "INTERMISSION", 25, 13, 10, 14, 20, 5],
-          sun_late:  [9, 7, 11, 3, 1, 26, 27, "INTERMISSION", 2, 25, 13, 5, 10, 20, 28]
+          sat_late:  [9, 7, 11, 12, 8, 17, 6, "INTERMISSION", 18, 4, 23, 26, 16, 29, 14, 28],
+          sun_early: [17, 8, 2, 19, 1, 3, 4, 27, "INTERMISSION", 13, 10, 20, 25, 21, 15, 14, 5],
+          sun_late:  [9, 7, 11, 3, 1, 26, 2, "INTERMISSION", 13, 21, 15, 25, 5, 10, 20, 28]
         }
       },
       config3: {
         name: "Config 3 (All 4 Shows)",
         builtIn: true,
         shows: {
-          sat_early: [11, 8, 12, 6, 1, "INTERMISSION", 18, 25, 14, 20, 5],
-          sat_late:  [9, 6, 3, 26, 27, "INTERMISSION", 18, 4, 29, 16, 28],
-          sun_early: [7, 8, 2, 1, 27, "INTERMISSION", 25, 13, 10, 4, 20, 5],
-          sun_late:  [9, 7, 11, 2, 3, 26, "INTERMISSION", 23, 13, 10, 14, 28]
+          sat_early: [11, 8, 12, 6, 18, 1, "INTERMISSION", 21, 15, 25, 14, 20, 5],
+          sat_late:  [9, 17, 6, 3, 18, 4, "INTERMISSION", 29, 26, 16, 21, 15, 28],
+          sun_early: [17, 8, 2, 19, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
+          sun_late:  [9, 7, 11, 2, 23, 3, "INTERMISSION", 26, 25, 13, 10, 14, 28]
         }
       }
     };
@@ -772,11 +772,10 @@
       let performerAppearances = {}; // person -> array of { actId, slot, role }
 
       // Initial show rigging default
-      // If first act has Back Pole, initial setup has Back Pole
       let firstActId = lineup.find(item => typeof item === "number");
       let initialStage = {
-        front: getNextExplicitPoint(lineup, 0, "front") === "Pole" && ACTS[firstActId]?.rigging.front !== "Aerial/Floor" ? "Pole" : "Aerial/Floor",
-        mid: getNextExplicitPoint(lineup, 0, "mid") === "Pole" && ACTS[firstActId]?.rigging.mid !== "Aerial/Floor" ? "Pole" : "Aerial/Floor",
+        front: "Aerial/Floor",
+        mid: "Aerial/Floor",
         back: "Pole"
       };
       if (firstActId && ACTS[firstActId]) {
@@ -784,6 +783,7 @@
         if (firstR.front === "Pole") initialStage.front = "Pole";
         if (firstR.mid === "Pole") initialStage.mid = "Pole";
         if (firstR.back === "Aerial/Floor") initialStage.back = "Aerial/Floor";
+        else if (firstR.back === "Any") initialStage.back = getNextExplicitPoint(lineup, 0, "back");
       }
 
       let currentStage = { ...initialStage };

@@ -118,8 +118,12 @@
             <span class="text-xs text-slate-400">(Drag acts or use ▲ ▼ buttons)</span>
           </div>
           <div class="flex items-center gap-2">
+            <button onclick="toggleCompactView()" id="compact-toggle-btn" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition flex items-center gap-1.5" title="Toggle dense compact view to see all acts without scrolling">
+              <span id="compact-btn-icon">🗜️</span>
+              <span id="compact-btn-text">Compact View</span>
+            </button>
             <button onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
-              ⏸️ Toggle / Move Intermission
+              ⏸️ Toggle Intermission
             </button>
             <button onclick="exportLineupMarkdown()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition">
               📋 Copy Lineup
@@ -492,6 +496,7 @@
     let currentShowKey = "sat_early";
     let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
     let draggedIndex = null;
+    let isCompactView = false;
 
     // ==========================================
     // 3. RIGGING ENGINE & CONFLICT DETECTION
@@ -713,6 +718,7 @@
 
       // Render Lineup Items
       const listContainer = document.getElementById("lineup-list");
+      listContainer.className = isCompactView ? "space-y-1.5 min-h-[400px]" : "space-y-2.5 min-h-[400px]";
       listContainer.innerHTML = "";
 
       if (lineup.length === 0) {
@@ -729,21 +735,32 @@
         // Changeover Alert Banner (if preceding act required a rigging shift)
         if (item.type === "act" && item.hasChangeover && rIdx > 0) {
           const changeEl = document.createElement("div");
-          changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between";
-          changeEl.innerHTML = `
-            <div class="flex items-center gap-2 text-amber-300 font-semibold">
-              <span class="text-sm">⚠️</span>
-              <span>Rigging Changeover:</span>
-              <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
-            </div>
-            <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
-          `;
+          if (isCompactView) {
+            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between";
+            changeEl.innerHTML = `
+              <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
+                <span>⚠️</span>
+                <span>Changeover:</span>
+                <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
+              </div>
+              <span class="text-[9px] uppercase font-bold text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded border border-amber-700/40 shrink-0">Stage Shift</span>
+            `;
+          } else {
+            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between";
+            changeEl.innerHTML = `
+              <div class="flex items-center gap-2 text-amber-300 font-semibold">
+                <span class="text-sm">⚠️</span>
+                <span>Rigging Changeover:</span>
+                <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
+              </div>
+              <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
+            `;
+          }
           listContainer.appendChild(changeEl);
         }
 
         if (item.type === "intermission") {
           const interEl = document.createElement("div");
-          interEl.className = "bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-indigo-400";
           interEl.draggable = true;
           interEl.dataset.index = item.index;
           interEl.ondragstart = handleDragStart;
@@ -752,20 +769,39 @@
           interEl.ondrop = handleDrop;
           interEl.ondragend = handleDragEnd;
 
-          interEl.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-base">⏸️</span>
-                <span class="font-bold text-indigo-300 text-xs tracking-wider uppercase">Intermission</span>
-                <span class="text-[11px] text-slate-400">(Major changeovers & pole strikes occur here)</span>
+          if (isCompactView) {
+            interEl.className = "bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-3 text-center cursor-move transition hover:border-indigo-400";
+            interEl.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span>⏸️</span>
+                  <span class="font-bold text-indigo-300 tracking-wider uppercase text-[11px]">Intermission</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:inline">(Major changeovers & pole strikes occur here)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
+                  <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
+                </div>
               </div>
-              <div class="flex items-center gap-1">
-                <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
-                <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
-                <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
+            `;
+          } else {
+            interEl.className = "bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-indigo-400";
+            interEl.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-base">⏸️</span>
+                  <span class="font-bold text-indigo-300 text-xs tracking-wider uppercase">Intermission</span>
+                  <span class="text-[11px] text-slate-400">(Major changeovers & pole strikes occur here)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
+                  <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          }
           listContainer.appendChild(interEl);
           return;
         }
@@ -778,9 +814,6 @@
         const actConflicts = analysis.conflicts.filter(c => c.actId === act.id || c.act1 === act.id || c.act2 === act.id);
         const hasConflict = actConflicts.length > 0;
 
-        actCard.className = `group bg-slate-900 border ${
-          hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
-        } rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
         actCard.draggable = true;
         actCard.dataset.index = item.index;
         actCard.ondragstart = handleDragStart;
@@ -789,79 +822,129 @@
         actCard.ondrop = handleDrop;
         actCard.ondragend = handleDragEnd;
 
-        actCard.innerHTML = `
-          <!-- Left: Order & Act Info -->
-          <div class="flex items-start gap-3">
-            <div class="flex flex-col items-center justify-center bg-slate-800/80 border border-slate-700/60 rounded-lg w-9 h-9 shrink-0">
-              <span class="text-xs text-slate-400 font-medium">#</span>
-              <span class="text-sm font-extrabold text-white leading-none">${item.slot}</span>
-            </div>
+        if (isCompactView) {
+          actCard.className = `group bg-slate-900 border ${
+            hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
+          } rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition cursor-grab active:cursor-grabbing`;
 
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="font-bold text-sm text-white">Act ${act.id}: ${act.title}</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
-                  act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
-                }">${act.type}</span>
+          actCard.innerHTML = `
+            <!-- Left: Order & Act Info in single row -->
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="flex items-center justify-center bg-slate-800/80 border border-slate-700/60 rounded w-6 h-6 shrink-0">
+                <span class="text-xs font-extrabold text-white leading-none">${item.slot}</span>
               </div>
-              <div class="text-xs text-slate-400 mt-0.5">
-                <span class="text-slate-300 font-medium">${act.apparatus}</span>
-                ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameos/Props: ${act.cameos.join(", ")}</span>` : ""}
-              </div>
-              ${hasConflict ? `
-                <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  <span>${actConflicts[0].message}</span>
+              <div class="truncate">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="font-bold text-xs text-white truncate">Act ${act.id}: ${act.title.split('—')[0]}</span>
+                  <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold shrink-0 ${
+                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                  }">${act.type}</span>
+                  <span class="text-[11px] text-slate-400 truncate hidden sm:inline">• ${act.apparatus}</span>
+                  ${act.cameos && act.cameos.length > 0 ? `<span class="text-[10px] text-amber-300/80 hidden md:inline">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
-              ` : ''}
-            </div>
-          </div>
-
-          <!-- Right: Rigging Point Badges & Controls -->
-          <div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
-            <!-- Inherent Act Rigging Requirements -->
-            <div class="flex flex-col items-end">
-              <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-wider mb-1">Act Rigging Needs</span>
-              <div class="flex items-center gap-1.5">
-                ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front)}
-                ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid)}
-                ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back)}
+                ${hasConflict ? `
+                  <div class="text-[10px] text-rose-400 font-medium truncate flex items-center gap-1">
+                    <span>⚠️</span>
+                    <span>${actConflicts[0].message}</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
-            <!-- Up / Down / Remove buttons -->
-            <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition pl-2 border-l border-slate-800">
-              <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
-              <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
-              <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
+            <!-- Right: Rigging Point Badges & Controls in single row -->
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-1">
+                ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, true)}
+                ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, true)}
+                ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, true)}
+              </div>
+              <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition pl-1.5 border-l border-slate-800">
+                <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
+                <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
+                <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          actCard.className = `group bg-slate-900 border ${
+            hasConflict ? "border-rose-500/70 shadow-rose-950/50 shadow-md" : "border-slate-800 hover:border-slate-700"
+          } rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
+
+          actCard.innerHTML = `
+            <!-- Left: Order & Act Info -->
+            <div class="flex items-start gap-3">
+              <div class="flex flex-col items-center justify-center bg-slate-800/80 border border-slate-700/60 rounded-lg w-9 h-9 shrink-0">
+                <span class="text-xs text-slate-400 font-medium">#</span>
+                <span class="text-sm font-extrabold text-white leading-none">${item.slot}</span>
+              </div>
+
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-bold text-sm text-white">Act ${act.id}: ${act.title}</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
+                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                  }">${act.type}</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-0.5">
+                  <span class="text-slate-300 font-medium">${act.apparatus}</span>
+                  ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameos/Props: ${act.cameos.join(", ")}</span>` : ""}
+                </div>
+                ${hasConflict ? `
+                  <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
+                    <span>⚠️</span>
+                    <span>${actConflicts[0].message}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Right: Rigging Point Badges & Controls -->
+            <div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
+              <!-- Inherent Act Rigging Requirements -->
+              <div class="flex flex-col items-end">
+                <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-wider mb-1">Act Rigging Needs</span>
+                <div class="flex items-center gap-1.5">
+                  ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, false)}
+                  ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, false)}
+                  ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, false)}
+                </div>
+              </div>
+
+              <!-- Up / Down / Remove buttons -->
+              <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition pl-2 border-l border-slate-800">
+                <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
+                <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
+                <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
+              </div>
+            </div>
+          `;
+        }
 
         listContainer.appendChild(actCard);
       });
     }
 
-    function renderActRiggingBadge(pointName, actReq, resolvedStageState) {
+    function renderActRiggingBadge(pointName, actReq, resolvedStageState, isCompact = false) {
+      const label = isCompact ? pointName[0] : pointName;
       if (actReq === "Any") {
         return `
-          <span class="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700" 
+          <span class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700" 
                 title="${pointName}: Flexible (Any). Adapts to current stage (${resolvedStageState}) with 0 changeover">
-            <span class="text-[10px] text-slate-400">${pointName}:</span>
+            <span class="text-[10px] text-slate-400">${label}:</span>
             <span class="text-indigo-300 font-semibold">Any</span>
-            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : 'Aerial/Floor'})</span>
+            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : 'Air'})</span>
           </span>
         `;
       }
       const isPole = actReq === "Pole";
       return `
-        <span class="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 ${
+        <span class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 ${
           isPole 
             ? 'bg-amber-950/80 text-amber-300 border border-amber-700/60' 
             : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
         }" title="${pointName}: Requires ${actReq}">
-          <span class="text-[10px] text-slate-400">${pointName}:</span>
-          <span>${isPole ? 'Pole' : 'Aerial/Floor'}</span>
+          <span class="text-[10px] text-slate-400">${label}:</span>
+          <span>${isPole ? 'Pole' : (isCompact ? 'Air/Flr' : 'Aerial/Floor')}</span>
         </span>
       `;
     }
@@ -1019,6 +1102,24 @@
       renderTabs();
       renderBench();
       showToast(`Act ${actId} added to ${SHOW_INFO[currentShowKey].short}`);
+    }
+
+    function toggleCompactView() {
+      isCompactView = !isCompactView;
+      const btn = document.getElementById("compact-toggle-btn");
+      if (btn) {
+        if (isCompactView) {
+          btn.className = "text-xs px-2.5 py-1 bg-indigo-950 text-indigo-300 border border-indigo-500/50 rounded font-semibold transition flex items-center gap-1.5 shadow-sm shadow-indigo-500/20";
+          document.getElementById("compact-btn-text").textContent = "Default View";
+          document.getElementById("compact-btn-icon").textContent = "📄";
+        } else {
+          btn.className = "text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition flex items-center gap-1.5";
+          document.getElementById("compact-btn-text").textContent = "Compact View";
+          document.getElementById("compact-btn-icon").textContent = "🗜️";
+        }
+      }
+      renderLineup();
+      showToast(isCompactView ? "Compact View enabled" : "Default View enabled");
     }
 
     function toggleIntermission() {

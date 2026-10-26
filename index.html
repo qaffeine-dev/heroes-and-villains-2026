@@ -878,17 +878,23 @@
           back: resolveStagePoint(act.rigging.back, currentStage.back, "Pole")
         };
 
-        // Determine if changeover happened
+        // Determine if changeover happened (only state final state for readability)
         let changes = [];
         if (nextStage.front !== currentStage.front) {
-          changes.push(`Front: ${currentStage.front} → ${nextStage.front}`);
+          changes.push(`Front: ${nextStage.front}`);
         }
         if (nextStage.mid !== currentStage.mid) {
-          changes.push(`Mid: ${currentStage.mid} → ${nextStage.mid}`);
+          changes.push(`Mid: ${nextStage.mid}`);
         }
         if (nextStage.back !== currentStage.back) {
-          changes.push(`Back: ${currentStage.back} → ${nextStage.back}`);
+          changes.push(`Back: ${nextStage.back}`);
         }
+
+        let finalStateSummary = [
+          `<span class="${nextStage.front !== currentStage.front ? 'text-amber-100 font-bold' : 'text-amber-200/75'}">Front: ${nextStage.front}</span>`,
+          `<span class="${nextStage.mid !== currentStage.mid ? 'text-amber-100 font-bold' : 'text-amber-200/75'}">Mid: ${nextStage.mid}</span>`,
+          `<span class="${nextStage.back !== currentStage.back ? 'text-amber-100 font-bold' : 'text-amber-200/75'}">Back: ${nextStage.back}</span>`
+        ].join(' <span class="text-amber-500/60">|</span> ');
 
         let hasChangeover = changes.length > 0;
         if (hasChangeover) {
@@ -902,7 +908,8 @@
           index: i,
           stageRigging: { ...nextStage },
           hasChangeover: hasChangeover,
-          changeoverDetails: changes
+          changeoverDetails: changes,
+          finalStateSummary: finalStateSummary
         });
 
         currentStage = { ...nextStage };
@@ -1127,7 +1134,7 @@
               <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
                 <span>⚠️</span>
                 <span>Changeover:</span>
-                <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
+                <span class="font-normal">${item.finalStateSummary}</span>
               </div>
               <span class="text-[9px] uppercase font-bold text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded border border-amber-700/40 shrink-0">Stage Shift</span>
             `;
@@ -1137,7 +1144,7 @@
               <div class="flex items-center gap-2 text-amber-300 font-semibold">
                 <span class="text-sm">⚠️</span>
                 <span>Rigging Changeover:</span>
-                <span class="text-amber-200/90 font-normal">${item.changeoverDetails.join(" • ")}</span>
+                <span class="font-normal">${item.finalStateSummary}</span>
               </div>
               <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
             `;

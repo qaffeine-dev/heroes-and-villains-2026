@@ -313,8 +313,9 @@
         rigging: { front: "Any", mid: "Aerial/Floor", back: "Pole" },
         performers: ["Ashley C", "Quan T"],
         cameos: ["Andy P", "Cat T", "Anna"],
-        availability: ["sat_late", "sun_late"],
-        notes: "Cameos: Andy P, Cat T, Anna."
+        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        maxShows: 2,
+        notes: "Available all 4 shows (prefers separate days). Cameos: Andy P, Cat T, Anna."
       },
       10: {
         id: 10,
@@ -695,6 +696,22 @@
           });
         }
 
+        // Max 2 Shows check across all shows
+        let scheduledInShows = [];
+        for (const [sKey, sList] of Object.entries(showLineups)) {
+          if ((sList || []).includes(act.id)) {
+            scheduledInShows.push(SHOW_INFO[sKey].short);
+          }
+        }
+        if (scheduledInShows.length > 2) {
+          conflicts.push({
+            type: "max_shows",
+            actId: act.id,
+            slot: slot,
+            message: `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — acts can only be in up to 2 shows!`
+          });
+        }
+
         // Resolve rigging points
         let nextStage = {
           front: resolveStagePoint(act.rigging.front, currentStage.front, "Aerial/Floor"),
@@ -968,12 +985,12 @@
                   <span class="text-[11px] text-slate-400 truncate hidden sm:inline">• ${act.apparatus}</span>
                   ${act.cameos && act.cameos.length > 0 ? `<span class="text-[10px] text-amber-300/80 hidden md:inline">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
-                ${hasConflict ? `
+                ${hasConflict ? actConflicts.map(c => `
                   <div class="text-[10px] text-rose-400 font-medium truncate flex items-center gap-1">
                     <span>⚠️</span>
-                    <span>${actConflicts[0].message}</span>
+                    <span>${c.message}</span>
                   </div>
-                ` : ''}
+                `).join("") : ''}
               </div>
             </div>
 
@@ -1017,12 +1034,12 @@
                   <span class="text-slate-300 font-medium">${act.apparatus}</span>
                   ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
-                ${hasConflict ? `
+                ${hasConflict ? actConflicts.map(c => `
                   <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
                     <span>⚠️</span>
-                    <span>${actConflicts[0].message}</span>
+                    <span>${c.message}</span>
                   </div>
-                ` : ''}
+                `).join("") : ''}
               </div>
             </div>
 
@@ -1120,6 +1137,16 @@
         const isPending = !!act.pending;
         const isMarkedAvail = act.availability.includes(currentShowKey);
 
+        // Count how many shows this act is currently scheduled in across all tabs
+        const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(id)).length;
+        const showCountBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
+          scheduledShowsCount > 2
+            ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
+            : scheduledShowsCount === 2
+            ? 'bg-indigo-950 text-indigo-300 border border-indigo-700/50'
+            : 'bg-slate-900 text-slate-400 border border-slate-800'
+        }" title="Scheduled in ${scheduledShowsCount} of max 2 shows across all tabs">${scheduledShowsCount}/2 Shows</span>`;
+
         let statusBadge = "";
         if (isPending) {
           statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800/40">Pending</span>`;
@@ -1136,6 +1163,7 @@
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="font-bold text-xs text-white">Act ${act.id}: ${act.title}</span>
               ${statusBadge}
+              ${showCountBadge}
             </div>
             <div class="text-[11px] text-slate-400 truncate mt-0.5">
               ${act.apparatus}${act.cameos && act.cameos.length > 0 ? ` • Cameo: ${act.cameos.join(", ")}` : ""}

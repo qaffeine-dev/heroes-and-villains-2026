@@ -130,8 +130,31 @@
       </div>
     </div>
 
-    <!-- Main Workspace: Lineup Column & Side Tools -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- ALL ACTIVE SHOWS QUICK VIEW (Read-Only Multi-Column) -->
+    <div id="all-shows-workspace" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>📊</span>
+            <span>All Active Shows — Side-by-Side Overview</span>
+          </h2>
+          <span class="text-xs text-slate-400">(Read-only quick view • Click any show header to edit)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAllActiveShowsMarkdown()" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-medium transition flex items-center gap-1.5">
+            <span>📋</span>
+            <span>Copy All Active Shows</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="all-shows-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Main Workspace: Single Show Lineup Column & Side Tools -->
+    <div id="single-show-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
       <!-- LEFT: Show Lineup (Drag-and-Drop) -->
       <div class="lg:col-span-8 space-y-3">
@@ -734,6 +757,7 @@
     // State
     let currentPresetKey = "config1";
     let currentShowKey = "sat_early";
+    let isAllShowsView = false;
     let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
     let draggedIndex = null;
     let isCompactView = false;
@@ -1040,9 +1064,12 @@
       const container = document.getElementById("show-tabs");
       container.innerHTML = "";
 
+      let activeShowsCount = 0;
+
       for (const [key, info] of Object.entries(SHOW_INFO)) {
         const count = (showLineups[key] || []).filter(x => typeof x === "number").length;
-        const isActive = key === currentShowKey;
+        if (count > 0) activeShowsCount++;
+        const isActive = !isAllShowsView && key === currentShowKey;
 
         const btn = document.createElement("button");
         btn.onclick = () => selectShow(key);
@@ -1057,6 +1084,263 @@
           <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? "bg-indigo-800 text-indigo-100" : "bg-slate-900 text-slate-400"}">${count}</span>
         `;
         container.appendChild(btn);
+      }
+
+      // Divider
+      const sep = document.createElement("div");
+      sep.className = "h-5 w-px bg-slate-700/80 mx-0.5 hidden sm:block";
+      container.appendChild(sep);
+
+      // All Active Shows Quick View button
+      const allBtn = document.createElement("button");
+      allBtn.onclick = () => toggleAllShowsView();
+      allBtn.className = `px-3.5 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition border ${
+        isAllShowsView
+          ? "bg-emerald-600 text-white border-emerald-400/50 shadow-md shadow-emerald-600/30"
+          : "bg-slate-800/90 text-emerald-300 border-emerald-700/50 hover:bg-slate-700 hover:text-emerald-200"
+      }`;
+      allBtn.innerHTML = `
+        <span>📊 All Active Shows</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isAllShowsView ? "bg-emerald-800 text-emerald-100" : "bg-slate-900 text-emerald-400"}">${activeShowsCount}</span>
+      `;
+      container.appendChild(allBtn);
+    }
+
+    function renderAllActiveShows() {
+      const grid = document.getElementById("all-shows-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      const activeShowKeys = Object.keys(SHOW_INFO).filter(
+        k => (showLineups[k] || []).some(x => typeof x === "number")
+      );
+
+      // Adjust responsive column count based on number of active shows
+      if (activeShowKeys.length >= 4) {
+        grid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start";
+      } else if (activeShowKeys.length === 3) {
+        grid.className = "grid grid-cols-1 lg:grid-cols-3 gap-4 items-start";
+      } else if (activeShowKeys.length === 2) {
+        grid.className = "grid grid-cols-1 lg:grid-cols-2 gap-4 items-start";
+      } else {
+        grid.className = "grid grid-cols-1 gap-4 items-start";
+      }
+
+      let totalActsAll = 0;
+      let totalSolosAll = 0;
+      let totalGroupsAll = 0;
+      let totalChangesAll = 0;
+      let allHardConflicts = [];
+      let allPrefConflicts = [];
+
+      if (activeShowKeys.length === 0) {
+        grid.innerHTML = `
+          <div class="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center text-slate-500">
+            <p class="font-medium text-sm">No active shows have acts scheduled.</p>
+            <p class="text-xs mt-1">Select a show tab above or load a preset.</p>
+          </div>
+        `;
+      }
+
+      activeShowKeys.forEach(showKey => {
+        const lineup = showLineups[showKey] || [];
+        const analysis = calculateShowRiggingAndConflicts(lineup, showKey);
+        const info = SHOW_INFO[showKey];
+
+        totalActsAll += analysis.totalActs;
+        totalChangesAll += analysis.changeovers;
+
+        let solos = 0, groups = 0;
+        let beforeInter = 0, afterInter = 0, seenInter = false;
+        lineup.forEach(item => {
+          if (item === "INTERMISSION") {
+            seenInter = true;
+          } else if (ACTS[item]) {
+            if (ACTS[item].type === "Solo") solos++;
+            else groups++;
+            if (!seenInter) beforeInter++;
+            else afterInter++;
+          }
+        });
+        totalSolosAll += solos;
+        totalGroupsAll += groups;
+
+        const hardC = analysis.conflicts.filter(c => c.severity !== "preference");
+        const prefC = analysis.conflicts.filter(c => c.severity === "preference");
+        hardC.forEach(c => allHardConflicts.push(`[${info.short}] ${c.message}`));
+        prefC.forEach(c => allPrefConflicts.push(`[${info.short}] ${c.message}`));
+
+        const splitText = seenInter ? `${beforeInter}/${afterInter} split` : `${analysis.totalActs} acts`;
+
+        const col = document.createElement("div");
+        col.className = "bg-slate-900/90 border border-slate-800 rounded-xl p-3 shadow-lg space-y-2";
+
+        // Column Header
+        const alertBadge = hardC.length > 0
+          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-700/60">⚠️ ${hardC.length}</span>`
+          : prefC.length > 0
+          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-fuchsia-950 text-fuchsia-300 border border-fuchsia-700/60">🗓️ ${prefC.length}</span>`
+          : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">✓ Clear</span>`;
+
+        let colHtml = `
+          <div class="border-b border-slate-800 pb-2.5 mb-2 flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-sm text-white">${info.short}</h3>
+                <span class="px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-700/50 text-[10px] font-semibold">${analysis.totalActs} Acts (${splitText})</span>
+                ${alertBadge}
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
+                <span class="text-sky-400 font-medium">${solos} Solo${solos === 1 ? '' : 's'}</span>
+                <span>•</span>
+                <span class="text-purple-400 font-medium">${groups} Group${groups === 1 ? '' : 's'}</span>
+                <span>•</span>
+                <span class="text-amber-400 font-medium">${analysis.changeovers} Rigging Change${analysis.changeovers === 1 ? '' : 's'}</span>
+              </div>
+            </div>
+            <button onclick="selectShow('${showKey}')" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700 rounded text-[11px] font-semibold transition shrink-0" title="Switch to editable view for ${info.short}">
+              ✎ Edit
+            </button>
+          </div>
+
+          <!-- Initial Setup Card -->
+          <div class="bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
+              <span>⚙️</span>
+              <span>Initial Setup:</span>
+              <span class="font-normal">
+                <span class="text-amber-100 font-bold">F: ${analysis.initialStage.front === 'Pole' ? 'Pole' : 'Air/Flr'}</span>
+                <span class="text-amber-500/60">|</span>
+                <span class="text-amber-100 font-bold">M: ${analysis.initialStage.mid === 'Pole' ? 'Pole' : 'Air/Flr'}</span>
+                <span class="text-amber-500/60">|</span>
+                <span class="text-amber-100 font-bold">B: ${analysis.initialStage.back === 'Pole' ? 'Pole' : 'Air/Flr'}</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+        `;
+
+        analysis.resolvedActs.forEach((item, rIdx) => {
+          if (item.type === "act" && item.hasChangeover && rIdx > 0) {
+            const prevStage = rIdx > 0 && analysis.resolvedActs[rIdx - 1].stageRigging
+              ? analysis.resolvedActs[rIdx - 1].stageRigging
+              : null;
+            const compactFinal = [
+              `<span class="text-amber-100 font-bold">F: ${item.stageRigging.front === 'Pole' ? 'Pole' : 'Air/Flr'}</span>`,
+              `<span class="text-amber-100 font-bold">M: ${item.stageRigging.mid === 'Pole' ? 'Pole' : 'Air/Flr'}</span>`,
+              `<span class="text-amber-100 font-bold">B: ${item.stageRigging.back === 'Pole' ? 'Pole' : 'Air/Flr'}</span>`
+            ].join(' <span class="text-amber-500/60">|</span> ');
+
+            colHtml += `
+              <div class="bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between">
+                <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
+                  <span>⚠️</span>
+                  <span>Rigging Change:</span>
+                  <span class="font-normal">${compactFinal}</span>
+                </div>
+              </div>
+            `;
+          }
+
+          if (item.type === "intermission") {
+            colHtml += `
+              <div class="bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-2.5 text-center">
+                <span class="font-bold text-indigo-300 tracking-wider uppercase text-[10px]">⏸️ Intermission</span>
+              </div>
+            `;
+            return;
+          }
+
+          const act = item.act;
+          const actConflicts = analysis.conflicts.filter(c => c.actId === act.id || c.act1 === act.id || c.act2 === act.id);
+          const hasHard = actConflicts.some(c => c.severity !== "preference");
+          const hasPref = actConflicts.some(c => c.severity === "preference");
+          const maxShows = act.maxShows || 2;
+          const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id)).length;
+
+          const borderCls = hasHard
+            ? "border-rose-500/70 bg-rose-950/10"
+            : hasPref
+            ? "border-fuchsia-500/70 bg-fuchsia-950/10"
+            : "border-slate-800/90 bg-slate-950/80";
+
+          colHtml += `
+            <div class="border ${borderCls} rounded-lg py-1.5 px-2.5 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-5 h-5 rounded bg-slate-800 border border-slate-700/70 text-[11px] font-extrabold text-white flex items-center justify-center shrink-0">${item.slot}</span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 truncate">
+                    <span class="font-bold text-xs text-white truncate" title="Act ${act.id}: ${act.title}">Act ${act.id}: ${act.title}</span>
+                    ${hasHard ? '<span title="Hard Conflict">⚠️</span>' : hasPref ? '<span title="Day Preference Flag">🗓️</span>' : ''}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate flex items-center gap-1.5">
+                    <span class="${
+                      act.type === 'Solo' ? 'text-sky-400' :
+                      act.type === 'Instructor-led Series' ? 'text-teal-400' :
+                      'text-purple-400'
+                    } font-semibold">${act.type === 'Instructor-led Series' ? 'Series' : act.type}</span>
+                    <span>•</span>
+                    <span>${scheduledShowsCount}/${maxShows} Shows</span>
+                    <span>•</span>
+                    <span class="truncate text-slate-300">${act.apparatus}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        colHtml += `</div>`;
+        col.innerHTML = colHtml;
+        grid.appendChild(col);
+      });
+
+      // Update Top Stats bar for All Active Shows
+      document.getElementById("stat-total-acts").textContent = `${totalActsAll} (${activeShowKeys.length} Shows)`;
+      document.getElementById("stat-solos").textContent = `${totalSolosAll} Solos`;
+      document.getElementById("stat-groups").textContent = `${totalGroupsAll} Groups`;
+      document.getElementById("stat-changeovers").textContent = totalChangesAll;
+
+      // Update Top Conflicts Drawer for All Active Shows
+      const conflictsContainer = document.getElementById("conflicts-alert-container");
+      const hardBox = document.getElementById("hard-conflicts-box");
+      const prefBox = document.getElementById("pref-conflicts-box");
+      const conflictsList = document.getElementById("conflicts-list");
+      const prefConflictsList = document.getElementById("pref-conflicts-list");
+      const conflictStat = document.getElementById("stat-conflict-count");
+
+      const uniquePrefConflicts = [...new Set(allPrefConflicts)];
+
+      if (allHardConflicts.length > 0 || uniquePrefConflicts.length > 0) {
+        conflictsContainer.classList.remove("hidden");
+        if (allHardConflicts.length > 0) {
+          hardBox.classList.remove("hidden");
+          conflictsList.innerHTML = allHardConflicts.map(msg => `<li>${msg}</li>`).join("");
+        } else {
+          hardBox.classList.add("hidden");
+          conflictsList.innerHTML = "";
+        }
+        if (uniquePrefConflicts.length > 0) {
+          prefBox.classList.remove("hidden");
+          prefConflictsList.innerHTML = uniquePrefConflicts.map(msg => `<li>${msg}</li>`).join("");
+        } else {
+          prefBox.classList.add("hidden");
+          prefConflictsList.innerHTML = "";
+        }
+        const statParts = [];
+        if (allHardConflicts.length > 0) statParts.push(`${allHardConflicts.length} Conflict${allHardConflicts.length === 1 ? '' : 's'}`);
+        if (uniquePrefConflicts.length > 0) statParts.push(`${uniquePrefConflicts.length} Pref Flag${uniquePrefConflicts.length === 1 ? '' : 's'}`);
+        conflictStat.textContent = statParts.join(" • ");
+        conflictStat.className = allHardConflicts.length > 0
+          ? "font-bold text-rose-400 text-sm"
+          : "font-bold text-fuchsia-400 text-sm";
+      } else {
+        conflictsContainer.classList.add("hidden");
+        hardBox.classList.add("hidden");
+        prefBox.classList.add("hidden");
+        conflictStat.textContent = "0 (All Clear)";
+        conflictStat.className = "font-bold text-emerald-400 text-sm";
       }
     }
 
@@ -1556,10 +1840,25 @@
     // ==========================================
 
     function selectShow(key) {
+      isAllShowsView = false;
       currentShowKey = key;
+      document.getElementById("all-shows-workspace").classList.add("hidden");
+      document.getElementById("single-show-workspace").classList.remove("hidden");
       renderTabs();
       renderLineup();
       renderBench();
+    }
+
+    function toggleAllShowsView() {
+      isAllShowsView = !isAllShowsView;
+      if (isAllShowsView) {
+        document.getElementById("single-show-workspace").classList.add("hidden");
+        document.getElementById("all-shows-workspace").classList.remove("hidden");
+        renderTabs();
+        renderAllActiveShows();
+      } else {
+        selectShow(currentShowKey);
+      }
     }
 
     function moveItem(index, direction) {
@@ -1739,21 +2038,57 @@
 
       renderPresetButtons();
       renderTabs();
-      renderLineup();
-      renderBench();
+      if (isAllShowsView) {
+        renderAllActiveShows();
+      } else {
+        renderLineup();
+        renderBench();
+      }
       showToast(`Loaded ${preset.name}`);
     }
 
     function resetCurrentShow() {
       showLineups[currentShowKey] = [];
       renderTabs();
-      renderLineup();
-      renderBench();
+      if (isAllShowsView) {
+        renderAllActiveShows();
+      } else {
+        renderLineup();
+        renderBench();
+      }
       showToast(`Cleared ${SHOW_INFO[currentShowKey].short}`);
     }
 
     function filterBench() {
       renderBench();
+    }
+
+    function exportAllActiveShowsMarkdown() {
+      const activeShowKeys = Object.keys(SHOW_INFO).filter(
+        k => (showLineups[k] || []).some(x => typeof x === "number")
+      );
+      let sections = [];
+      activeShowKeys.forEach(key => {
+        const lineup = showLineups[key] || [];
+        const analysis = calculateShowRiggingAndConflicts(lineup, key);
+        let text = `### ${SHOW_INFO[key].title} Lineup (${analysis.totalActs} Acts)\n`;
+        text += `Initial Setup: Rigging: Front: ${analysis.initialStage.front} | Mid: ${analysis.initialStage.mid} | Back: ${analysis.initialStage.back}\n\n`;
+        analysis.resolvedActs.forEach(item => {
+          if (item.type === "intermission") {
+            text += `⏸️ INTERMISSION\n`;
+          } else {
+            if (item.hasChangeover) {
+              text += `⚠️ Rigging Change: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;
+            }
+            text += `${item.slot}. Act ${item.act.id}: ${item.act.title} — ${item.act.apparatus}\n`;
+          }
+        });
+        sections.push(text);
+      });
+
+      navigator.clipboard.writeText(sections.join("\n---\n\n")).then(() => {
+        showToast("All active shows copied to clipboard!");
+      });
     }
 
     function exportLineupMarkdown() {

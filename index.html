@@ -98,7 +98,7 @@
           </div>
 
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
-            <span class="text-slate-400">Rigging Changeovers:</span>
+            <span class="text-slate-400">Rigging Changes:</span>
             <span id="stat-changeovers" class="font-bold text-amber-400 text-sm">0</span>
             <span id="stat-pole-strikes" class="text-emerald-400 font-medium"></span>
           </div>
@@ -154,10 +154,11 @@
         </div>
 
         <!-- Initial Setup Banner -->
-        <div id="initial-setup-banner" class="bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-300">Initial Setup:</span>
-            <span id="initial-setup-text" class="text-slate-400">Rigging: Front: Aerial/Floor | Mid: Aerial/Floor | Back: Pole</span>
+        <div id="initial-setup-banner" class="bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between">
+          <div class="flex items-center gap-2 text-amber-300 font-semibold">
+            <span class="text-sm">⚙️</span>
+            <span>Initial Setup:</span>
+            <span id="initial-setup-text" class="font-normal"></span>
           </div>
           <div class="flex items-center gap-1.5" id="initial-setup-badges">
             <!-- Badges -->
@@ -1100,13 +1101,21 @@
         conflictStat.className = "font-bold text-emerald-400 text-sm";
       }
 
-      // Initial Setup Banner
-      const initText = `Rigging: Front: ${analysis.initialStage.front} | Mid: ${analysis.initialStage.mid} | Back: ${analysis.initialStage.back}`;
-      document.getElementById("initial-setup-text").textContent = initText;
+      // Initial Setup Banner (styled identically to Rigging Change card)
+      const initBanner = document.getElementById("initial-setup-banner");
+      if (initBanner) {
+        initBanner.className = isCompactView
+          ? "bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between"
+          : "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between";
+      }
+      const initSummaryHtml = [
+        `<span class="text-amber-100 font-bold">Front: ${analysis.initialStage.front}</span>`,
+        `<span class="text-amber-100 font-bold">Mid: ${analysis.initialStage.mid}</span>`,
+        `<span class="text-amber-100 font-bold">Back: ${analysis.initialStage.back}</span>`
+      ].join(' <span class="text-amber-500/60">|</span> ');
+      document.getElementById("initial-setup-text").innerHTML = initSummaryHtml;
       document.getElementById("initial-setup-badges").innerHTML = `
-        ${renderRiggingBadge('Front', analysis.initialStage.front)}
-        ${renderRiggingBadge('Mid', analysis.initialStage.mid)}
-        ${renderRiggingBadge('Back', analysis.initialStage.back)}
+        <span class="${isCompactView ? 'text-[9px] px-1.5 py-0.2' : 'text-[10px] px-2 py-0.5'} uppercase font-bold text-amber-400 bg-amber-950/80 rounded border border-amber-700/40 shrink-0">Opening Rigging</span>
       `;
 
       // Render Lineup Items
@@ -1125,7 +1134,7 @@
       }
 
       analysis.resolvedActs.forEach((item, rIdx) => {
-        // Changeover Alert Banner (if preceding act required a rigging shift)
+        // Rigging Change Alert Banner (if preceding act required a rigging shift)
         if (item.type === "act" && item.hasChangeover && rIdx > 0) {
           const changeEl = document.createElement("div");
           if (isCompactView) {
@@ -1133,7 +1142,7 @@
             changeEl.innerHTML = `
               <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
                 <span>⚠️</span>
-                <span>Changeover:</span>
+                <span>Rigging Change:</span>
                 <span class="font-normal">${item.finalStateSummary}</span>
               </div>
               <span class="text-[9px] uppercase font-bold text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded border border-amber-700/40 shrink-0">Stage Shift</span>
@@ -1143,7 +1152,7 @@
             changeEl.innerHTML = `
               <div class="flex items-center gap-2 text-amber-300 font-semibold">
                 <span class="text-sm">⚠️</span>
-                <span>Rigging Changeover:</span>
+                <span>Rigging Change:</span>
                 <span class="font-normal">${item.finalStateSummary}</span>
               </div>
               <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>

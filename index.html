@@ -663,10 +663,10 @@
         name: "Config 1 (Sat E, Sat L, Sun L)",
         builtIn: true,
         shows: {
-          sat_early: [11, 7, 8, 12, 6, 3, 1, 18, "INTERMISSION", 25, 13, 14, 20, 5],
-          sat_late:  [9, 6, 3, 26, 18, 27, 4, "INTERMISSION", 29, 13, 16, 23, 20, 28],
+          sat_early: [11, 7, 8, 12, 6, 3, 1, "INTERMISSION", 18, 25, 13, 14, 20, 5],
+          sat_late:  [9, 6, 3, 26, 18, 27, "INTERMISSION", 4, 29, 13, 16, 23, 20, 28],
           sun_early: [],
-          sun_late:  [9, 7, 11, 8, 2, 1, 26, 27, "INTERMISSION", 25, 10, 14, 5, 28]
+          sun_late:  [9, 7, 11, 1, 26, 27, "INTERMISSION", 8, 2, 25, 10, 14, 5, 28]
         }
       },
       config2: {
@@ -675,18 +675,18 @@
         shows: {
           sat_early: [],
           sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 23, 14, 28],
-          sun_early: [8, 2, 3, 1, 27, "INTERMISSION", 25, 13, 10, 4, 14, 20, 5],
-          sun_late:  [9, 7, 11, 2, 3, 1, 26, 27, "INTERMISSION", 25, 13, 5, 10, 20, 28]
+          sun_early: [8, 2, 3, 1, 27, 4, "INTERMISSION", 25, 13, 10, 14, 20, 5],
+          sun_late:  [9, 7, 11, 3, 1, 26, 27, "INTERMISSION", 2, 25, 13, 5, 10, 20, 28]
         }
       },
       config3: {
         name: "Config 3 (All 4 Shows)",
         builtIn: true,
         shows: {
-          sat_early: [11, 8, 12, 6, 1, 18, "INTERMISSION", 25, 14, 20, 5],
-          sat_late:  [9, 6, 3, 26, 18, 27, 4, "INTERMISSION", 29, 16, 28],
+          sat_early: [11, 8, 12, 6, 1, "INTERMISSION", 18, 25, 14, 20, 5],
+          sat_late:  [9, 6, 3, 26, 27, "INTERMISSION", 18, 4, 29, 16, 28],
           sun_early: [7, 8, 2, 1, 27, "INTERMISSION", 25, 13, 10, 4, 20, 5],
-          sun_late:  [9, 7, 11, 2, 3, 26, 23, "INTERMISSION", 13, 10, 14, 28]
+          sun_late:  [9, 7, 11, 2, 3, 26, "INTERMISSION", 23, 13, 10, 14, 28]
         }
       }
     };
@@ -742,13 +742,25 @@
     // 3. RIGGING ENGINE & CONFLICT DETECTION
     // ==========================================
 
-    // Resolves stage rigging state for an act given the prior state
-    function resolveStagePoint(actPoint, prevPoint, defaultPoint) {
+    // Resolves stage rigging state for an act given the prior state (and optional lookahead after Intermission)
+    function resolveStagePoint(actPoint, prevPoint, defaultPoint, lookaheadPoint) {
       if (actPoint === "Pole") return "Pole";
       if (actPoint === "Aerial/Floor") return "Aerial/Floor";
-      // If "Any"
+      // If "Any" and we just had an Intermission, adopt the post-Intermission target state immediately
+      if (lookaheadPoint && lookaheadPoint !== "Any") return lookaheadPoint;
       if (prevPoint && prevPoint !== "Any") return prevPoint;
       return defaultPoint || "Aerial/Floor";
+    }
+
+    function getNextExplicitPoint(lineup, startIndex, pointKey) {
+      for (let j = startIndex; j < lineup.length; j++) {
+        const id = lineup[j];
+        if (typeof id === "number" && ACTS[id]) {
+          const req = ACTS[id].rigging[pointKey];
+          if (req === "Pole" || req === "Aerial/Floor") return req;
+        }
+      }
+      return "Aerial/Floor";
     }
 
     function calculateShowRiggingAndConflicts(lineup, showKey) {
@@ -762,7 +774,11 @@
       // Initial show rigging default
       // If first act has Back Pole, initial setup has Back Pole
       let firstActId = lineup.find(item => typeof item === "number");
-      let initialStage = { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Pole" };
+      let initialStage = {
+        front: getNextExplicitPoint(lineup, 0, "front") === "Pole" && ACTS[firstActId]?.rigging.front !== "Aerial/Floor" ? "Pole" : "Aerial/Floor",
+        mid: getNextExplicitPoint(lineup, 0, "mid") === "Pole" && ACTS[firstActId]?.rigging.mid !== "Aerial/Floor" ? "Pole" : "Aerial/Floor",
+        back: "Pole"
+      };
       if (firstActId && ACTS[firstActId]) {
         let firstR = ACTS[firstActId].rigging;
         if (firstR.front === "Pole") initialStage.front = "Pole";
@@ -772,6 +788,7 @@
 
       let currentStage = { ...initialStage };
       let actSlotCounter = 1;
+      let justHadIntermission = false;
 
       for (let i = 0; i < lineup.length; i++) {
         let item = lineup[i];
@@ -781,6 +798,7 @@
             type: "intermission",
             index: i
           });
+          justHadIntermission = true;
           continue;
         }
 
@@ -873,11 +891,16 @@
           }
         }
 
-        // Resolve rigging points
+        // Resolve rigging points (if right after Intermission, resolve Any to the post-Intermission block's target state)
+        let lookaheadFront = justHadIntermission ? getNextExplicitPoint(lineup, i, "front") : null;
+        let lookaheadMid = justHadIntermission ? getNextExplicitPoint(lineup, i, "mid") : null;
+        let lookaheadBack = justHadIntermission ? getNextExplicitPoint(lineup, i, "back") : null;
+        justHadIntermission = false;
+
         let nextStage = {
-          front: resolveStagePoint(act.rigging.front, currentStage.front, "Aerial/Floor"),
-          mid: resolveStagePoint(act.rigging.mid, currentStage.mid, "Aerial/Floor"),
-          back: resolveStagePoint(act.rigging.back, currentStage.back, "Pole")
+          front: resolveStagePoint(act.rigging.front, currentStage.front, "Aerial/Floor", lookaheadFront),
+          mid: resolveStagePoint(act.rigging.mid, currentStage.mid, "Aerial/Floor", lookaheadMid),
+          back: resolveStagePoint(act.rigging.back, currentStage.back, "Pole", lookaheadBack)
         };
 
         // Determine if changeover happened (only state final state for readability)

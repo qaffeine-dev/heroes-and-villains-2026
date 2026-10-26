@@ -43,33 +43,33 @@
     </div>
 
     <!-- Presets & Controls -->
-    <div class="flex flex-col items-start md:items-end gap-2">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs text-slate-400 font-medium">Presets:</span>
+    <div class="flex flex-col items-start md:items-end gap-2.5">
+      <!-- Row 1: Preset Selector Pills -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        <span class="text-xs text-slate-400 font-medium mr-1">Load Preset:</span>
         <div id="preset-buttons-container" class="flex flex-wrap items-center gap-1.5">
           <!-- Populated by JS -->
         </div>
-        <button onclick="toggleSavePresetPanel()" class="px-3 py-1.5 text-xs font-semibold rounded bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 transition flex items-center gap-1">
-          <span>💾</span>
-          <span>Save Preset</span>
-        </button>
-        <button onclick="resetCurrentShow()" class="px-3 py-1.5 text-xs font-semibold rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition">
-          ↺ Clear Show
-        </button>
       </div>
 
-      <!-- Inline Save Preset Panel -->
-      <div id="save-preset-panel" class="hidden bg-slate-900 border border-emerald-700/50 rounded-lg p-2.5 shadow-xl flex flex-wrap items-center gap-2 text-xs">
-        <input id="new-preset-name" type="text" placeholder="Preset name (e.g. Draft A)..." 
-          class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-48">
-        <button onclick="saveNewPreset()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition">
-          + Save New
+      <!-- Row 2: Always-Visible Named Preset Controls -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2 flex flex-wrap items-center gap-2 text-xs shadow-inner">
+        <span class="text-[11px] text-slate-400 font-medium pl-1">Preset Name:</span>
+        <input id="new-preset-name" type="text" placeholder="Type name (e.g. Final Lineup)..." 
+          onkeydown="if(event.key==='Enter') saveNewPreset()"
+          class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-48 sm:w-56">
+        <button onclick="saveNewPreset()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition flex items-center gap-1 shadow-sm" title="Save current 4-show lineups as a new named preset">
+          <span>💾</span>
+          <span>Save As New</span>
         </button>
-        <button id="overwrite-preset-btn" onclick="overwriteCurrentPreset()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded transition">
+        <button id="overwrite-preset-btn" onclick="overwriteCurrentPreset()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded transition" title="Save current lineups (and name, if typed) into the currently selected preset">
           Update Current
         </button>
-        <button onclick="toggleSavePresetPanel()" class="px-2 py-1 text-slate-400 hover:text-white">
-          ✕
+        <button onclick="renameCurrentPreset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded transition" title="Rename the active preset using the name typed in the box">
+          ✏️ Rename
+        </button>
+        <button onclick="resetCurrentShow()" class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold rounded transition" title="Clear acts from current show tab">
+          ↺ Clear Show
         </button>
       </div>
     </div>
@@ -1587,20 +1587,11 @@
       renderLineup();
     }
 
-    function toggleSavePresetPanel() {
-      const panel = document.getElementById("save-preset-panel");
-      if (!panel) return;
-      panel.classList.toggle("hidden");
-      if (!panel.classList.contains("hidden")) {
-        const input = document.getElementById("new-preset-name");
-        if (input) input.focus();
-      }
-    }
-
     function saveNewPreset() {
       const input = document.getElementById("new-preset-name");
       const rawName = (input ? input.value : "").trim();
-      const name = rawName || `Custom Preset ${Object.keys(PRESETS).length - 2}`;
+      const customCount = Object.values(PRESETS).filter(p => p.custom).length + 1;
+      const name = rawName || `Custom Preset ${customCount}`;
       const key = "custom_" + Date.now();
 
       PRESETS[key] = {
@@ -1613,7 +1604,6 @@
       renderPresetButtons();
 
       if (input) input.value = "";
-      document.getElementById("save-preset-panel").classList.add("hidden");
       showToast(`Saved new preset "${name}"!`);
     }
 
@@ -1621,14 +1611,48 @@
       const preset = PRESETS[currentPresetKey];
       if (!preset) return;
 
+      const input = document.getElementById("new-preset-name");
+      const rawName = (input ? input.value : "").trim();
+      if (rawName) {
+        preset.name = rawName;
+        if (input) input.value = "";
+      }
+
       preset.shows = JSON.parse(JSON.stringify(showLineups));
       if (preset.builtIn) {
         preset.modified = true;
       }
       persistPresetsToStorage();
       renderPresetButtons();
-      document.getElementById("save-preset-panel").classList.add("hidden");
-      showToast(`Updated preset "${preset.name}"!`);
+      showToast(`Saved updates to "${preset.name}"!`);
+    }
+
+    function renameCurrentPreset() {
+      const preset = PRESETS[currentPresetKey];
+      if (!preset) return;
+
+      const input = document.getElementById("new-preset-name");
+      const rawName = (input ? input.value : "").trim();
+
+      if (!rawName) {
+        if (input) {
+          input.value = preset.name;
+          input.focus();
+          input.select();
+        }
+        showToast(`Edit the name in the box and click Rename (or Update)`);
+        return;
+      }
+
+      const oldName = preset.name;
+      preset.name = rawName;
+      if (preset.builtIn) {
+        preset.modified = true;
+      }
+      if (input) input.value = "";
+      persistPresetsToStorage();
+      renderPresetButtons();
+      showToast(`Renamed "${oldName}" → "${preset.name}"!`);
     }
 
     function deletePreset(key) {

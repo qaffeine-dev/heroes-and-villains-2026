@@ -443,8 +443,8 @@
       },
       16: {
         id: 16,
-        title: "Mulan (Kim N, Jen J)",
-        concept: "Mulan",
+        title: "Mulan & Ping (Kim N, Jen J)",
+        concept: "Mulan & Ping",
         type: "Group",
         apparatus: "Lyra, Straps, Fly Pole",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
@@ -609,11 +609,11 @@
         rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
         performers: ["Sal"],
         cameos: ["Britt C", "Lauren G", "Seema", "Jon", "Rissa"],
-        availability: [],
+        availability: ["sat_late", "sun_early", "sun_late"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Shares Rissa with Act 3 (needs 1-act buffer)."
+        dayPref: "no_pref",
+        pending: false,
+        notes: "Available Sat Late, Sun Early & Sun Late. Shares Rissa with Act 3 (needs 1-act buffer)."
       },
       28: {
         id: 28,
@@ -661,10 +661,10 @@
         name: "Config 1 (Sat E, Sat L, Sun L)",
         builtIn: true,
         shows: {
-          sat_early: [11, 7, 8, 12, 6, 1, 18, "INTERMISSION", 25, 13, 14, 20, 5],
-          sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 13, 16, 23, 20, 28],
+          sat_early: [11, 7, 8, 12, 6, 3, 1, 18, "INTERMISSION", 25, 13, 14, 20, 5],
+          sat_late:  [9, 6, 3, 26, 18, 27, 4, "INTERMISSION", 29, 13, 16, 23, 20, 28],
           sun_early: [],
-          sun_late:  [9, 7, 11, 8, 2, 3, 1, 26, "INTERMISSION", 25, 10, 14, 5, 28]
+          sun_late:  [9, 7, 11, 8, 2, 1, 26, 27, "INTERMISSION", 25, 10, 14, 5, 28]
         }
       },
       config2: {
@@ -672,18 +672,18 @@
         builtIn: true,
         shows: {
           sat_early: [],
-          sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 14, 28],
-          sun_early: [8, 2, 3, 1, "INTERMISSION", 25, 13, 10, 4, 14, 20, 5],
-          sun_late:  [9, 7, 11, 2, 3, 1, 26, "INTERMISSION", 25, 13, 5, 10, 20, 23, 28]
+          sat_late:  [9, 7, 11, 12, 8, 6, 26, "INTERMISSION", 18, 4, 29, 16, 23, 14, 28],
+          sun_early: [8, 2, 3, 1, 27, "INTERMISSION", 25, 13, 10, 4, 14, 20, 5],
+          sun_late:  [9, 7, 11, 2, 3, 1, 26, 27, "INTERMISSION", 25, 13, 5, 10, 20, 28]
         }
       },
       config3: {
         name: "Config 3 (All 4 Shows)",
         builtIn: true,
         shows: {
-          sat_early: [11, 8, 12, 6, 1, 18, "INTERMISSION", 25, 14, 5],
-          sat_late:  [9, 6, 3, 26, 18, 4, "INTERMISSION", 29, 16, 20, 28],
-          sun_early: [7, 8, 2, 1, "INTERMISSION", 25, 13, 10, 4, 20, 5],
+          sat_early: [11, 8, 12, 6, 1, 18, "INTERMISSION", 25, 14, 20, 5],
+          sat_late:  [9, 6, 3, 26, 18, 27, 4, "INTERMISSION", 29, 16, 28],
+          sun_early: [7, 8, 2, 1, 27, "INTERMISSION", 25, 13, 10, 4, 20, 5],
           sun_late:  [9, 7, 11, 2, 3, 26, 23, "INTERMISSION", 13, 10, 14, 28]
         }
       }

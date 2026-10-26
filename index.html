@@ -205,36 +205,39 @@
 
   <script>
     // ==========================================
-    // 1. DATA: Master Acts Catalog
+    // 1. DATA: Master Acts Catalog (All 29 Acts)
     // ==========================================
     const ACTS = {
       1: {
         id: 1,
-        title: "Angel and (cameo) Brian",
+        title: "Harley Quinn (Angel)",
+        concept: "Harley Quinn",
         type: "Solo",
-        apparatus: "Pole (No Heels), Floor",
+        apparatus: "Pole (No Heels)",
         rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
-        performers: ["Angel Bonbright"],
-        cameos: ["Brian Forbes"],
+        performers: ["Angel"],
+        cameos: ["Brian F"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         notes: "Paired with Act 5 (precedes Act 5). Separated from Luna (Act 29)."
       },
       2: {
         id: 2,
-        title: "Lisa Zacarias, Dorothy Thai, Alyx Jeong, Lara Abaya",
+        title: "Teen Titans (Lisa Z, Dorothy T)",
+        concept: "Teen Titans",
         type: "Group",
         apparatus: "Straps, Pole (No Heels), Skates",
         rigging: { front: "Pole", mid: "Pole", back: "Aerial/Floor" },
-        performers: ["Lisa Zacarias", "Dorothy Thai", "Alyx Jeong", "Lara Abaya"],
-        cameos: [],
+        performers: ["Lisa Z", "Dorothy T"],
+        cameos: ["Alyx J", "Lara A"],
         availability: ["sun_early", "sun_late"],
         notes: "Prefers 2 shows same day (Sunday)."
       },
       3: {
         id: 3,
-        title: "Rissa, Asia",
+        title: "Lord Farquaad & Dragon (Rissa, Asia)",
+        concept: "Lord Farquaad & Dragon",
         type: "Group",
-        apparatus: "Pole w/ Heels, Silks, Floor",
+        apparatus: "Pole w/ Heels, Silks",
         rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
         performers: ["Rissa", "Asia"],
         cameos: [],
@@ -243,194 +246,303 @@
       },
       4: {
         id: 4,
-        title: "Elly Zhen",
+        title: "Blind Mag (Elly Z)",
+        concept: "Blind Mag",
         type: "Solo",
         apparatus: "Silks, Lyra",
         rigging: { front: "Aerial/Floor", mid: "Any", back: "Aerial/Floor" },
-        performers: ["Elly Zhen"],
-        cameos: ["Angel Bonbright"], // Angel is human prop
+        performers: ["Elly Z"],
+        cameos: ["Angel"],
         availability: ["sat_late", "sun_early"],
         notes: "Prefers separate days. Angel is human prop."
       },
       5: {
         id: 5,
-        title: "Brian Forbes",
+        title: "Poison Ivan (Brian F)",
+        concept: "Poison Ivan",
         type: "Solo",
         apparatus: "Straps",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Brian Forbes"],
-        cameos: ["Angel Bonbright"], // Angel helps
+        performers: ["Brian F"],
+        cameos: ["Angel"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         notes: "Paired with Act 1 (after Act 1). Separated from Luna."
       },
       6: {
         id: 6,
-        title: "Christina Wu",
+        title: "Joker (Christina W)",
+        concept: "Joker",
         type: "Solo",
         apparatus: "Pole (No Heels)",
         rigging: { front: "Aerial/Floor", mid: "Pole", back: "Pole" },
-        performers: ["Christina Wu"],
+        performers: ["Christina W"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
         notes: "Available Sat only. Prefers 2 shows same day."
       },
       7: {
         id: 7,
-        title: "Jonathan Mao",
+        title: "Sukuna (Jonathan M)",
+        concept: "Sukuna",
         type: "Solo",
-        apparatus: "Floor, Chair",
+        apparatus: "Chair",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Any" },
-        performers: ["Jonathan Mao"],
+        performers: ["Jonathan M"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         notes: "Separates Act 9 and Act 11 with 0 changeovers."
       },
       8: {
         id: 8,
-        title: "Alice Kutsyy",
+        title: "Pink Panther (Alice K)",
+        concept: "Pink Panther",
         type: "Solo",
-        apparatus: "Pole (No Heels), Floor",
+        apparatus: "Pole (No Heels)",
         rigging: { front: "Pole", mid: "Pole", back: "Any" },
-        performers: ["Alice Kutsyy"],
-        cameos: [],
+        performers: ["Alice K"],
+        cameos: ["Summer"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         notes: "Available all 4 shows."
       },
       9: {
         id: 9,
-        title: "Ashley Chan, Quan Tran",
+        title: "Team Rocket (Ashley C, Quan T)",
+        concept: "Team Rocket",
         type: "Group",
         apparatus: "Pole w/ Heels, Lyra",
         rigging: { front: "Any", mid: "Aerial/Floor", back: "Pole" },
-        performers: ["Ashley Chan", "Quan Tran"],
-        cameos: ["Andy Pham", "Cat Tang", "Anna Lee"],
+        performers: ["Ashley C", "Quan T"],
+        cameos: ["Andy P", "Cat T", "Anna"],
         availability: ["sat_late", "sun_late"],
-        notes: "Cameos: Andy Pham & Cat Tang."
+        notes: "Cameos: Andy P, Cat T, Anna."
       },
       10: {
         id: 10,
-        title: "Ye Wang, Jie Zou",
+        title: "Black & White Swans (Ye W, Jie Z)",
+        concept: "Black & White Swans",
         type: "Group",
         apparatus: "Silks, Lyra",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Ye Wang", "Jie Zou"],
+        performers: ["Ye W", "Jie Z"],
         cameos: [],
         availability: ["sun_early", "sun_late"],
         notes: "Prefers 2 shows same day (Sunday)."
       },
       11: {
         id: 11,
-        title: "Andy Pham, Charlotte C., Cat T., Michelle L., Sandy W. (Sailor Scouts)",
+        title: "Sailor Scouts",
+        concept: "Sailor Scouts",
         type: "Group",
-        apparatus: "Floor, Chair, Heels",
+        apparatus: "Chair, Heels",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Pole" },
-        performers: ["Andy Pham", "Charlotte C", "Cat Tang", "Michelle Leu", "Sandy Wong"],
-        cameos: ["Austin Truong", "Amiel"],
+        performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"],
+        cameos: ["Amiel", "Austin T"],
         availability: ["sat_early", "sat_late", "sun_late"],
         notes: "Front Floor, Mid Floor, Back Pole. Requires 1-act buffer from Act 9 & Act 14."
       },
       12: {
         id: 12,
-        title: "Patricia Hsuan",
+        title: "Ursula (Patricia H)",
+        concept: "Ursula",
         type: "Solo",
         apparatus: "Pole w/ Heels",
         rigging: { front: "Pole", mid: "Pole", back: "Pole" },
-        performers: ["Patricia Hsuan"],
+        performers: ["Patricia H"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
         notes: "1 show only."
       },
       13: {
         id: 13,
-        title: "Paige Leeds",
+        title: "Ursula (Paige L)",
+        concept: "Ursula",
         type: "Solo",
-        apparatus: "Lyra, Floor",
+        apparatus: "Lyra",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Paige Leeds"],
-        cameos: ["Jenn Lee Tanaka"],
+        performers: ["Paige L"],
+        cameos: ["Jenn L"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
-        notes: "Cameo by Jenn Lee Tanaka (buffer with Act 20)."
+        notes: "Cameo by Jenn L (buffer with Act 20)."
       },
       14: {
         id: 14,
-        title: "Austin Truong, Andy Pham, Cat Tang",
-        type: "Group",
+        title: "Spiderman (Austin T)",
+        concept: "Spiderman",
+        type: "Solo",
         apparatus: "Silks, Straps",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Austin Truong", "Andy Pham", "Cat Tang"],
-        cameos: [],
+        performers: ["Austin T"],
+        cameos: ["Andy P", "Cat T"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
-        notes: "Andy & Cat perform here. Buffer with Act 9 & Act 11."
+        notes: "Cameos: Andy P & Cat T. Buffer with Act 9 & Act 11."
+      },
+      15: {
+        id: 15,
+        title: "Prison Break",
+        concept: "Prison Break",
+        type: "Instructor-led Series",
+        apparatus: "Silks",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Emily C", "Erica C", "Zoe", "Kim G"],
+        cameos: ["Selina"],
+        availability: [],
+        pending: true,
+        notes: "Continuation act immediately after Act 21 (Mama Morton)."
       },
       16: {
         id: 16,
-        title: "Kim Ngo, Jen Jaing",
+        title: "Mulan (Kim N, Jen J)",
+        concept: "Mulan",
         type: "Group",
         apparatus: "Lyra, Straps, Fly Pole",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Kim Ngo", "Jen Jaing"],
+        performers: ["Kim N", "Jen J"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
         notes: "1 show only."
       },
+      17: {
+        id: 17,
+        title: "PowerPuff Girls (Louise, Amiel, Claudelle)",
+        concept: "PowerPuff Girls",
+        type: "Group",
+        apparatus: "Pole (No Heels), Pole w/ Heels",
+        rigging: { front: "Pole", mid: "Pole", back: "Pole" },
+        performers: ["Louise", "Amiel", "Claudelle"],
+        cameos: ["Bobbie"],
+        availability: [],
+        pending: true,
+        notes: "Amiel is a prop in Act 11 (requires 1-act buffer)."
+      },
       18: {
         id: 18,
-        title: "Karen Sanders",
+        title: "Angel Dust (Karen S)",
+        concept: "Angel Dust",
         type: "Solo",
         apparatus: "Lyra",
         rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
-        performers: ["Karen Sanders"],
+        performers: ["Karen S"],
         cameos: [],
         availability: ["sat_early", "sat_late"],
         notes: "Prefers 2 shows same day (Saturday)."
       },
+      19: {
+        id: 19,
+        title: "Lois & Clark (Cece, Josh J)",
+        concept: "Lois & Clark",
+        type: "Group",
+        apparatus: "Pole (No Heels)",
+        rigging: { front: "Pole", mid: "Pole", back: "Pole" },
+        performers: ["Cece", "Josh J"],
+        cameos: [],
+        availability: [],
+        pending: true,
+        notes: "Josh J is distinct from Josh P (Act 22)."
+      },
       20: {
         id: 20,
-        title: "Jenn Lee Tanaka, Celeste",
+        title: "Organ Donor (Jenn L)",
+        concept: "Organ Donor",
         type: "Solo",
         apparatus: "Sphere",
         rigging: { front: "Any", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Jenn Lee Tanaka", "Celeste"],
-        cameos: ["3 extras"],
+        performers: ["Jenn L"],
+        cameos: ["Celeste"],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
-        notes: "Needs buffer with Act 13 (Jenn Lee Tanaka cameo in Act 13)."
+        notes: "Needs buffer with Act 13 (Jenn L cameo in Act 13)."
+      },
+      21: {
+        id: 21,
+        title: "Mama Morton (Selina)",
+        concept: "Mama Morton",
+        type: "Solo",
+        apparatus: "Silks",
+        rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
+        performers: ["Selina"],
+        cameos: ["Emily C", "Zoe"],
+        availability: [],
+        pending: true,
+        notes: "Immediately precedes Act 15 (Prison Break)."
+      },
+      22: {
+        id: 22,
+        title: "Ratatouille (Josh P)",
+        concept: "Ratatouille",
+        type: "Solo",
+        apparatus: "Pole (No Heels)",
+        rigging: { front: "Any", mid: "Pole", back: "Pole" },
+        performers: ["Josh P"],
+        cameos: ["Cheng J"],
+        availability: [],
+        pending: true,
+        notes: "Cheng J cameos here (needs buffer with Act 24)."
       },
       23: {
         id: 23,
-        title: "Christine Sun",
+        title: "Rumi (Christine S)",
+        concept: "Rumi",
         type: "Solo",
         apparatus: "Lyra",
         rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
-        performers: ["Christine Sun"],
+        performers: ["Christine S"],
         cameos: [],
         availability: ["sat_late", "sun_late"],
         notes: "1 show only."
       },
+      24: {
+        id: 24,
+        title: "Masked Assassin (Cheng J)",
+        concept: "Masked Assassin",
+        type: "Solo",
+        apparatus: "Pole (No Heels)",
+        rigging: { front: "Pole", mid: "Any", back: "Pole" },
+        performers: ["Cheng J"],
+        cameos: ["Elly Z"],
+        availability: [],
+        pending: true,
+        notes: "Elly Z is human prop (needs buffer with Act 4)."
+      },
       25: {
         id: 25,
-        title: "Medusa & Her Snakes (Kitty, Derika, Heartley, Emma, Chloe, Anna Lee, Anne, Mackenzie)",
-        type: "Group",
+        title: "Snakes of Medusa",
+        concept: "Snakes of Medusa",
+        type: "Instructor-led Series",
         apparatus: "Chair, Sensual Heels",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
-        performers: ["Kitty", "Derika", "Heartley", "Emma", "Chloe", "Anna Lee", "Anne", "Mackenzie"],
+        performers: ["Kitty", "Derikka", "Heartley", "Emma", "Chloe", "Anna", "Anne", "Mackenzie"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         notes: "Floor only. Zero rigging changeover."
       },
       26: {
         id: 26,
-        title: "Kristine Gonzaga, Scott Suh",
+        title: "Obsession (Kristine G, Scott S)",
+        concept: "Obsession",
         type: "Group",
         apparatus: "Pole w/ Heels, Chair, Sensual Heels",
         rigging: { front: "Aerial/Floor", mid: "Pole", back: "Any" },
-        performers: ["Kristine Gonzaga", "Scott Suh"],
-        cameos: ["Cat Tang"],
+        performers: ["Kristine G", "Scott S"],
+        cameos: ["Cat T"],
         availability: ["sat_early", "sat_late", "sun_late"],
-        notes: "Cameo: Cat Tang. Buffer with Acts 9, 11, 14."
+        notes: "Cameo: Cat T. Buffer with Acts 9, 11, 14."
+      },
+      27: {
+        id: 27,
+        title: "The Devil (Sal)",
+        concept: "The Devil",
+        type: "Group",
+        apparatus: "Pole w/ Heels",
+        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        performers: ["Sal"],
+        cameos: ["Britt C", "Lauren G", "Seema", "Jon", "Rissa"],
+        availability: [],
+        pending: true,
+        notes: "Shares Rissa with Act 3 (needs 1-act buffer)."
       },
       28: {
         id: 28,
-        title: "Masa",
+        title: "Masked Enigma (Masa)",
+        concept: "Masked Enigma",
         type: "Solo",
         apparatus: "Straps",
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
@@ -441,14 +553,15 @@
       },
       29: {
         id: 29,
-        title: "Luna",
+        title: "Poison Ivy (Luna)",
+        concept: "Poison Ivy",
         type: "Solo",
         apparatus: "Hammock",
         rigging: { front: "Any", mid: "Any", back: "Aerial/Floor" },
         performers: ["Luna"],
         cameos: [],
         availability: ["sat_late"],
-        notes: "1 show only (Sat Late). Must be separated from Brian."
+        notes: "1 show only (Sat Late). Must be separated from Brian F."
       }
     };
 
@@ -566,12 +679,19 @@
         });
 
         // Availability check
-        if (!act.availability.includes(showKey)) {
+        if (act.pending) {
           conflicts.push({
             type: "availability",
             actId: act.id,
             slot: slot,
-            message: `Act ${act.id} (${act.title.split('—')[0]}): Not marked available for ${SHOW_INFO[showKey].short}!`
+            message: `Act ${act.id} (${act.title}): Pending availability survey response.`
+          });
+        } else if (!act.availability.includes(showKey)) {
+          conflicts.push({
+            type: "availability",
+            actId: act.id,
+            slot: slot,
+            message: `Act ${act.id} (${act.title}): Not marked available for ${SHOW_INFO[showKey].short}!`
           });
         }
 
@@ -618,6 +738,10 @@
           for (let a = 0; a < apps.length - 1; a++) {
             let app1 = apps[a];
             let app2 = apps[a + 1];
+            // Intentional continuation exception: Act 21 (Mama Morton) -> Act 15 (Prison Break)
+            if ((app1.actId === 21 && app2.actId === 15) || (app1.actId === 15 && app2.actId === 21)) {
+              continue;
+            }
             let diff = Math.abs(app1.slot - app2.slot);
             if (diff < 2) {
               conflicts.push({
@@ -627,7 +751,7 @@
                 act2: app2.actId,
                 slot1: app1.slot,
                 slot2: app2.slot,
-                message: `Performer Buffer Conflict: "${name}" performs in Act ${app1.actId} (Slot #${app1.slot}) and Act ${app2.actId} (Slot #${app2.slot}) with 0 buffer acts!`
+                message: `Performer Buffer Conflict: "${name}" appears in Act ${app1.actId} (Slot #${app1.slot}) and Act ${app2.actId} (Slot #${app2.slot}) with 0 buffer acts!`
               });
             }
           }
@@ -835,9 +959,11 @@
               </div>
               <div class="truncate">
                 <div class="flex items-center gap-1.5 truncate">
-                  <span class="font-bold text-xs text-white truncate">Act ${act.id}: ${act.title.split('—')[0]}</span>
+                  <span class="font-bold text-xs text-white truncate">Act ${act.id}: ${act.title}</span>
                   <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold shrink-0 ${
-                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' :
+                    act.type === 'Instructor-led Series' ? 'bg-teal-950 text-teal-300 border border-teal-800/50' :
+                    'bg-purple-950 text-purple-300 border border-purple-800/50'
                   }">${act.type}</span>
                   <span class="text-[11px] text-slate-400 truncate hidden sm:inline">• ${act.apparatus}</span>
                   ${act.cameos && act.cameos.length > 0 ? `<span class="text-[10px] text-amber-300/80 hidden md:inline">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
@@ -882,12 +1008,14 @@
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="font-bold text-sm text-white">Act ${act.id}: ${act.title}</span>
                   <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
-                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' : 'bg-purple-950 text-purple-300 border border-purple-800/50'
+                    act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' :
+                    act.type === 'Instructor-led Series' ? 'bg-teal-950 text-teal-300 border border-teal-800/50' :
+                    'bg-purple-950 text-purple-300 border border-purple-800/50'
                   }">${act.type}</span>
                 </div>
                 <div class="text-xs text-slate-400 mt-0.5">
                   <span class="text-slate-300 font-medium">${act.apparatus}</span>
-                  ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameos/Props: ${act.cameos.join(", ")}</span>` : ""}
+                  ${act.cameos && act.cameos.length > 0 ? `<span class="ml-2 text-amber-300/90 font-medium">• Cameo: ${act.cameos.join(", ")}</span>` : ""}
                 </div>
                 ${hasConflict ? `
                   <div class="text-[11px] text-rose-400 font-medium mt-1 flex items-center gap-1">
@@ -932,7 +1060,7 @@
                 title="${pointName}: Flexible (Any). Adapts to current stage (${resolvedStageState}) with 0 changeover">
             <span class="text-[10px] text-slate-400">${label}:</span>
             <span class="text-indigo-300 font-semibold">Any</span>
-            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : 'Air'})</span>
+            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : (isCompact ? 'Air/Flr' : 'Aerial/Floor')})</span>
           </span>
         `;
       }
@@ -977,9 +1105,11 @@
         const id = parseInt(idStr);
         if (scheduledIds.has(id)) continue;
 
-        // Search filter
+        // Search filter (matches title, concept, performers, cameos, apparatus, or act #)
+        const allPeopleStr = [...(act.performers || []), ...(act.cameos || [])].join(" ").toLowerCase();
         const matchQuery = !query || 
           act.title.toLowerCase().includes(query) || 
+          allPeopleStr.includes(query) ||
           act.apparatus.toLowerCase().includes(query) ||
           act.id.toString() === query;
 
@@ -987,20 +1117,28 @@
 
         availableCount++;
 
+        const isPending = !!act.pending;
         const isMarkedAvail = act.availability.includes(currentShowKey);
+
+        let statusBadge = "";
+        if (isPending) {
+          statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800/40">Pending</span>`;
+        } else if (isMarkedAvail) {
+          statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/40">Avail</span>`;
+        } else {
+          statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800/40">Unavail</span>`;
+        }
 
         const card = document.createElement("div");
         card.className = "bg-slate-950 border border-slate-800/80 hover:border-slate-700 rounded-lg p-2.5 flex items-center justify-between gap-2 transition";
         card.innerHTML = `
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-xs text-white">Act ${act.id}: ${act.title.split('—')[0]}</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded ${
-                isMarkedAvail ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/40' : 'bg-rose-950 text-rose-300 border border-rose-800/40'
-              }">${isMarkedAvail ? 'Avail' : 'Unavail'}</span>
+              <span class="font-bold text-xs text-white">Act ${act.id}: ${act.title}</span>
+              ${statusBadge}
             </div>
             <div class="text-[11px] text-slate-400 truncate mt-0.5">
-              ${act.apparatus}
+              ${act.apparatus}${act.cameos && act.cameos.length > 0 ? ` • Cameo: ${act.cameos.join(", ")}` : ""}
             </div>
           </div>
           <button onclick="addActToLineup(${act.id})" class="shrink-0 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold transition" title="Add to Lineup">

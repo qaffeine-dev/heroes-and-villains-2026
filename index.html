@@ -38,14 +38,34 @@
           <span class="text-slate-400 font-normal text-lg md:text-xl">| Interactive Lineup & Rigging Scheduler</span>
         </h1>
       </div>
-      <p class="text-slate-400 text-sm mt-1">
+      <p id="header-subtitle-text" class="text-slate-400 text-sm mt-1">
         Drag and reorder acts to dynamically compute rigging state transitions, cameo buffers, and performer availability.
       </p>
     </div>
 
-    <!-- Presets & Controls -->
-    <div class="flex flex-col items-start md:items-end gap-2.5">
-      <!-- Row 1: Preset Selector Pills -->
+    <!-- Read-Only Shared Mode Banner (Hidden in Editor Mode) -->
+    <div id="readonly-share-banner" class="hidden flex-col items-start md:items-end gap-2">
+      <div class="bg-indigo-950/80 border border-indigo-500/60 rounded-xl px-4 py-2.5 flex flex-wrap items-center gap-3 shadow-lg">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded bg-indigo-500/30 border border-indigo-400/50 text-indigo-200 text-[11px] font-bold uppercase tracking-wider">🔒 Read-Only Link</span>
+          <span class="text-xs text-slate-300">Viewing Preset:</span>
+          <span id="readonly-preset-title" class="text-sm font-extrabold text-white">Preset</span>
+        </div>
+        <div class="flex items-center gap-1.5 border-l border-indigo-800/80 pl-3">
+          <button onclick="copyCurrentShareLink()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm" title="Copy this read-only link">
+            <span>🔗</span>
+            <span>Copy Link</span>
+          </button>
+          <button onclick="exitReadOnlyMode()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium rounded transition" title="Unlock a local editable copy in your browser">
+            🔓 Edit Copy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Presets & Controls (Hidden in Read-Only Mode) -->
+    <div id="editor-preset-controls" class="flex flex-col items-start md:items-end gap-2.5">
+      <!-- Row 1: Preset Selector Pills (each has its own 🔗 Share Read-Only button) -->
       <div class="flex flex-wrap items-center gap-1.5">
         <span class="text-xs text-slate-400 font-medium mr-1">Load Preset:</span>
         <div id="preset-buttons-container" class="flex flex-wrap items-center gap-1.5">
@@ -69,11 +89,31 @@
         <button onclick="renameCurrentPreset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded transition" title="Rename the active preset using the name typed in the box">
           ✏️ Rename
         </button>
+        <button onclick="sharePresetReadOnly(currentPresetKey)" class="px-2.5 py-1 bg-sky-950/80 hover:bg-sky-900/80 text-sky-200 border border-sky-700/60 font-semibold rounded transition flex items-center gap-1" title="Generate & copy a shareable read-only link for the active preset">
+          <span>🔗</span>
+          <span>Share Read-Only</span>
+        </button>
         <button onclick="optimizeCurrentPresetRigging()" class="px-2.5 py-1 bg-amber-950/70 hover:bg-amber-900/70 text-amber-300 border border-amber-700/60 font-semibold rounded transition" title="Reorder acts in active shows for the least amount of rigging changes">
           ⚡ Min Rigging
         </button>
         <button onclick="resetCurrentShow()" class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold rounded transition" title="Clear acts from current show tab">
           ↺ Clear Show
+        </button>
+      </div>
+
+      <!-- Row 3: Shareable Read-Only Link Drawer (appears when 🔗 is clicked on any preset) -->
+      <div id="share-link-drawer" class="hidden w-full bg-slate-900/95 border border-sky-500/40 rounded-lg p-2 flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs shadow-lg">
+        <span id="share-link-label" class="text-[11px] font-semibold text-sky-300 shrink-0 pl-1">🔗 Read-Only Link:</span>
+        <input id="share-link-input" type="text" readonly onclick="this.select()"
+          class="w-full sm:w-72 md:w-96 bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-[11px] text-slate-200 font-mono focus:outline-none focus:border-sky-500">
+        <button onclick="copyShareDrawerInput()" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded transition shrink-0">
+          📋 Copy
+        </button>
+        <a id="share-link-open-btn" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-medium rounded transition shrink-0" title="Open read-only link in a new tab">
+          ↗ Preview
+        </a>
+        <button onclick="document.getElementById('share-link-drawer').classList.add('hidden')" class="px-1.5 py-1 text-slate-400 hover:text-white transition shrink-0" title="Close">
+          ✕
         </button>
       </div>
     </div>
@@ -145,7 +185,7 @@
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <!-- Mode Segmented Toggle: Read-Only vs Editable -->
-          <div class="inline-flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-xs">
+          <div id="all-shows-mode-toggle" class="inline-flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-xs">
             <button id="mode-readonly-btn" onclick="setAllShowsEditMode(false)" class="px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 bg-indigo-600 text-white shadow-sm">
               <span>🔒</span>
               <span>Read-Only</span>
@@ -176,17 +216,17 @@
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center gap-2">
             <h2 id="current-show-title" class="text-lg font-bold text-white">Saturday Early (3:00 PM) Lineup</h2>
-            <span class="text-xs text-slate-400">(Drag acts or use ▲ ▼ buttons)</span>
+            <span id="single-show-subtitle" class="text-xs text-slate-400">(Drag acts or use ▲ ▼ buttons)</span>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="toggleCompactView()" id="compact-toggle-btn" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition flex items-center gap-1.5" title="Toggle dense compact view to see all acts without scrolling">
               <span id="compact-btn-icon">🗜️</span>
               <span id="compact-btn-text">Compact View</span>
             </button>
-            <button onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
+            <button id="toggle-intermission-btn" onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
               ⏸️ Toggle Intermission
             </button>
-            <div class="inline-flex items-center rounded overflow-hidden border border-emerald-500/30 bg-slate-800">
+            <div id="single-show-game-controls" class="inline-flex items-center rounded overflow-hidden border border-emerald-500/30 bg-slate-800">
               <button onclick="addGameToCurrentShow()" class="text-xs px-2.5 py-1 hover:bg-slate-700 text-emerald-300 font-medium transition flex items-center gap-1" title="Insert a Game break into this show (can add multiple)">
                 <span>🎲</span>
                 <span id="add-game-btn-text">+ Add Game</span>
@@ -229,7 +269,7 @@
               <span>Acts Available for this Show</span>
               <span id="bench-count" class="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs">0</span>
             </h3>
-            <span class="text-[11px] text-slate-500">Click + to add to lineup</span>
+            <span id="bench-help-text" class="text-[11px] text-slate-500">Click + to add to lineup</span>
           </div>
 
           <div class="mb-3">
@@ -1034,6 +1074,247 @@
     let riggingOverrides = JSON.parse(JSON.stringify(PRESETS.config1.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
     let draggedIndex = null;
     let isCompactView = false;
+    let isReadOnlyShareMode = false;
+    let sharedPresetTitle = "";
+
+    // ==========================================
+    // 2B. SHAREABLE READ-ONLY LINK ENCODING
+    // ==========================================
+
+    function encodeShowLineupCompact(arr) {
+      return (arr || []).map(item => {
+        if (item === "INTERMISSION") return "I";
+        if (item === "GAMES") return "G";
+        return String(item);
+      }).join(".");
+    }
+
+    function decodeShowLineupCompact(str) {
+      if (!str || typeof str !== "string") return [];
+      return str.split(".").filter(Boolean).map(tok => {
+        if (tok === "I") return "INTERMISSION";
+        if (tok === "G") return "GAMES";
+        const num = parseInt(tok, 10);
+        return (!isNaN(num) && ACTS[num]) ? num : null;
+      }).filter(x => x !== null);
+    }
+
+    function toBase64Url(str) {
+      const b64 = btoa(unescape(encodeURIComponent(str)));
+      return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function fromBase64Url(b64url) {
+      let b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4 !== 0) b64 += "=";
+      return decodeURIComponent(escape(atob(b64)));
+    }
+
+    function getShareBaseUrl() {
+      if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        return window.location.origin + window.location.pathname;
+      }
+      return "https://qaffeine-dev.github.io/heroes-and-villains-2026/";
+    }
+
+    function buildPresetShareUrl(presetKey) {
+      const targetKey = presetKey || currentPresetKey;
+      const preset = PRESETS[targetKey];
+      const useLive = (targetKey === currentPresetKey);
+      const name = isReadOnlyShareMode
+        ? (sharedPresetTitle || "Shared Preset")
+        : (preset ? preset.name : "Custom Preset");
+      const showsObj = useLive ? showLineups : (preset ? preset.shows : showLineups);
+      const ovObj = useLive ? riggingOverrides : (preset && preset.riggingOverrides ? preset.riggingOverrides : {});
+
+      const payload = {
+        n: name,
+        s: [
+          encodeShowLineupCompact(showsObj.sat_early),
+          encodeShowLineupCompact(showsObj.sat_late),
+          encodeShowLineupCompact(showsObj.sun_early),
+          encodeShowLineupCompact(showsObj.sun_late)
+        ]
+      };
+
+      const hasOverrides = ovObj && Object.values(ovObj).some(s => s && Object.keys(s).length > 0);
+      if (hasOverrides) {
+        payload.o = ovObj;
+      }
+
+      const encoded = toBase64Url(JSON.stringify(payload));
+      return `${getShareBaseUrl()}?ro=1&p=${encoded}`;
+    }
+
+    function copyTextToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+      } else {
+        fallbackCopyText(text);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    function sharePresetReadOnly(presetKey) {
+      const targetKey = presetKey || currentPresetKey;
+      const preset = PRESETS[targetKey];
+      const presetName = preset ? preset.name : "Preset";
+      const url = buildPresetShareUrl(targetKey);
+
+      copyTextToClipboard(url);
+
+      const drawer = document.getElementById("share-link-drawer");
+      const label = document.getElementById("share-link-label");
+      const input = document.getElementById("share-link-input");
+      const openBtn = document.getElementById("share-link-open-btn");
+      if (drawer && input) {
+        if (label) label.textContent = `🔗 Read-Only (${presetName}):`;
+        input.value = url;
+        if (openBtn) openBtn.href = url;
+        drawer.classList.remove("hidden");
+      }
+
+      showToast(`🔗 Read-only link copied for "${presetName}"!`);
+    }
+
+    function copyShareDrawerInput() {
+      const input = document.getElementById("share-link-input");
+      if (!input || !input.value) return;
+      input.select();
+      copyTextToClipboard(input.value);
+      showToast("🔗 Read-only link copied to clipboard!");
+    }
+
+    function copyCurrentShareLink() {
+      const url = window.location.href.includes("ro=1") ? window.location.href : buildPresetShareUrl(currentPresetKey);
+      copyTextToClipboard(url);
+      showToast("🔗 Read-only link copied to clipboard!");
+    }
+
+    function applyReadOnlyUiMode() {
+      const editorControls = document.getElementById("editor-preset-controls");
+      const roBanner = document.getElementById("readonly-share-banner");
+      const roTitle = document.getElementById("readonly-preset-title");
+      const headerSub = document.getElementById("header-subtitle-text");
+      const allShowsModeToggle = document.getElementById("all-shows-mode-toggle");
+      const allShowsSub = document.getElementById("all-shows-subtitle-text");
+      const singleShowSub = document.getElementById("single-show-subtitle");
+      const interBtn = document.getElementById("toggle-intermission-btn");
+      const gameCtrls = document.getElementById("single-show-game-controls");
+      const benchHelp = document.getElementById("bench-help-text");
+
+      if (isReadOnlyShareMode) {
+        if (editorControls) editorControls.classList.add("hidden");
+        if (roBanner) {
+          roBanner.classList.remove("hidden");
+          roBanner.classList.add("flex");
+        }
+        if (roTitle) roTitle.textContent = sharedPresetTitle;
+        if (headerSub) headerSub.textContent = `Viewing shared read-only preset "${sharedPresetTitle}". Switch between tabs or hover over acts to inspect availability & rigging.`;
+        if (allShowsModeToggle) allShowsModeToggle.classList.add("hidden");
+        if (allShowsSub) allShowsSub.textContent = `(🔒 Read-only shared preset "${sharedPresetTitle}")`;
+        if (singleShowSub) singleShowSub.textContent = `(🔒 Read-only shared view)`;
+        if (interBtn) interBtn.classList.add("hidden");
+        if (gameCtrls) gameCtrls.classList.add("hidden");
+        if (benchHelp) benchHelp.textContent = "Read-only view";
+        isAllShowsEditMode = false;
+      } else {
+        if (editorControls) editorControls.classList.remove("hidden");
+        if (roBanner) {
+          roBanner.classList.add("hidden");
+          roBanner.classList.remove("flex");
+        }
+        if (headerSub) headerSub.textContent = "Drag and reorder acts to dynamically compute rigging state transitions, cameo buffers, and performer availability.";
+        if (allShowsModeToggle) allShowsModeToggle.classList.remove("hidden");
+        if (allShowsSub) allShowsSub.textContent = "(Read-only quick view • Switch to Editable to reorder or move acts)";
+        if (singleShowSub) singleShowSub.textContent = "(Drag acts or use ▲ ▼ buttons)";
+        if (interBtn) interBtn.classList.remove("hidden");
+        if (gameCtrls) gameCtrls.classList.remove("hidden");
+        if (benchHelp) benchHelp.textContent = "Click + to add to lineup";
+      }
+    }
+
+    function checkUrlForSharedPreset() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const isRo = params.get("ro") === "1" || params.get("readonly") === "1";
+        const pParam = params.get("p") || params.get("share");
+        const presetParam = params.get("preset");
+
+        if (pParam) {
+          const decodedJson = fromBase64Url(pParam);
+          const payload = JSON.parse(decodedJson);
+          if (payload && Array.isArray(payload.s)) {
+            isReadOnlyShareMode = true;
+            sharedPresetTitle = payload.n || "Shared Preset";
+            showLineups = {
+              sat_early: decodeShowLineupCompact(payload.s[0]),
+              sat_late:  decodeShowLineupCompact(payload.s[1]),
+              sun_early: decodeShowLineupCompact(payload.s[2]),
+              sun_late:  decodeShowLineupCompact(payload.s[3])
+            };
+            riggingOverrides = payload.o || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} };
+            const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
+            if (firstActive) currentShowKey = firstActive;
+            applyReadOnlyUiMode();
+            return true;
+          }
+        } else if (isRo && presetParam && PRESETS[presetParam]) {
+          isReadOnlyShareMode = true;
+          currentPresetKey = presetParam;
+          sharedPresetTitle = PRESETS[presetParam].name;
+          showLineups = JSON.parse(JSON.stringify(PRESETS[presetParam].shows));
+          riggingOverrides = JSON.parse(JSON.stringify(PRESETS[presetParam].riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
+          const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
+          if (firstActive) currentShowKey = firstActive;
+          applyReadOnlyUiMode();
+          return true;
+        }
+      } catch (e) {
+        console.warn("Could not parse shared preset URL:", e);
+      }
+      return false;
+    }
+
+    function exitReadOnlyMode() {
+      isReadOnlyShareMode = false;
+      // Save the shared preset into PRESETS if it isn't already there so user can edit it
+      const existingEntry = Object.entries(PRESETS).find(([k, v]) => v.name === sharedPresetTitle);
+      if (existingEntry) {
+        currentPresetKey = existingEntry[0];
+      } else if (sharedPresetTitle) {
+        const newKey = "shared_" + Date.now();
+        PRESETS[newKey] = {
+          name: sharedPresetTitle,
+          custom: true,
+          shows: JSON.parse(JSON.stringify(showLineups)),
+          riggingOverrides: JSON.parse(JSON.stringify(riggingOverrides || {}))
+        };
+        currentPresetKey = newKey;
+        persistPresetsToStorage();
+      }
+      // Clean URL query params without reloading
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      applyReadOnlyUiMode();
+      renderPresetButtons();
+      renderTabs();
+      if (isAllShowsView) renderAllActiveShows();
+      else renderLineup();
+      renderBench();
+      showToast(`Unlocked editable copy of "${sharedPresetTitle}"!`);
+    }
 
     // ==========================================
     // 3. RIGGING ENGINE & CONFLICT DETECTION
@@ -1414,6 +1695,16 @@
           ${preset.modified ? '<span class="text-[9px] text-amber-300 font-normal">(edited)</span>' : ''}
         `;
         wrapper.appendChild(btn);
+
+        const shareBtn = document.createElement("button");
+        shareBtn.onclick = (e) => {
+          e.stopPropagation();
+          sharePresetReadOnly(key);
+        };
+        shareBtn.className = "px-1.5 py-1.5 text-[10px] text-sky-300 hover:bg-sky-950 hover:text-sky-200 border-l border-slate-700/80 transition";
+        shareBtn.title = `Copy shareable read-only link for "${preset.name}"`;
+        shareBtn.textContent = "🔗";
+        wrapper.appendChild(shareBtn);
 
         if (preset.custom) {
           const delBtn = document.createElement("button");
@@ -1969,11 +2260,13 @@
         if (item.type === "act" && item.hasChangeover && rIdx > 0) {
           const changeEl = document.createElement("div");
           let shiftBtnsHtml = "";
-          if (item.shiftBeforeActId) {
-            shiftBtnsHtml += `<button onclick="shiftRiggingChangeBefore('${currentShowKey}', ${item.shiftBeforeActId}, ${item.act.id})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change earlier (before Act ${item.shiftBeforeActId}: ${ACTS[item.shiftBeforeActId].title})">▲ Move Before Act ${item.shiftBeforeActId}</button>`;
-          }
-          if (item.shiftAfterActId) {
-            shiftBtnsHtml += `<button onclick="shiftRiggingChangeAfter('${currentShowKey}', ${item.shiftAfterActId})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change later (after Act ${item.shiftAfterActId}: ${ACTS[item.shiftAfterActId].title})">▼ Move After Act ${item.shiftAfterActId}</button>`;
+          if (!isReadOnlyShareMode) {
+            if (item.shiftBeforeActId) {
+              shiftBtnsHtml += `<button onclick="shiftRiggingChangeBefore('${currentShowKey}', ${item.shiftBeforeActId}, ${item.act.id})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change earlier (before Act ${item.shiftBeforeActId}: ${ACTS[item.shiftBeforeActId].title})">▲ Move Before Act ${item.shiftBeforeActId}</button>`;
+            }
+            if (item.shiftAfterActId) {
+              shiftBtnsHtml += `<button onclick="shiftRiggingChangeAfter('${currentShowKey}', ${item.shiftAfterActId})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change later (after Act ${item.shiftAfterActId}: ${ACTS[item.shiftAfterActId].title})">▼ Move After Act ${item.shiftAfterActId}</button>`;
+            }
           }
 
           if (isCompactView) {
@@ -2008,16 +2301,18 @@
 
         if (item.type === "intermission") {
           const interEl = document.createElement("div");
-          interEl.draggable = true;
-          interEl.dataset.index = item.index;
-          interEl.ondragstart = handleDragStart;
-          interEl.ondragover = handleDragOver;
-          interEl.ondragleave = handleDragLeave;
-          interEl.ondrop = handleDrop;
-          interEl.ondragend = handleDragEnd;
+          if (!isReadOnlyShareMode) {
+            interEl.draggable = true;
+            interEl.dataset.index = item.index;
+            interEl.ondragstart = handleDragStart;
+            interEl.ondragover = handleDragOver;
+            interEl.ondragleave = handleDragLeave;
+            interEl.ondrop = handleDrop;
+            interEl.ondragend = handleDragEnd;
+          }
 
           if (isCompactView) {
-            interEl.className = "bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-3 text-center cursor-move transition hover:border-indigo-400";
+            interEl.className = `bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-indigo-400'}`;
             interEl.innerHTML = `
               <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
@@ -2025,15 +2320,17 @@
                   <span class="font-bold text-indigo-300 tracking-wider uppercase text-[11px]">Intermission</span>
                   <span class="text-[10px] text-slate-400 hidden sm:inline">(Major changeovers & pole strikes occur here)</span>
                 </div>
+                ${isReadOnlyShareMode ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
                   <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
                 </div>
+                `}
               </div>
             `;
           } else {
-            interEl.className = "bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-indigo-400";
+            interEl.className = `bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-indigo-400'}`;
             interEl.innerHTML = `
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -2041,11 +2338,13 @@
                   <span class="font-bold text-indigo-300 text-xs tracking-wider uppercase">Intermission</span>
                   <span class="text-[11px] text-slate-400">(Major changeovers & pole strikes occur here)</span>
                 </div>
+                ${isReadOnlyShareMode ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
                   <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Intermission">✕</button>
                 </div>
+                `}
               </div>
             `;
           }
@@ -2055,16 +2354,18 @@
 
         if (item.type === "games") {
           const gamesEl = document.createElement("div");
-          gamesEl.draggable = true;
-          gamesEl.dataset.index = item.index;
-          gamesEl.ondragstart = handleDragStart;
-          gamesEl.ondragover = handleDragOver;
-          gamesEl.ondragleave = handleDragLeave;
-          gamesEl.ondrop = handleDrop;
-          gamesEl.ondragend = handleDragEnd;
+          if (!isReadOnlyShareMode) {
+            gamesEl.draggable = true;
+            gamesEl.dataset.index = item.index;
+            gamesEl.ondragstart = handleDragStart;
+            gamesEl.ondragover = handleDragOver;
+            gamesEl.ondragleave = handleDragLeave;
+            gamesEl.ondrop = handleDrop;
+            gamesEl.ondragend = handleDragEnd;
+          }
 
           if (isCompactView) {
-            gamesEl.className = "bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-3 text-center cursor-move transition hover:border-emerald-400";
+            gamesEl.className = `bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-emerald-400'}`;
             gamesEl.innerHTML = `
               <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
@@ -2072,15 +2373,17 @@
                   <span class="font-bold text-emerald-300 tracking-wider uppercase text-[11px]">${item.label}</span>
                   <span class="text-[10px] text-slate-400 hidden sm:inline">(Audience games & stage transition break)</span>
                 </div>
+                ${isReadOnlyShareMode ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
                   <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove ${item.label}">✕</button>
                 </div>
+                `}
               </div>
             `;
           } else {
-            gamesEl.className = "bg-emerald-950/50 border-2 border-dashed border-emerald-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-emerald-400";
+            gamesEl.className = `bg-emerald-950/50 border-2 border-dashed border-emerald-500/40 rounded-lg p-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-emerald-400'}`;
             gamesEl.innerHTML = `
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -2088,11 +2391,13 @@
                   <span class="font-bold text-emerald-300 text-xs tracking-wider uppercase">${item.label}</span>
                   <span class="text-[11px] text-slate-400">(Audience games & stage transition break)</span>
                 </div>
+                ${isReadOnlyShareMode ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
                   <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove ${item.label}">✕</button>
                 </div>
+                `}
               </div>
             `;
           }
@@ -2127,19 +2432,21 @@
           ? "border-fuchsia-500/70 shadow-fuchsia-950/50 shadow-md"
           : "border-slate-800 hover:border-slate-700";
 
-        actCard.draggable = true;
-        actCard.dataset.index = item.index;
-        actCard.ondragstart = (e) => { hideActTooltip(); handleDragStart.call(actCard, e); };
-        actCard.ondragover = handleDragOver;
-        actCard.ondragleave = handleDragLeave;
-        actCard.ondrop = handleDrop;
-        actCard.ondragend = handleDragEnd;
+        if (!isReadOnlyShareMode) {
+          actCard.draggable = true;
+          actCard.dataset.index = item.index;
+          actCard.ondragstart = (e) => { hideActTooltip(); handleDragStart.call(actCard, e); };
+          actCard.ondragover = handleDragOver;
+          actCard.ondragleave = handleDragLeave;
+          actCard.ondrop = handleDrop;
+          actCard.ondragend = handleDragEnd;
+        }
         actCard.onmouseenter = (e) => showActTooltip(e, act.id);
         actCard.onmousemove = (e) => moveActTooltip(e);
         actCard.onmouseleave = () => hideActTooltip();
 
         if (isCompactView) {
-          actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition cursor-grab active:cursor-grabbing`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition ${isReadOnlyShareMode ? '' : 'cursor-grab active:cursor-grabbing'}`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info in single row -->
@@ -2180,15 +2487,17 @@
                 ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, true, act.id)}
                 ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, true, act.id)}
               </div>
+              ${isReadOnlyShareMode ? '' : `
               <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition pl-1.5 border-l border-slate-800">
                 <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
                 <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
                 <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
               </div>
+              `}
             </div>
           `;
         } else {
-          actCard.className = `group bg-slate-900 border ${borderClass} rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition cursor-grab active:cursor-grabbing`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition ${isReadOnlyShareMode ? '' : 'cursor-grab active:cursor-grabbing'}`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info -->
@@ -2239,12 +2548,14 @@
                 </div>
               </div>
 
+              ${isReadOnlyShareMode ? '' : `
               <!-- Up / Down / Remove buttons -->
               <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition pl-2 border-l border-slate-800">
                 <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
                 <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
                 <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400 hover:text-rose-300 transition" title="Remove to Bench">✕</button>
               </div>
+              `}
             </div>
           `;
         }
@@ -2258,6 +2569,16 @@
       const pointKey = pointName.toLowerCase();
       if (actReq === "Any") {
         const hasManualOverride = actId && riggingOverrides && riggingOverrides[currentShowKey] && riggingOverrides[currentShowKey][actId] && riggingOverrides[currentShowKey][actId][pointKey];
+        if (isReadOnlyShareMode) {
+          return `
+            <span class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700"
+                  title="${pointName}: Flexible (Any). Currently ${resolvedStageState}.">
+              <span class="text-[10px] text-slate-400">${label}:</span>
+              <span class="text-indigo-300 font-semibold">Any</span>
+              <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : (isCompact ? 'Air/Flr' : 'Aerial/Floor')})</span>
+            </span>
+          `;
+        }
         return `
           <button type="button"
                   onclick="event.stopPropagation(); toggleActAnyPoint('${currentShowKey}', ${actId}, '${pointKey}', '${resolvedStageState}')"
@@ -2372,9 +2693,11 @@
               ${act.apparatus}${act.cameos && act.cameos.length > 0 ? ` • Cameo: ${act.cameos.join(", ")}` : ""}
             </div>
           </div>
+          ${isReadOnlyShareMode ? '' : `
           <button onclick="addActToLineup(${act.id})" class="shrink-0 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold transition" title="Add to Lineup">
             + Add
           </button>
+          `}
         `;
         benchContainer.appendChild(card);
       }
@@ -2565,6 +2888,7 @@
     }
 
     function setAllShowsEditMode(editable) {
+      if (isReadOnlyShareMode) return;
       isAllShowsEditMode = !!editable;
       const roBtn = document.getElementById("mode-readonly-btn");
       const edBtn = document.getElementById("mode-editable-btn");
@@ -3140,10 +3464,20 @@
 
     // Initialize
     window.addEventListener("DOMContentLoaded", () => {
+      const openedShared = checkUrlForSharedPreset();
       renderPresetButtons();
-      renderTabs();
-      renderLineup();
-      renderBench();
+      if (openedShared) {
+        isAllShowsView = true;
+        document.getElementById("single-show-workspace").classList.add("hidden");
+        document.getElementById("all-shows-workspace").classList.remove("hidden");
+        renderTabs();
+        renderAllActiveShows();
+        renderBench();
+      } else {
+        renderTabs();
+        renderLineup();
+        renderBench();
+      }
     });
   </script>
 </body>

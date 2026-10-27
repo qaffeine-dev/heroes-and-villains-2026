@@ -269,6 +269,10 @@
       Copied!
     </div>
 
+    <!-- Floating Act Availability Hover Tooltip -->
+    <div id="act-hover-tooltip" class="fixed hidden pointer-events-none z-50 w-72 bg-slate-950/95 backdrop-blur-md border border-slate-700/90 rounded-xl p-3 shadow-2xl text-xs space-y-2">
+    </div>
+
   </div>
 
   <script>
@@ -1472,14 +1476,16 @@
           colHtml += `
             <div ${isAllShowsEditMode ? `
                  draggable="true"
-                 ondragstart="handleMultiDragStart(event, '${showKey}', ${item.index})"
+                 ondragstart="hideActTooltip(); handleMultiDragStart(event, '${showKey}', ${item.index})"
                  ondragover="handleMultiDragOver(event)"
                  ondragleave="handleMultiDragLeave(event)"
                  ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
                  ondragend="handleMultiDragEnd(event)"
                  ` : ''}
-                 class="group border ${borderCls} rounded-lg py-1.5 px-2 flex items-center justify-between gap-1.5 ${isAllShowsEditMode ? 'cursor-grab active:cursor-grabbing' : ''} transition"
-                 ${conflictTooltip ? `title="${conflictTooltip.replace(/"/g, '&quot;')}"` : ''}>
+                 onmouseenter="showActTooltip(event, ${act.id})"
+                 onmousemove="moveActTooltip(event)"
+                 onmouseleave="hideActTooltip()"
+                 class="group border ${borderCls} rounded-lg py-1.5 px-2 flex items-center justify-between gap-1.5 ${isAllShowsEditMode ? 'cursor-grab active:cursor-grabbing' : ''} transition">
               <div class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-800 border border-slate-700/70 text-[11px] font-extrabold text-white flex items-center justify-center shrink-0">${item.slot}</span>
                 <div class="min-w-0">
@@ -1824,11 +1830,14 @@
 
         actCard.draggable = true;
         actCard.dataset.index = item.index;
-        actCard.ondragstart = handleDragStart;
+        actCard.ondragstart = (e) => { hideActTooltip(); handleDragStart.call(actCard, e); };
         actCard.ondragover = handleDragOver;
         actCard.ondragleave = handleDragLeave;
         actCard.ondrop = handleDrop;
         actCard.ondragend = handleDragEnd;
+        actCard.onmouseenter = (e) => showActTooltip(e, act.id);
+        actCard.onmousemove = (e) => moveActTooltip(e);
+        actCard.onmouseleave = () => hideActTooltip();
 
         if (isCompactView) {
           actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition cursor-grab active:cursor-grabbing`;
@@ -2041,6 +2050,9 @@
 
         const card = document.createElement("div");
         card.className = "bg-slate-950 border border-slate-800/80 hover:border-slate-700 rounded-lg p-2.5 flex items-center justify-between gap-2 transition";
+        card.onmouseenter = (e) => showActTooltip(e, act.id);
+        card.onmousemove = (e) => moveActTooltip(e);
+        card.onmouseleave = () => hideActTooltip();
         card.innerHTML = `
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
@@ -2269,6 +2281,7 @@
     }
 
     function moveItemInShow(showKey, index, direction) {
+      hideActTooltip();
       const lineup = showLineups[showKey];
       if (!lineup) return;
       const targetIndex = index + direction;
@@ -2286,6 +2299,7 @@
     }
 
     function removeLineupItemFromShow(showKey, index) {
+      hideActTooltip();
       const lineup = showLineups[showKey];
       if (!lineup) return;
       lineup.splice(index, 1);
@@ -2373,6 +2387,7 @@
     }
 
     function moveItem(index, direction) {
+      hideActTooltip();
       const lineup = showLineups[currentShowKey];
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= lineup.length) return;
@@ -2385,6 +2400,7 @@
     }
 
     function removeLineupItem(index) {
+      hideActTooltip();
       const lineup = showLineups[currentShowKey];
       lineup.splice(index, 1);
       renderLineup();
@@ -2393,6 +2409,7 @@
     }
 
     function addActToLineup(actId) {
+      hideActTooltip();
       const lineup = showLineups[currentShowKey];
       lineup.push(actId);
       renderLineup();
@@ -2635,6 +2652,92 @@
       navigator.clipboard.writeText(text).then(() => {
         showToast("Lineup Markdown copied to clipboard!");
       });
+    }
+
+    function showActTooltip(e, actId) {
+      const act = ACTS[actId];
+      const tooltip = document.getElementById("act-hover-tooltip");
+      if (!act || !tooltip) return;
+
+      const maxShows = act.maxShows || 2;
+      const scheduledShowKeys = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id));
+
+      const showPillsHtml = Object.entries(SHOW_INFO).map(([sKey, sInfo]) => {
+        const isAvail = act.availability.includes(sKey);
+        const isScheduled = scheduledShowKeys.includes(sKey);
+        const pillCls = isAvail
+          ? (isScheduled
+              ? "bg-emerald-950/90 text-emerald-200 border-emerald-400/80 ring-1 ring-emerald-400/40"
+              : "bg-emerald-950/50 text-emerald-300 border-emerald-700/50")
+          : (isScheduled
+              ? "bg-rose-950/90 text-rose-200 border-rose-500/80"
+              : "bg-slate-900/80 text-slate-500 border-slate-800");
+        const icon = isAvail ? "✓" : "✕";
+        return `
+          <div class="px-2 py-1 rounded border ${pillCls} flex items-center justify-between gap-1 text-[10px]">
+            <span class="font-semibold truncate">${ icon } ${ sInfo.short }</span>
+            ${ isScheduled ? '<span class="px-1 py-0.2 rounded bg-indigo-600/90 text-white text-[8px] font-bold uppercase shrink-0">In Show</span>' : '' }
+          </div>
+        `;
+      }).join("");
+
+      tooltip.innerHTML = `
+        <div class="border-b border-slate-800 pb-1.5">
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="font-bold text-white text-xs truncate">Act ${act.id}: ${act.title}</span>
+            <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold shrink-0 ${
+              act.type === 'Solo' ? 'bg-sky-950 text-sky-300 border border-sky-800/50' :
+              act.type === 'Instructor-led Series' ? 'bg-teal-950 text-teal-300 border border-teal-800/50' :
+              'bg-purple-950 text-purple-300 border border-purple-800/50'
+            }">${act.type === 'Instructor-led Series' ? 'Series' : act.type}</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-0.5 flex items-center justify-between">
+            <span>${DAY_PREF_LABELS[act.dayPref] || ''}</span>
+            <span class="font-semibold ${scheduledShowKeys.length > maxShows ? 'text-rose-400' : 'text-indigo-300'}">${scheduledShowKeys.length}/${maxShows} Shows Scheduled</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Available Shows</div>
+          <div class="grid grid-cols-2 gap-1">
+            ${showPillsHtml}
+          </div>
+        </div>
+
+        <div class="pt-1 border-t border-slate-800/80 text-[10px] text-slate-300 space-y-0.5">
+          <div><span class="text-slate-400">Apparatus:</span> <span class="font-medium">${act.apparatus}</span></div>
+          <div><span class="text-slate-400">Rigging:</span> <span class="font-medium">F: ${act.rigging.front} | M: ${act.rigging.mid} | B: ${act.rigging.back}</span></div>
+          ${act.cameos && act.cameos.length > 0 ? `<div><span class="text-amber-300/90">Cameo/Prop:</span> ${act.cameos.join(", ")}</div>` : ''}
+        </div>
+      `;
+
+      tooltip.classList.remove("hidden");
+      moveActTooltip(e);
+    }
+
+    function moveActTooltip(e) {
+      const tooltip = document.getElementById("act-hover-tooltip");
+      if (!tooltip || tooltip.classList.contains("hidden")) return;
+
+      const pad = 14;
+      const rect = tooltip.getBoundingClientRect();
+      let left = e.clientX + pad;
+      let top = e.clientY + pad;
+
+      if (left + rect.width > window.innerWidth - 12) {
+        left = e.clientX - rect.width - pad;
+      }
+      if (top + rect.height > window.innerHeight - 12) {
+        top = Math.max(12, window.innerHeight - rect.height - 12);
+      }
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+
+    function hideActTooltip() {
+      const tooltip = document.getElementById("act-hover-tooltip");
+      if (tooltip) tooltip.classList.add("hidden");
     }
 
     function showToast(msg) {

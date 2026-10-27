@@ -776,26 +776,6 @@
     // 2. CONFIG PRESETS & CUSTOM PRESET STORAGE
     // ==========================================
     const DEFAULT_PRESETS = {
-      config1: {
-        name: "Config 1 (Sat E, Sat L, Sun L)",
-        builtIn: true,
-        shows: {
-          sat_early: [11, 8, 12, 19, 17, 24, 6, 18, "INTERMISSION", 1, 21, 15, 13, 7, 14, 20, 5],
-          sat_late:  [9, 17, 6, 22, 3, 18, 4, 29, "INTERMISSION", 26, 16, 21, 15, 25, 13, 28, 20],
-          sun_early: [],
-          sun_late:  [9, 7, 11, 24, 8, 2, 3, 1, "INTERMISSION", 23, 26, 27, 25, 10, 14, 5, 28]
-        }
-      },
-      config2: {
-        name: "Config 2 (Sat L, Sun E, Sun L)",
-        builtIn: true,
-        shows: {
-          sat_early: [],
-          sat_late:  [9, 7, 11, 24, 12, 17, 6, 22, "INTERMISSION", 3, 18, 4, 29, 26, 16, 21, 15, 14],
-          sun_early: [17, 19, 8, 2, 3, 4, 27, 1, "INTERMISSION", 21, 15, 13, 25, 10, 20, 5, 28],
-          sun_late:  [9, 7, 11, 24, 8, 2, 1, 23, "INTERMISSION", 26, 13, 10, 14, 25, 20, 5, 28]
-        }
-      },
       config3: {
         name: "Config 3 (All 4 Shows)",
         builtIn: true,
@@ -814,6 +794,26 @@
           sat_late:  [9, 22, 6, 18, 3, 4, "INTERMISSION", 29, 26, 16, 21, 15, 20, 28],
           sun_early: [17, 19, 8, 2, "GAMES", 1, 27, 25, "INTERMISSION", 13, 7, 10, 4, 20, 5],
           sun_late:  [9, 7, 11, 24, 23, 2, "INTERMISSION", 3, 26, 13, 10, 14, 28]
+        }
+      },
+      min_rigging_prefs: {
+        name: "Min Rigging (Honors Prefs)",
+        builtIn: true,
+        shows: {
+          sat_early: [9, 7, 11, 18, 16, 21, 15, "INTERMISSION", 14, 6, 26, 19, 12, 17],
+          sat_late:  [17, 8, 24, 6, 22, 20, "INTERMISSION", 18, 4, 29, 13, 21, 15, 28],
+          sun_early: [1, 27, 4, 3, 2, 8, "INTERMISSION", 25, 10, 13, 14, 20, 5],
+          sun_late:  [9, 7, 11, 3, 26, 1, "INTERMISSION", 2, 24, 25, 10, 23, 5, 28]
+        }
+      },
+      min_rigging_no_prefs: {
+        name: "Min Rigging (Ignores Prefs)",
+        builtIn: true,
+        shows: {
+          sat_early: [9, 7, 11, 1, 18, 3, "INTERMISSION", 6, 26, 19, 12, 17, 8],
+          sat_late:  [17, 24, 6, 22, 14, 21, 15, "INTERMISSION", 18, 4, 29, 16, 13, 28],
+          sun_early: [2, 8, 21, 15, 4, 10, "INTERMISSION", 13, 5, 14, 20, 25, 28],
+          sun_late:  [9, 7, 11, 1, 27, 26, 3, "INTERMISSION", 2, 24, 25, 10, 20, 23, 5]
         }
       }
     };
@@ -1040,7 +1040,7 @@
         if (raw) {
           const saved = JSON.parse(raw);
           for (const [k, v] of Object.entries(saved)) {
-            if (k === "config4") continue;
+            if (k === "config1" || k === "config2" || k === "config4") continue;
             PRESETS[k] = v;
           }
           // If the user has "QT - Energy Flow" in localStorage and hasn't manually customized qt_energy_min,
@@ -1092,12 +1092,12 @@
     };
 
     // State
-    let currentPresetKey = "config1";
+    let currentPresetKey = "config3";
     let currentShowKey = "sat_early";
     let isAllShowsView = false;
     let isAllShowsEditMode = false;
-    let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
-    let riggingOverrides = JSON.parse(JSON.stringify(PRESETS.config1.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
+    let showLineups = JSON.parse(JSON.stringify(PRESETS.config3.shows));
+    let riggingOverrides = JSON.parse(JSON.stringify(PRESETS.config3.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
     let draggedIndex = null;
     let isCompactView = false;
     let isReadOnlyShareMode = false;
@@ -3427,7 +3427,8 @@
       persistPresetsToStorage();
 
       if (currentPresetKey === key) {
-        loadPreset("config1");
+        const fallbackKey = Object.keys(PRESETS)[0] || "config3";
+        loadPreset(fallbackKey);
       } else {
         renderPresetButtons();
       }

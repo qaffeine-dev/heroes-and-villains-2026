@@ -1027,6 +1027,53 @@
         }
       }
 
+      // Check Continuation Pairing: Act 21 (Mama Morton - Selina) -> Act 15 (Prison Break) must be directly one after the other
+      const idx21 = lineup.indexOf(21);
+      const idx15 = lineup.indexOf(15);
+      const has21 = idx21 !== -1;
+      const has15 = idx15 !== -1;
+      if (has21 || has15) {
+        const res21 = resolvedActs.find(r => r.type === "act" && r.act.id === 21);
+        const res15 = resolvedActs.find(r => r.type === "act" && r.act.id === 15);
+        if (has21 && !has15) {
+          conflicts.push({
+            type: "continuation",
+            severity: "conflict",
+            actId: 21,
+            act1: 21,
+            act2: 15,
+            message: `Continuation Alert: Act 21 (Mama Morton — Selina, Slot #${res21.slot}) is scheduled without Act 15 (Prison Break) — they must be one after the other!`
+          });
+        } else if (!has21 && has15) {
+          conflicts.push({
+            type: "continuation",
+            severity: "conflict",
+            actId: 15,
+            act1: 21,
+            act2: 15,
+            message: `Continuation Alert: Act 15 (Prison Break, Slot #${res15.slot}) is scheduled without Act 21 (Mama Morton — Selina) — they must be one after the other!`
+          });
+        } else if (idx15 !== idx21 + 1) {
+          let detailMsg = "";
+          if (idx21 === idx15 + 1) {
+            detailMsg = `Continuation Alert: Act 21 (Mama Morton — Selina, Slot #${res21.slot}) and Act 15 (Prison Break, Slot #${res15.slot}) are in reverse order — Act 21 (Selina) must immediately precede Act 15 (Prison Break)!`;
+          } else if (res15.slot === res21.slot + 1) {
+            detailMsg = `Continuation Alert: Act 21 (Mama Morton — Selina, Slot #${res21.slot}) and Act 15 (Prison Break, Slot #${res15.slot}) are separated by an Intermission/Games break — they must be directly one after the other!`;
+          } else {
+            detailMsg = `Continuation Alert: Act 21 (Mama Morton — Selina, Slot #${res21.slot}) and Act 15 (Prison Break, Slot #${res15.slot}) are not one after the other!`;
+          }
+          conflicts.push({
+            type: "continuation",
+            severity: "conflict",
+            act1: 21,
+            act2: 15,
+            slot1: res21.slot,
+            slot2: res15.slot,
+            message: detailMsg
+          });
+        }
+      }
+
       return {
         resolvedActs,
         initialStage,

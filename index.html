@@ -78,26 +78,49 @@
         <span class="text-[11px] text-slate-400 font-medium pl-1">Preset Name:</span>
         <input id="new-preset-name" type="text" placeholder="Type name (e.g. Final Lineup)..." 
           onkeydown="if(event.key==='Enter') saveNewPreset()"
-          class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-48 sm:w-56">
+          class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-52">
         <button onclick="saveNewPreset()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition flex items-center gap-1 shadow-sm" title="Save current 4-show lineups as a new named preset">
           <span>💾</span>
           <span>Save As New</span>
         </button>
-        <button id="overwrite-preset-btn" onclick="overwriteCurrentPreset()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded transition" title="Save current lineups (and name, if typed) into the currently selected preset">
-          Update Current
-        </button>
-        <button onclick="renameCurrentPreset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded transition" title="Rename the active preset using the name typed in the box">
-          ✏️ Rename
-        </button>
+
+        <!-- Unlocked Editing Buttons -->
+        <div id="unlocked-preset-actions" class="inline-flex flex-wrap items-center gap-2">
+          <button id="overwrite-preset-btn" onclick="overwriteCurrentPreset()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded transition" title="Save current lineups (and name, if typed) into the currently selected preset">
+            Update Current
+          </button>
+          <button onclick="renameCurrentPreset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded transition" title="Rename the active preset using the name typed in the box">
+            ✏️ Rename
+          </button>
+          <button onclick="lockPreset(currentPresetKey)" class="px-2.5 py-1 bg-amber-950/80 hover:bg-amber-900/80 text-amber-200 border border-amber-700/60 font-semibold rounded transition flex items-center gap-1" title="Lock this preset from accidental editing (requires typing UNLOCK to edit again)">
+            <span>🔒</span>
+            <span>Lock Preset</span>
+          </button>
+          <button onclick="optimizeCurrentPresetRigging()" class="px-2.5 py-1 bg-amber-950/70 hover:bg-amber-900/70 text-amber-300 border border-amber-700/60 font-semibold rounded transition" title="Reorder acts in active shows for the least amount of rigging changes">
+            ⚡ Min Rigging
+          </button>
+          <button onclick="resetCurrentShow()" class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold rounded transition" title="Clear acts from current show tab">
+            ↺ Clear Show
+          </button>
+        </div>
+
+        <!-- Locked Preset Prompt (Shown when active preset is locked) -->
+        <div id="locked-preset-actions" class="hidden items-center gap-1.5 bg-rose-950/50 border border-rose-500/50 rounded-md px-2.5 py-1">
+          <span class="text-[11px] font-bold text-rose-300 flex items-center gap-1">
+            <span>🔒</span>
+            <span>Preset Locked:</span>
+          </span>
+          <input id="unlock-preset-input" type="text" placeholder="Type UNLOCK to edit..."
+            onkeydown="if(event.key==='Enter') unlockCurrentPreset()"
+            class="bg-slate-950 border border-rose-500/60 rounded px-2 py-0.5 text-xs text-white placeholder-slate-500 font-mono uppercase focus:outline-none focus:border-emerald-400 w-36 sm:w-40">
+          <button onclick="unlockCurrentPreset()" class="px-2.5 py-0.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded transition text-[11px]" title="Type UNLOCK in the box and click to unlock editing">
+            🔓 Unlock
+          </button>
+        </div>
+
         <button onclick="sharePresetReadOnly(currentPresetKey)" class="px-2.5 py-1 bg-sky-950/80 hover:bg-sky-900/80 text-sky-200 border border-sky-700/60 font-semibold rounded transition flex items-center gap-1" title="Generate & copy a shareable read-only link for the active preset">
           <span>🔗</span>
           <span>Share Read-Only</span>
-        </button>
-        <button onclick="optimizeCurrentPresetRigging()" class="px-2.5 py-1 bg-amber-950/70 hover:bg-amber-900/70 text-amber-300 border border-amber-700/60 font-semibold rounded transition" title="Reorder acts in active shows for the least amount of rigging changes">
-          ⚡ Min Rigging
-        </button>
-        <button onclick="resetCurrentShow()" class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold rounded transition" title="Clear acts from current show tab">
-          ↺ Clear Show
         </button>
       </div>
 
@@ -1046,7 +1069,7 @@
       try {
         const toSave = {};
         for (const [k, v] of Object.entries(PRESETS)) {
-          if (v.custom || v.modified) {
+          if (v.custom || v.modified || v.locked) {
             toSave[k] = v;
           }
         }
@@ -1201,17 +1224,91 @@
       showToast("🔗 Read-only link copied to clipboard!");
     }
 
+    function isCurrentPresetLocked() {
+      return !!(PRESETS[currentPresetKey] && PRESETS[currentPresetKey].locked);
+    }
+
+    function isEditingBlocked() {
+      return isReadOnlyShareMode || isCurrentPresetLocked();
+    }
+
+    function lockPreset(presetKey) {
+      const targetKey = presetKey || currentPresetKey;
+      const preset = PRESETS[targetKey];
+      if (!preset) return;
+      preset.locked = true;
+      persistPresetsToStorage();
+      applyReadOnlyUiMode();
+      renderPresetButtons();
+      renderTabs();
+      if (isAllShowsView) renderAllActiveShows();
+      else {
+        renderLineup();
+        renderBench();
+      }
+      showToast(`🔒 "${preset.name}" is now locked from editing (type UNLOCK to edit)`);
+    }
+
+    function unlockCurrentPreset() {
+      const preset = PRESETS[currentPresetKey];
+      if (!preset) return;
+      const input = document.getElementById("unlock-preset-input");
+      const val = (input ? input.value : "").trim();
+      if (val.toUpperCase() !== "UNLOCK") {
+        if (input) {
+          input.focus();
+          input.select();
+          input.classList.add("ring-2", "ring-rose-500");
+          setTimeout(() => input.classList.remove("ring-2", "ring-rose-500"), 1200);
+        }
+        showToast(`⚠️ Please type UNLOCK in the box to unlock "${preset.name}" for editing`);
+        return;
+      }
+      preset.locked = false;
+      if (input) input.value = "";
+      persistPresetsToStorage();
+      applyReadOnlyUiMode();
+      renderPresetButtons();
+      renderTabs();
+      if (isAllShowsView) renderAllActiveShows();
+      else {
+        renderLineup();
+        renderBench();
+      }
+      showToast(`🔓 "${preset.name}" unlocked for editing!`);
+    }
+
+    function focusUnlockInputForPreset(presetKey) {
+      if (presetKey && presetKey !== currentPresetKey) {
+        loadPreset(presetKey);
+      }
+      const input = document.getElementById("unlock-preset-input");
+      if (input) {
+        input.focus();
+        input.select();
+        input.classList.add("ring-2", "ring-amber-400");
+        setTimeout(() => input.classList.remove("ring-2", "ring-amber-400"), 1200);
+      }
+      const pName = PRESETS[currentPresetKey] ? PRESETS[currentPresetKey].name : "Preset";
+      showToast(`🔒 "${pName}" is locked — type UNLOCK in the box to edit`);
+    }
+
     function applyReadOnlyUiMode() {
       const editorControls = document.getElementById("editor-preset-controls");
       const roBanner = document.getElementById("readonly-share-banner");
       const roTitle = document.getElementById("readonly-preset-title");
       const headerSub = document.getElementById("header-subtitle-text");
+      const unlockedActions = document.getElementById("unlocked-preset-actions");
+      const lockedActions = document.getElementById("locked-preset-actions");
       const allShowsModeToggle = document.getElementById("all-shows-mode-toggle");
       const allShowsSub = document.getElementById("all-shows-subtitle-text");
       const singleShowSub = document.getElementById("single-show-subtitle");
       const interBtn = document.getElementById("toggle-intermission-btn");
       const gameCtrls = document.getElementById("single-show-game-controls");
       const benchHelp = document.getElementById("bench-help-text");
+
+      const presetLocked = isCurrentPresetLocked();
+      const activePresetName = PRESETS[currentPresetKey] ? PRESETS[currentPresetKey].name : "Preset";
 
       if (isReadOnlyShareMode) {
         if (editorControls) editorControls.classList.add("hidden");
@@ -1228,11 +1325,41 @@
         if (gameCtrls) gameCtrls.classList.add("hidden");
         if (benchHelp) benchHelp.textContent = "Read-only view";
         isAllShowsEditMode = false;
+      } else if (presetLocked) {
+        if (editorControls) editorControls.classList.remove("hidden");
+        if (roBanner) {
+          roBanner.classList.add("hidden");
+          roBanner.classList.remove("flex");
+        }
+        if (unlockedActions) {
+          unlockedActions.classList.add("hidden");
+          unlockedActions.classList.remove("inline-flex");
+        }
+        if (lockedActions) {
+          lockedActions.classList.remove("hidden");
+          lockedActions.classList.add("inline-flex");
+        }
+        if (headerSub) headerSub.textContent = `🔒 Preset "${activePresetName}" is locked from editing. Type UNLOCK in the preset bar to enable editing.`;
+        if (allShowsModeToggle) allShowsModeToggle.classList.add("hidden");
+        if (allShowsSub) allShowsSub.textContent = `(🔒 Preset "${activePresetName}" is locked • Type UNLOCK above to edit)`;
+        if (singleShowSub) singleShowSub.textContent = `(🔒 Preset locked • Type UNLOCK above to edit)`;
+        if (interBtn) interBtn.classList.add("hidden");
+        if (gameCtrls) gameCtrls.classList.add("hidden");
+        if (benchHelp) benchHelp.textContent = "🔒 Preset locked";
+        isAllShowsEditMode = false;
       } else {
         if (editorControls) editorControls.classList.remove("hidden");
         if (roBanner) {
           roBanner.classList.add("hidden");
           roBanner.classList.remove("flex");
+        }
+        if (unlockedActions) {
+          unlockedActions.classList.remove("hidden");
+          unlockedActions.classList.add("inline-flex");
+        }
+        if (lockedActions) {
+          lockedActions.classList.add("hidden");
+          lockedActions.classList.remove("inline-flex");
         }
         if (headerSub) headerSub.textContent = "Drag and reorder acts to dynamically compute rigging state transitions, cameo buffers, and performer availability.";
         if (allShowsModeToggle) allShowsModeToggle.classList.remove("hidden");
@@ -1691,10 +1818,31 @@
           isActive ? "text-indigo-200" : "text-slate-200 hover:text-white"
         }`;
         btn.innerHTML = `
+          ${preset.locked ? '<span class="text-[10px]" title="Locked from editing">🔒</span>' : ''}
           <span>${preset.name}</span>
           ${preset.modified ? '<span class="text-[9px] text-amber-300 font-normal">(edited)</span>' : ''}
         `;
         wrapper.appendChild(btn);
+
+        const lockBtn = document.createElement("button");
+        lockBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (preset.locked) {
+            focusUnlockInputForPreset(key);
+          } else {
+            lockPreset(key);
+          }
+        };
+        lockBtn.className = `px-1.5 py-1.5 text-[10px] border-l border-slate-700/80 transition ${
+          preset.locked
+            ? "text-rose-300 bg-rose-950/40 hover:bg-rose-900/60"
+            : "text-slate-400 hover:bg-amber-950 hover:text-amber-300"
+        }`;
+        lockBtn.title = preset.locked
+          ? `"${preset.name}" is locked — click to type UNLOCK and edit`
+          : `Lock "${preset.name}" from editing`;
+        lockBtn.textContent = preset.locked ? "🔒" : "🔓";
+        wrapper.appendChild(lockBtn);
 
         const shareBtn = document.createElement("button");
         shareBtn.onclick = (e) => {
@@ -1706,7 +1854,7 @@
         shareBtn.textContent = "🔗";
         wrapper.appendChild(shareBtn);
 
-        if (preset.custom) {
+        if (preset.custom && !preset.locked) {
           const delBtn = document.createElement("button");
           delBtn.onclick = (e) => {
             e.stopPropagation();
@@ -1716,7 +1864,7 @@
           delBtn.title = `Delete saved preset "${preset.name}"`;
           delBtn.textContent = "✕";
           wrapper.appendChild(delBtn);
-        } else if (preset.modified) {
+        } else if (preset.modified && !preset.locked) {
           const restoreBtn = document.createElement("button");
           restoreBtn.onclick = (e) => {
             e.stopPropagation();
@@ -2260,7 +2408,7 @@
         if (item.type === "act" && item.hasChangeover && rIdx > 0) {
           const changeEl = document.createElement("div");
           let shiftBtnsHtml = "";
-          if (!isReadOnlyShareMode) {
+          if (!isEditingBlocked()) {
             if (item.shiftBeforeActId) {
               shiftBtnsHtml += `<button onclick="shiftRiggingChangeBefore('${currentShowKey}', ${item.shiftBeforeActId}, ${item.act.id})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change earlier (before Act ${item.shiftBeforeActId}: ${ACTS[item.shiftBeforeActId].title})">▲ Move Before Act ${item.shiftBeforeActId}</button>`;
             }
@@ -2301,7 +2449,7 @@
 
         if (item.type === "intermission") {
           const interEl = document.createElement("div");
-          if (!isReadOnlyShareMode) {
+          if (!isEditingBlocked()) {
             interEl.draggable = true;
             interEl.dataset.index = item.index;
             interEl.ondragstart = handleDragStart;
@@ -2312,7 +2460,7 @@
           }
 
           if (isCompactView) {
-            interEl.className = `bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-indigo-400'}`;
+            interEl.className = `bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-3 text-center transition ${isEditingBlocked() ? '' : 'cursor-move hover:border-indigo-400'}`;
             interEl.innerHTML = `
               <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
@@ -2320,7 +2468,7 @@
                   <span class="font-bold text-indigo-300 tracking-wider uppercase text-[11px]">Intermission</span>
                   <span class="text-[10px] text-slate-400 hidden sm:inline">(Major changeovers & pole strikes occur here)</span>
                 </div>
-                ${isReadOnlyShareMode ? '' : `
+                ${isEditingBlocked() ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
@@ -2330,7 +2478,7 @@
               </div>
             `;
           } else {
-            interEl.className = `bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-indigo-400'}`;
+            interEl.className = `bg-indigo-950/50 border-2 border-dashed border-indigo-500/40 rounded-lg p-3 text-center transition ${isEditingBlocked() ? '' : 'cursor-move hover:border-indigo-400'}`;
             interEl.innerHTML = `
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -2338,7 +2486,7 @@
                   <span class="font-bold text-indigo-300 text-xs tracking-wider uppercase">Intermission</span>
                   <span class="text-[11px] text-slate-400">(Major changeovers & pole strikes occur here)</span>
                 </div>
-                ${isReadOnlyShareMode ? '' : `
+                ${isEditingBlocked() ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
@@ -2354,7 +2502,7 @@
 
         if (item.type === "games") {
           const gamesEl = document.createElement("div");
-          if (!isReadOnlyShareMode) {
+          if (!isEditingBlocked()) {
             gamesEl.draggable = true;
             gamesEl.dataset.index = item.index;
             gamesEl.ondragstart = handleDragStart;
@@ -2365,7 +2513,7 @@
           }
 
           if (isCompactView) {
-            gamesEl.className = `bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-emerald-400'}`;
+            gamesEl.className = `bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-3 text-center transition ${isEditingBlocked() ? '' : 'cursor-move hover:border-emerald-400'}`;
             gamesEl.innerHTML = `
               <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
@@ -2373,7 +2521,7 @@
                   <span class="font-bold text-emerald-300 tracking-wider uppercase text-[11px]">${item.label}</span>
                   <span class="text-[10px] text-slate-400 hidden sm:inline">(Audience games & stage transition break)</span>
                 </div>
-                ${isReadOnlyShareMode ? '' : `
+                ${isEditingBlocked() ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
@@ -2383,7 +2531,7 @@
               </div>
             `;
           } else {
-            gamesEl.className = `bg-emerald-950/50 border-2 border-dashed border-emerald-500/40 rounded-lg p-3 text-center transition ${isReadOnlyShareMode ? '' : 'cursor-move hover:border-emerald-400'}`;
+            gamesEl.className = `bg-emerald-950/50 border-2 border-dashed border-emerald-500/40 rounded-lg p-3 text-center transition ${isEditingBlocked() ? '' : 'cursor-move hover:border-emerald-400'}`;
             gamesEl.innerHTML = `
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -2391,7 +2539,7 @@
                   <span class="font-bold text-emerald-300 text-xs tracking-wider uppercase">${item.label}</span>
                   <span class="text-[11px] text-slate-400">(Audience games & stage transition break)</span>
                 </div>
-                ${isReadOnlyShareMode ? '' : `
+                ${isEditingBlocked() ? '' : `
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
@@ -2432,7 +2580,7 @@
           ? "border-fuchsia-500/70 shadow-fuchsia-950/50 shadow-md"
           : "border-slate-800 hover:border-slate-700";
 
-        if (!isReadOnlyShareMode) {
+        if (!isEditingBlocked()) {
           actCard.draggable = true;
           actCard.dataset.index = item.index;
           actCard.ondragstart = (e) => { hideActTooltip(); handleDragStart.call(actCard, e); };
@@ -2446,7 +2594,7 @@
         actCard.onmouseleave = () => hideActTooltip();
 
         if (isCompactView) {
-          actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition ${isReadOnlyShareMode ? '' : 'cursor-grab active:cursor-grabbing'}`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-lg py-1.5 px-3 flex flex-row items-center justify-between gap-2.5 transition ${isEditingBlocked() ? '' : 'cursor-grab active:cursor-grabbing'}`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info in single row -->
@@ -2487,7 +2635,7 @@
                 ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, true, act.id)}
                 ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, true, act.id)}
               </div>
-              ${isReadOnlyShareMode ? '' : `
+              ${isEditingBlocked() ? '' : `
               <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition pl-1.5 border-l border-slate-800">
                 <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
                 <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Down">▼</button>
@@ -2497,7 +2645,7 @@
             </div>
           `;
         } else {
-          actCard.className = `group bg-slate-900 border ${borderClass} rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition ${isReadOnlyShareMode ? '' : 'cursor-grab active:cursor-grabbing'}`;
+          actCard.className = `group bg-slate-900 border ${borderClass} rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition ${isEditingBlocked() ? '' : 'cursor-grab active:cursor-grabbing'}`;
 
           actCard.innerHTML = `
             <!-- Left: Order & Act Info -->
@@ -2548,7 +2696,7 @@
                 </div>
               </div>
 
-              ${isReadOnlyShareMode ? '' : `
+              ${isEditingBlocked() ? '' : `
               <!-- Up / Down / Remove buttons -->
               <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition pl-2 border-l border-slate-800">
                 <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
@@ -2569,7 +2717,7 @@
       const pointKey = pointName.toLowerCase();
       if (actReq === "Any") {
         const hasManualOverride = actId && riggingOverrides && riggingOverrides[currentShowKey] && riggingOverrides[currentShowKey][actId] && riggingOverrides[currentShowKey][actId][pointKey];
-        if (isReadOnlyShareMode) {
+        if (isEditingBlocked()) {
           return `
             <span class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700"
                   title="${pointName}: Flexible (Any). Currently ${resolvedStageState}.">
@@ -2693,7 +2841,7 @@
               ${act.apparatus}${act.cameos && act.cameos.length > 0 ? ` • Cameo: ${act.cameos.join(", ")}` : ""}
             </div>
           </div>
-          ${isReadOnlyShareMode ? '' : `
+          ${isEditingBlocked() ? '' : `
           <button onclick="addActToLineup(${act.id})" class="shrink-0 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold transition" title="Add to Lineup">
             + Add
           </button>
@@ -2888,7 +3036,10 @@
     }
 
     function setAllShowsEditMode(editable) {
-      if (isReadOnlyShareMode) return;
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
       isAllShowsEditMode = !!editable;
       const roBtn = document.getElementById("mode-readonly-btn");
       const edBtn = document.getElementById("mode-editable-btn");
@@ -3151,6 +3302,10 @@
     }
 
     function optimizeCurrentPresetRigging() {
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
       let beforeTotal = 0;
       let afterTotal = 0;
       for (const sKey of Object.keys(SHOW_INFO)) {
@@ -3179,18 +3334,29 @@
       PRESETS[key] = {
         name: name,
         custom: true,
+        locked: false,
         shows: JSON.parse(JSON.stringify(showLineups)),
         riggingOverrides: JSON.parse(JSON.stringify(riggingOverrides || {}))
       };
       currentPresetKey = key;
       persistPresetsToStorage();
+      applyReadOnlyUiMode();
       renderPresetButtons();
+      if (isAllShowsView) renderAllActiveShows();
+      else {
+        renderLineup();
+        renderBench();
+      }
 
       if (input) input.value = "";
       showToast(`Saved new preset "${name}"!`);
     }
 
     function overwriteCurrentPreset() {
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
       const preset = PRESETS[currentPresetKey];
       if (!preset) return;
 
@@ -3212,6 +3378,10 @@
     }
 
     function renameCurrentPreset() {
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
       const preset = PRESETS[currentPresetKey];
       if (!preset) return;
 
@@ -3242,6 +3412,10 @@
     function deletePreset(key) {
       const preset = PRESETS[key];
       if (!preset || !preset.custom) return;
+      if (preset.locked) {
+        focusUnlockInputForPreset(key);
+        return;
+      }
       const name = preset.name;
       delete PRESETS[key];
       persistPresetsToStorage();
@@ -3256,6 +3430,10 @@
 
     function restoreDefaultPreset(key) {
       if (!DEFAULT_PRESETS[key]) return;
+      if (PRESETS[key] && PRESETS[key].locked) {
+        focusUnlockInputForPreset(key);
+        return;
+      }
       PRESETS[key] = JSON.parse(JSON.stringify(DEFAULT_PRESETS[key]));
       persistPresetsToStorage();
       if (currentPresetKey === key) {
@@ -3273,6 +3451,8 @@
       currentPresetKey = presetKey;
       showLineups = JSON.parse(JSON.stringify(preset.shows));
       riggingOverrides = JSON.parse(JSON.stringify(preset.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
+      const unlockInput = document.getElementById("unlock-preset-input");
+      if (unlockInput) unlockInput.value = "";
       
       // Auto-select first non-empty show in preset
       for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
@@ -3282,6 +3462,7 @@
         }
       }
 
+      applyReadOnlyUiMode();
       renderPresetButtons();
       renderTabs();
       if (isAllShowsView) {
@@ -3290,10 +3471,14 @@
         renderLineup();
         renderBench();
       }
-      showToast(`Loaded ${preset.name}`);
+      showToast(`Loaded ${preset.name}${preset.locked ? ' (🔒 Locked)' : ''}`);
     }
 
     function resetCurrentShow() {
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
       showLineups[currentShowKey] = [];
       if (riggingOverrides && riggingOverrides[currentShowKey]) {
         riggingOverrides[currentShowKey] = {};
@@ -3465,6 +3650,7 @@
     // Initialize
     window.addEventListener("DOMContentLoaded", () => {
       const openedShared = checkUrlForSharedPreset();
+      applyReadOnlyUiMode();
       renderPresetButtons();
       if (openedShared) {
         isAllShowsView = true;

@@ -736,16 +736,6 @@
           sun_early: [17, 19, 8, 2, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
           sun_late:  [9, 7, 11, 24, 2, 23, 3, "INTERMISSION", 26, 25, 13, 10, 14, 28]
         }
-      },
-      config4: {
-        name: "Config 4 (4 Shows: Early Angel Dust & Medusa)",
-        builtIn: true,
-        shows: {
-          sat_early: [1, 18, 25, 5, 21, 15, 14, "INTERMISSION", 6, 17, 12, 24, 8, 11],
-          sat_late:  [9, 6, 22, 18, 3, 26, "INTERMISSION", 4, 29, 16, 21, 15, 20, 28],
-          sun_early: [1, 27, 25, 13, 7, 10, 4, "INTERMISSION", 20, 5, 2, 8, 17, 19],
-          sun_late:  [9, 7, 11, 24, 2, 23, "INTERMISSION", 3, 26, 13, 10, 14, 28]
-        }
       }
     };
 
@@ -758,6 +748,7 @@
         if (raw) {
           const saved = JSON.parse(raw);
           for (const [k, v] of Object.entries(saved)) {
+            if (k === "config4") continue;
             PRESETS[k] = v;
           }
         }

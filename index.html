@@ -470,6 +470,10 @@
                 ✕
               </button>
             </div>
+            <button id="reset-dress-rehearsal-btn" onclick="resetDressRehearsalToDefault()" class="hidden text-xs px-2.5 py-1 bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-500/40 rounded font-semibold transition flex items-center gap-1" title="Reset Dress Rehearsal lineup to the default 29-act QT - Flow #2 order">
+              <span>↺</span>
+              <span>Reset QT - Flow #2 Order</span>
+            </button>
             <button onclick="exportLineupMarkdown()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition">
               📋 Copy Lineup
             </button>
@@ -1339,13 +1343,107 @@
       sun_late:  { title: "Sunday Late (7:00 PM)",    short: "Sun Late (7PM)" }
     };
 
+    const DRESS_REHEARSAL_KEY = "dress_rehearsal";
+    const DRESS_REHEARSAL_STORAGE_KEY = "revel_hv_dress_rehearsal_v1";
+    const DRESS_REHEARSAL_INFO = {
+      title: "Dress Rehearsal — All 29 Acts (QT - Flow #2 Practice Flow)",
+      short: "🎭 Dress Rehearsal"
+    };
+
+    // Continuous 29-act Dress Rehearsal lineup mirroring QT - Flow #2's rigging transitions & act blocks
+    const DEFAULT_DRESS_REHEARSAL_LINEUP = [
+      // Block 1 (Front: A/F | Mid: A/F | Back: Pole -> Mid: Pole): Opener block from Sun Late & Sat Late
+      9, 7, 11, 6,
+      "GAMES",
+      // Block 2 (Front: A/F | Mid: Pole | Back: A/F): Pre-Intermission Mid-Pole flow from Sat Early, Sun Early & Sat Late
+      18, 1, 27, 4, 3, 26,
+      "INTERMISSION",
+      // Block 3 (Front: Pole | Mid: Pole | Back: Pole -> Back: A/F): Pole blocks from Sat Late, Sat Early & Sun Late
+      22, 17, 24, 19, 12, 8, 2, 23,
+      "GAMES",
+      // Block 4 (Front: A/F | Mid: A/F | Back: A/F): All-Aerial & Finale blocks from Sat Early, Sun Late & Sat Late
+      25, 21, 15, 14, 16, 5, 13, 10, 20, 29, 28
+    ];
+
+    const DRESS_REHEARSAL_FLOW_NOTES = {
+      9:  "QT Flow #2: Sat L & Sun L #1 Opener",
+      7:  "QT Flow #2: Sat L & Sun L #2 (after Act 9)",
+      11: "QT Flow #2: Sun L #3 (after Act 7) / Sat E Finale",
+      6:  "QT Flow #2: Sat L #3 (after Act 7) / Sat E #1",
+      18: "QT Flow #2: Sat E #2 (after Act 6, before Act 1)",
+      1:  "QT Flow #2: Sat E #3 (after Act 18) / Sun E #5",
+      27: "QT Flow #2: Sun E #4 (paired with Act 1)",
+      4:  "QT Flow #2: Sat L #4 (starts 4 → 3 → 26 block)",
+      3:  "QT Flow #2: Sat L #5 & Sun L #9 (before Act 26)",
+      26: "QT Flow #2: Sat L #6 & Sun L #10 (after Act 3)",
+      22: "QT Flow #2: Sat L #7 (starts 22 → 17 → 24 block)",
+      17: "QT Flow #2: Sat L #8 (between Act 22 & Act 24)",
+      24: "QT Flow #2: Sat L #9 (after Act 17)",
+      19: "QT Flow #2: Sat E #10 (starts 19 → 12 → 8 block)",
+      12: "QT Flow #2: Sat E #11 (between Act 19 & Act 8)",
+      8:  "QT Flow #2: Sat E #12 / Sun E #11",
+      2:  "QT Flow #2: Sun L #7 (starts 2 → 23 block) / Sun E #10",
+      23: "QT Flow #2: Sun L #8 (after Act 2)",
+      25: "QT Flow #2: Sat E #4 (starts 25 → 21 → 15 block)",
+      21: "QT Flow #2: Sat E #5 & Sun E #8 (paired before Act 15)",
+      15: "QT Flow #2: Sat E #6 & Sun E #9 (continuation of Act 21)",
+      14: "QT Flow #2: Sat E #7 (starts 14 → 16 → 5 block)",
+      16: "QT Flow #2: Sat E #8 (between Act 14 & Act 5)",
+      5:  "QT Flow #2: Sat E #9 (after Act 16) / Sun E #7",
+      13: "QT Flow #2: Sun L #4 (starts 13 → 10 block) / Sat L #10",
+      10: "QT Flow #2: Sun L #5 (after Act 13) / Sun E #3",
+      20: "QT Flow #2: Sun L #11 (before Finale Act 28) / Sun E #6",
+      29: "QT Flow #2: Sat L #11 (before Finale Act 28)",
+      28: "QT Flow #2: Sat L #12 & Sun L #12 Grand Finale"
+    };
+
+    function getShowInfo(key) {
+      if (key === DRESS_REHEARSAL_KEY) return DRESS_REHEARSAL_INFO;
+      return SHOW_INFO[key] || { title: key, short: key };
+    }
+
+    function loadStoredDressRehearsal() {
+      try {
+        const raw = localStorage.getItem(DRESS_REHEARSAL_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.lineup) && parsed.lineup.length > 0) {
+            return {
+              lineup: parsed.lineup,
+              overrides: parsed.overrides || {}
+            };
+          }
+        }
+      } catch (e) {}
+      return {
+        lineup: [...DEFAULT_DRESS_REHEARSAL_LINEUP],
+        overrides: {}
+      };
+    }
+
+    function persistDressRehearsal() {
+      try {
+        localStorage.setItem(DRESS_REHEARSAL_STORAGE_KEY, JSON.stringify({
+          lineup: showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP],
+          overrides: (riggingOverrides && riggingOverrides[DRESS_REHEARSAL_KEY]) || {}
+        }));
+      } catch (e) {}
+    }
+
     // State
     let currentPresetKey = "config3";
     let currentShowKey = "sat_early";
     let isAllShowsView = false;
     let isAllShowsEditMode = false;
-    let showLineups = JSON.parse(JSON.stringify(PRESETS.config3.shows));
-    let riggingOverrides = JSON.parse(JSON.stringify(PRESETS.config3.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
+    const initialDr = loadStoredDressRehearsal();
+    let showLineups = {
+      ...JSON.parse(JSON.stringify(PRESETS.config3.shows)),
+      [DRESS_REHEARSAL_KEY]: initialDr.lineup
+    };
+    let riggingOverrides = {
+      ...JSON.parse(JSON.stringify(PRESETS.config3.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} })),
+      [DRESS_REHEARSAL_KEY]: initialDr.overrides
+    };
     let draggedIndex = null;
     let isCompactView = false;
     let isReadOnlyShareMode = false;
@@ -1408,8 +1506,12 @@
           encodeShowLineupCompact(showsObj.sat_late),
           encodeShowLineupCompact(showsObj.sun_early),
           encodeShowLineupCompact(showsObj.sun_late)
-        ]
+        ],
+        d: encodeShowLineupCompact(showLineups[DRESS_REHEARSAL_KEY] || DEFAULT_DRESS_REHEARSAL_LINEUP)
       };
+      if (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY) {
+        payload.t = DRESS_REHEARSAL_KEY;
+      }
 
       const hasOverrides = ovObj && Object.values(ovObj).some(s => s && Object.keys(s).length > 0);
       if (hasOverrides) {
@@ -1639,11 +1741,18 @@
               sat_early: decodeShowLineupCompact(payload.s[0]),
               sat_late:  decodeShowLineupCompact(payload.s[1]),
               sun_early: decodeShowLineupCompact(payload.s[2]),
-              sun_late:  decodeShowLineupCompact(payload.s[3])
+              sun_late:  decodeShowLineupCompact(payload.s[3]),
+              [DRESS_REHEARSAL_KEY]: payload.d
+                ? decodeShowLineupCompact(payload.d)
+                : [...DEFAULT_DRESS_REHEARSAL_LINEUP]
             };
-            riggingOverrides = payload.o || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} };
-            const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
-            if (firstActive) currentShowKey = firstActive;
+            riggingOverrides = payload.o || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, [DRESS_REHEARSAL_KEY]: {} };
+            if (payload.t === DRESS_REHEARSAL_KEY) {
+              currentShowKey = DRESS_REHEARSAL_KEY;
+            } else {
+              const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
+              if (firstActive) currentShowKey = firstActive;
+            }
             applyReadOnlyUiMode();
             return true;
           }
@@ -1793,74 +1902,77 @@
           });
         });
 
-        // Availability check
-        if (act.pending) {
-          conflicts.push({
-            type: "availability",
-            severity: "conflict",
-            actId: act.id,
-            slot: slot,
-            message: `Act ${act.id} (${act.title}): Pending availability survey response.`
-          });
-        } else if (!act.availability.includes(showKey)) {
-          const cameoReason = act.cameoUnavailable && act.cameoUnavailable[showKey]
-            ? ` — cameo ${act.cameoUnavailable[showKey]} is not available for ${SHOW_INFO[showKey].short}`
-            : "";
-          conflicts.push({
-            type: "availability",
-            severity: "conflict",
-            actId: act.id,
-            slot: slot,
-            message: `Act ${act.id} (${act.title}): Not marked available for ${SHOW_INFO[showKey].short}${cameoReason}!`
-          });
-        }
-
-        // Max Shows & Day Preference checks across all shows
-        let scheduledShowKeys = [];
-        for (const [sKey, sList] of Object.entries(showLineups)) {
-          if ((sList || []).includes(act.id)) {
-            scheduledShowKeys.push(sKey);
+        // Availability, Max Shows & Day Preference checks apply only to the 4 weekend shows (Dress Rehearsal is independent)
+        if (showKey !== DRESS_REHEARSAL_KEY) {
+          if (act.pending) {
+            conflicts.push({
+              type: "availability",
+              severity: "conflict",
+              actId: act.id,
+              slot: slot,
+              message: `Act ${act.id} (${act.title}): Pending availability survey response.`
+            });
+          } else if (!act.availability.includes(showKey)) {
+            const cameoReason = act.cameoUnavailable && act.cameoUnavailable[showKey]
+              ? ` — cameo ${act.cameoUnavailable[showKey]} is not available for ${getShowInfo(showKey).short}`
+              : "";
+            conflicts.push({
+              type: "availability",
+              severity: "conflict",
+              actId: act.id,
+              slot: slot,
+              message: `Act ${act.id} (${act.title}): Not marked available for ${getShowInfo(showKey).short}${cameoReason}!`
+            });
           }
-        }
-        let scheduledInShows = scheduledShowKeys.map(k => SHOW_INFO[k].short);
-        const maxShows = act.maxShows || 2;
 
-        if (scheduledShowKeys.length > maxShows) {
-          conflicts.push({
-            type: "max_shows",
-            severity: "conflict",
-            actId: act.id,
-            slot: slot,
-            message: maxShows === 1
-              ? `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — requested 1 show only (max 1/1 Shows)!`
-              : `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — acts can only be in up to 2 shows!`
-          });
-        }
+          // Max Shows & Day Preference checks across the 4 weekend shows only
+          let scheduledShowKeys = [];
+          for (const sKey of Object.keys(SHOW_INFO)) {
+            const sList = showLineups[sKey];
+            if ((sList || []).includes(act.id)) {
+              scheduledShowKeys.push(sKey);
+            }
+          }
+          let scheduledInShows = scheduledShowKeys.map(k => SHOW_INFO[k].short);
+          const maxShows = act.maxShows || 2;
 
-        // Day Preference check (2 shows in one day vs. 1 show per day)
-        if (scheduledShowKeys.length >= 2) {
-          const satShows = scheduledShowKeys.filter(k => k.startsWith("sat_"));
-          const sunShows = scheduledShowKeys.filter(k => k.startsWith("sun_"));
-
-          if (act.dayPref === "separate_days" && (satShows.length >= 2 || sunShows.length >= 2)) {
-            const sameDayName = satShows.length >= 2
-              ? "Saturday (Sat Early & Sat Late)"
-              : "Sunday (Sun Early & Sun Late)";
+          if (scheduledShowKeys.length > maxShows) {
             conflicts.push({
-              type: "day_pref",
-              severity: "preference",
+              type: "max_shows",
+              severity: "conflict",
               actId: act.id,
               slot: slot,
-              message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 1 show per day (separate days), but scheduled for 2 shows on ${sameDayName}!`
+              message: maxShows === 1
+                ? `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — requested 1 show only (max 1/1 Shows)!`
+                : `Act ${act.id} (${act.title}): Scheduled in ${scheduledInShows.length} shows (${scheduledInShows.join(", ")}) — acts can only be in up to 2 shows!`
             });
-          } else if (act.dayPref === "same_day" && satShows.length >= 1 && sunShows.length >= 1) {
-            conflicts.push({
-              type: "day_pref",
-              severity: "preference",
-              actId: act.id,
-              slot: slot,
-              message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 2 shows in one day, but scheduled across separate days (${scheduledInShows.join(" & ")})!`
-            });
+          }
+
+          // Day Preference check (2 shows in one day vs. 1 show per day)
+          if (scheduledShowKeys.length >= 2) {
+            const satShows = scheduledShowKeys.filter(k => k.startsWith("sat_"));
+            const sunShows = scheduledShowKeys.filter(k => k.startsWith("sun_"));
+
+            if (act.dayPref === "separate_days" && (satShows.length >= 2 || sunShows.length >= 2)) {
+              const sameDayName = satShows.length >= 2
+                ? "Saturday (Sat Early & Sat Late)"
+                : "Sunday (Sun Early & Sun Late)";
+              conflicts.push({
+                type: "day_pref",
+                severity: "preference",
+                actId: act.id,
+                slot: slot,
+                message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 1 show per day (separate days), but scheduled for 2 shows on ${sameDayName}!`
+              });
+            } else if (act.dayPref === "same_day" && satShows.length >= 1 && sunShows.length >= 1) {
+              conflicts.push({
+                type: "day_pref",
+                severity: "preference",
+                actId: act.id,
+                slot: slot,
+                message: `Day Preference Flag — Act ${act.id} (${act.title}): Prefers 2 shows in one day, but scheduled across separate days (${scheduledInShows.join(" & ")})!`
+              });
+            }
           }
         }
 
@@ -2183,6 +2295,28 @@
         <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isAllShowsView ? "bg-emerald-800 text-emerald-100" : "bg-slate-900 text-emerald-400"}">${activeShowsCount}</span>
       `;
       container.appendChild(allBtn);
+
+      // Divider before Dress Rehearsal
+      const sepDr = document.createElement("div");
+      sepDr.className = "h-5 w-px bg-slate-700/80 mx-0.5 hidden sm:block";
+      container.appendChild(sepDr);
+
+      // Independent Dress Rehearsal (All 29 Acts) Tab
+      const drCount = (showLineups[DRESS_REHEARSAL_KEY] || []).filter(x => typeof x === "number").length;
+      const isDrActive = !isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY;
+      const drBtn = document.createElement("button");
+      drBtn.onclick = () => selectShow(DRESS_REHEARSAL_KEY);
+      drBtn.className = `px-3.5 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition border ${
+        isDrActive
+          ? "bg-purple-600 text-white border-purple-400/60 shadow-md shadow-purple-600/30"
+          : "bg-slate-800/90 text-purple-300 border-purple-700/50 hover:bg-slate-700 hover:text-purple-200"
+      }`;
+      drBtn.title = "Single-day continuous Dress Rehearsal lineup for all 29 acts (independent of the 4 weekend shows)";
+      drBtn.innerHTML = `
+        <span>${DRESS_REHEARSAL_INFO.short}</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isDrActive ? "bg-purple-800 text-purple-100" : "bg-slate-900 text-purple-300"}">${drCount}</span>
+      `;
+      container.appendChild(drBtn);
     }
 
     function renderAllActiveShows() {
@@ -2551,8 +2685,17 @@
     function renderLineup() {
       const lineup = showLineups[currentShowKey] || [];
       const analysis = calculateShowRiggingAndConflicts(lineup, currentShowKey);
+      const isDressRehearsal = currentShowKey === DRESS_REHEARSAL_KEY;
 
-      document.getElementById("current-show-title").textContent = `${SHOW_INFO[currentShowKey].title} Lineup`;
+      document.getElementById("current-show-title").textContent = isDressRehearsal
+        ? DRESS_REHEARSAL_INFO.title
+        : `${ getShowInfo(currentShowKey).title } Lineup`;
+
+      const resetDrBtn = document.getElementById("reset-dress-rehearsal-btn");
+      if (resetDrBtn) {
+        if (isDressRehearsal && !isEditingBlocked()) resetDrBtn.classList.remove("hidden");
+        else resetDrBtn.classList.add("hidden");
+      }
 
       // Update Add/Remove Game toolbar buttons
       const gamesCount = lineup.filter(x => x === "GAMES").length;
@@ -2817,10 +2960,13 @@
         const hasPrefConflict = actConflicts.some(c => c.severity === "preference");
         const hasConflict = actConflicts.length > 0;
 
-        // Show count across all tabs for this act
+        // Show count across all tabs for this act (or QT Flow #2 reference badge in Dress Rehearsal)
         const maxShows = act.maxShows || 2;
         const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id)).length;
-        const showCountBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
+        const drFlowNote = DRESS_REHEARSAL_FLOW_NOTES[act.id] || "";
+        const showCountBadge = isDressRehearsal
+          ? `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium bg-purple-950/80 text-purple-200 border border-purple-700/50" title="Mirrors ${drFlowNote}">${drFlowNote}</span>`
+          : `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
           scheduledShowsCount > maxShows
             ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
             : scheduledShowsCount === maxShows
@@ -3070,7 +3216,9 @@
           : "";
 
         let statusBadge = "";
-        if (isPending) {
+        if (currentShowKey === DRESS_REHEARSAL_KEY) {
+          statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-200 border border-purple-800/40">Rehearsal</span>`;
+        } else if (isPending) {
           statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800/40">Pending</span>`;
         } else if (isMarkedAvail) {
           statusBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/40">Avail</span>`;
@@ -3145,6 +3293,7 @@
         const lineup = showLineups[currentShowKey];
         const movedItem = lineup.splice(draggedIndex, 1)[0];
         lineup.splice(targetIndex, 0, movedItem);
+        if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
 
         renderLineup();
         renderTabs();
@@ -3397,8 +3546,9 @@
       if (!lineup) return;
       const insertIdx = getNextGameInsertIndex(lineup);
       lineup.splice(insertIdx, 0, "GAMES");
+      if (showKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
       const count = lineup.filter(x => x === "GAMES").length;
-      showToast(`Added Game break #${count} to ${SHOW_INFO[showKey].short}`);
+      showToast(`Added Game break #${count} to ${getShowInfo(showKey).short}`);
       if (isAllShowsView) {
         renderAllActiveShows();
       } else {
@@ -3412,8 +3562,9 @@
       const lastIdx = lineup.lastIndexOf("GAMES");
       if (lastIdx > -1) {
         lineup.splice(lastIdx, 1);
+        if (showKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
         const remaining = lineup.filter(x => x === "GAMES").length;
-        showToast(`Removed Game break from ${SHOW_INFO[showKey].short} (${remaining} remaining)`);
+        showToast(`Removed Game break from ${getShowInfo(showKey).short} (${remaining} remaining)`);
       }
       if (isAllShowsView) {
         renderAllActiveShows();
@@ -3430,6 +3581,7 @@
 
       const item = lineup.splice(index, 1)[0];
       lineup.splice(targetIndex, 0, item);
+      if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
 
       renderLineup();
       renderTabs();
@@ -3439,6 +3591,7 @@
       hideActTooltip();
       const lineup = showLineups[currentShowKey];
       lineup.splice(index, 1);
+      if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
       renderLineup();
       renderTabs();
       renderBench();
@@ -3448,10 +3601,11 @@
       hideActTooltip();
       const lineup = showLineups[currentShowKey];
       lineup.push(actId);
+      if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
       renderLineup();
       renderTabs();
       renderBench();
-      showToast(`Act ${actId} added to ${SHOW_INFO[currentShowKey].short}`);
+      showToast(`Act ${actId} added to ${getShowInfo(currentShowKey).short}`);
     }
 
     function toggleCompactView() {
@@ -3486,6 +3640,7 @@
         lineup.splice(mid, 0, "INTERMISSION");
         showToast("Intermission inserted at halfway point");
       }
+      if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
 
       renderLineup();
     }
@@ -3703,17 +3858,28 @@
       const preset = PRESETS[presetKey];
       if (!preset) return;
 
+      const savedDrLineup = showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP];
+      const savedDrOverrides = (riggingOverrides && riggingOverrides[DRESS_REHEARSAL_KEY]) || {};
+
       currentPresetKey = presetKey;
-      showLineups = JSON.parse(JSON.stringify(preset.shows));
-      riggingOverrides = JSON.parse(JSON.stringify(preset.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
+      showLineups = {
+        ...JSON.parse(JSON.stringify(preset.shows)),
+        [DRESS_REHEARSAL_KEY]: savedDrLineup
+      };
+      riggingOverrides = {
+        ...JSON.parse(JSON.stringify(preset.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} })),
+        [DRESS_REHEARSAL_KEY]: savedDrOverrides
+      };
       const unlockInput = document.getElementById("unlock-preset-input");
       if (unlockInput) unlockInput.value = "";
       
-      // Auto-select first non-empty show in preset
-      for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
-        if (showLineups[key] && showLineups[key].length > 0) {
-          currentShowKey = key;
-          break;
+      // Auto-select first non-empty show in preset (unless currently viewing Dress Rehearsal)
+      if (currentShowKey !== DRESS_REHEARSAL_KEY) {
+        for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
+          if (showLineups[key] && showLineups[key].length > 0) {
+            currentShowKey = key;
+            break;
+          }
         }
       }
 
@@ -3729,6 +3895,20 @@
       showToast(`Loaded ${preset.name}${preset.locked ? ' (🔒 Locked)' : ''}`);
     }
 
+    function resetDressRehearsalToDefault() {
+      if (isEditingBlocked()) {
+        if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
+        return;
+      }
+      showLineups[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
+      if (riggingOverrides) riggingOverrides[DRESS_REHEARSAL_KEY] = {};
+      persistDressRehearsal();
+      renderTabs();
+      renderLineup();
+      renderBench();
+      showToast("Reset Dress Rehearsal to default 29-act QT - Flow #2 order!");
+    }
+
     function resetCurrentShow() {
       if (isEditingBlocked()) {
         if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
@@ -3738,6 +3918,7 @@
       if (riggingOverrides && riggingOverrides[currentShowKey]) {
         riggingOverrides[currentShowKey] = {};
       }
+      if (currentShowKey === DRESS_REHEARSAL_KEY) persistDressRehearsal();
       renderTabs();
       if (isAllShowsView) {
         renderAllActiveShows();
@@ -3745,7 +3926,7 @@
         renderLineup();
         renderBench();
       }
-      showToast(`Cleared ${SHOW_INFO[currentShowKey].short}`);
+      showToast(`Cleared ${getShowInfo(currentShowKey).short}`);
     }
 
     function filterBench() {
@@ -3785,8 +3966,11 @@
     function exportLineupMarkdown() {
       const lineup = showLineups[currentShowKey];
       const analysis = calculateShowRiggingAndConflicts(lineup, currentShowKey);
+      const isDressRehearsal = currentShowKey === DRESS_REHEARSAL_KEY;
 
-      let text = `### ${SHOW_INFO[currentShowKey].title} Lineup\n`;
+      let text = isDressRehearsal
+        ? `### ${DRESS_REHEARSAL_INFO.title}\n`
+        : `### ${getShowInfo(currentShowKey).title} Lineup\n`;
       text += `Initial Setup: Rigging: Front: ${analysis.initialStage.front} | Mid: ${analysis.initialStage.mid} | Back: ${analysis.initialStage.back}\n\n`;
 
       analysis.resolvedActs.forEach(item => {
@@ -3938,7 +4122,7 @@
       const openedShared = checkUrlForSharedPreset();
       applyReadOnlyUiMode();
       renderPresetButtons();
-      if (openedShared) {
+      if (openedShared && currentShowKey !== DRESS_REHEARSAL_KEY) {
         isAllShowsView = true;
         document.getElementById("single-show-workspace").classList.add("hidden");
         document.getElementById("all-shows-workspace").classList.remove("hidden");
@@ -3946,6 +4130,10 @@
         renderAllActiveShows();
         renderBench();
       } else {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("tab") === "dress_rehearsal" || params.get("tab") === "dr") {
+          currentShowKey = DRESS_REHEARSAL_KEY;
+        }
         renderTabs();
         renderLineup();
         renderBench();

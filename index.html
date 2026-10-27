@@ -2960,12 +2960,11 @@
         const hasPrefConflict = actConflicts.some(c => c.severity === "preference");
         const hasConflict = actConflicts.length > 0;
 
-        // Show count across all tabs for this act (or QT Flow #2 reference badge in Dress Rehearsal)
+        // Show count across all tabs for this act (omitted in Dress Rehearsal)
         const maxShows = act.maxShows || 2;
         const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id)).length;
-        const drFlowNote = DRESS_REHEARSAL_FLOW_NOTES[act.id] || "";
         const showCountBadge = isDressRehearsal
-          ? `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium bg-purple-950/80 text-purple-200 border border-purple-700/50" title="Mirrors ${drFlowNote}">${drFlowNote}</span>`
+          ? ""
           : `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
           scheduledShowsCount > maxShows
             ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
@@ -3064,7 +3063,7 @@
                     'bg-purple-950 text-purple-300 border border-purple-800/50'
                   }">${act.type}</span>
                   ${showCountBadge}
-                  <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800/90 text-slate-300 border border-slate-700/60">${DAY_PREF_LABELS[act.dayPref] || ''}</span>
+                  ${isDressRehearsal ? '' : `<span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800/90 text-slate-300 border border-slate-700/60">${DAY_PREF_LABELS[act.dayPref] || ''}</span>`}
                 </div>
                 <div class="text-xs text-slate-400 mt-0.5">
                   <span class="text-slate-300 font-medium">${act.apparatus}</span>

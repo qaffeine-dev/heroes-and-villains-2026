@@ -400,7 +400,7 @@
         availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
         maxShows: 2,
         dayPref: "separate_days",
-        notes: "Available all 4 shows; prefers 1 show per day (separate days). Cameos: Andy P, Cat T, Anna."
+        notes: "Must always be the 1st act (Slot #1). Available all 4 shows; prefers 1 show per day (separate days). Cameos: Andy P, Cat T, Anna."
       },
       10: {
         id: 10,
@@ -738,9 +738,9 @@
         builtIn: true,
         shows: {
           sat_early: [1, 18, 25, 5, 21, 15, 14, "INTERMISSION", 20, 6, 12, 24, 8, 11],
-          sat_late:  [3, 18, 4, 26, 6, 22, 17, "INTERMISSION", 9, 29, 16, 21, 15, 28],
+          sat_late:  [9, 6, 22, 18, 3, 26, 17, "INTERMISSION", 4, 29, 16, 21, 15, 28],
           sun_early: [17, 19, 8, 2, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
-          sun_late:  [23, 25, 13, 10, 14, 28, "INTERMISSION", 3, 26, 2, 24, 11, 7, 9]
+          sun_late:  [9, 7, 11, 25, 13, 10, 14, "INTERMISSION", 24, 2, 23, 3, 26, 28]
         }
       }
     };
@@ -1080,6 +1080,21 @@
             slot1: res21.slot,
             slot2: res15.slot,
             message: detailMsg
+          });
+        }
+      }
+
+      // Check Opener Rule: Act 9 (Team Rocket) must ALWAYS be the 1st act (Slot #1) when scheduled in a show
+      const idx9 = lineup.indexOf(9);
+      if (idx9 !== -1) {
+        const res9 = resolvedActs.find(r => r.type === "act" && r.act.id === 9);
+        if (res9 && (res9.slot !== 1 || idx9 !== 0)) {
+          conflicts.push({
+            type: "opener",
+            severity: "conflict",
+            actId: 9,
+            slot: res9.slot,
+            message: `Opener Alert: Act 9 (Team Rocket, Slot #${res9.slot}) must always be the 1st act (Slot #1) at the start of the show!`
           });
         }
       }

@@ -183,6 +183,9 @@
             <button onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
               ⏸️ Toggle Intermission
             </button>
+            <button onclick="toggleGames()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded font-medium transition">
+              🎲 Toggle Games
+            </button>
             <button onclick="exportLineupMarkdown()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition">
               📋 Copy Lineup
             </button>
@@ -839,6 +842,15 @@
           continue;
         }
 
+        if (item === "GAMES") {
+          resolvedActs.push({
+            type: "games",
+            index: i
+          });
+          justHadIntermission = true;
+          continue;
+        }
+
         let act = ACTS[item];
         if (!act) continue;
 
@@ -1235,6 +1247,9 @@
                   <button onclick="toggleIntermissionForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded text-[10px] font-medium transition" title="Toggle Intermission in ${info.short}">
                     ⏸️
                   </button>
+                  <button onclick="toggleGamesForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded text-[10px] font-medium transition" title="Toggle Games in ${info.short}">
+                    🎲
+                  </button>
                 ` : ''}
                 <button onclick="selectShow('${showKey}')" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700 rounded text-[11px] font-semibold transition" title="Open single-show view for ${info.short}">
                   ⤢ Focus
@@ -1313,6 +1328,34 @@
               colHtml += `
                 <div class="bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-2.5 text-center">
                   <span class="font-bold text-indigo-300 tracking-wider uppercase text-[10px]">⏸️ Intermission</span>
+                </div>
+              `;
+            }
+            return;
+          }
+
+          if (item.type === "games") {
+            if (isAllShowsEditMode) {
+              colHtml += `
+                <div draggable="true"
+                     ondragstart="handleMultiDragStart(event, '${showKey}', ${item.index})"
+                     ondragover="handleMultiDragOver(event)"
+                     ondragleave="handleMultiDragLeave(event)"
+                     ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
+                     ondragend="handleMultiDragEnd(event)"
+                     class="group bg-emerald-950/50 border border-dashed border-emerald-500/40 hover:border-emerald-400 rounded py-1 px-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing transition">
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 Games</span>
+                  <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition">
+                    <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
+                    <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
+                    <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove Games">✕</button>
+                  </div>
+                </div>
+              `;
+            } else {
+              colHtml += `
+                <div class="bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-2.5 text-center">
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 Games</span>
                 </div>
               `;
             }
@@ -1598,6 +1641,53 @@
             `;
           }
           listContainer.appendChild(interEl);
+          return;
+        }
+
+        if (item.type === "games") {
+          const gamesEl = document.createElement("div");
+          gamesEl.draggable = true;
+          gamesEl.dataset.index = item.index;
+          gamesEl.ondragstart = handleDragStart;
+          gamesEl.ondragover = handleDragOver;
+          gamesEl.ondragleave = handleDragLeave;
+          gamesEl.ondrop = handleDrop;
+          gamesEl.ondragend = handleDragEnd;
+
+          if (isCompactView) {
+            gamesEl.className = "bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-3 text-center cursor-move transition hover:border-emerald-400";
+            gamesEl.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span>🎲</span>
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[11px]">Games</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:inline">(Audience games & stage transition break)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
+                  <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove Games">✕</button>
+                </div>
+              </div>
+            `;
+          } else {
+            gamesEl.className = "bg-emerald-950/50 border-2 border-dashed border-emerald-500/40 rounded-lg p-3 text-center cursor-move transition hover:border-emerald-400";
+            gamesEl.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-base">🎲</span>
+                  <span class="font-bold text-emerald-300 text-xs tracking-wider uppercase">Games</span>
+                  <span class="text-[11px] text-slate-400">(Audience games & stage transition break)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
+                  <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Games">✕</button>
+                </div>
+              </div>
+            `;
+          }
+          listContainer.appendChild(gamesEl);
           return;
         }
 
@@ -1972,12 +2062,18 @@
           showToast(`${SHOW_INFO[targetShowKey].short} already has an Intermission!`);
           return;
         }
+        if (item === "GAMES" && targetLineup.includes("GAMES")) {
+          showToast(`${SHOW_INFO[targetShowKey].short} already has Games!`);
+          return;
+        }
         sourceLineup.splice(multiDragSourceIdx, 1);
         targetLineup.splice(targetIdx, 0, item);
         renderAllActiveShows();
         renderTabs();
         showToast(typeof item === "number"
           ? `Moved Act ${item} to ${SHOW_INFO[targetShowKey].short}`
+          : item === "GAMES"
+          ? `Moved Games to ${SHOW_INFO[targetShowKey].short}`
           : `Moved Intermission to ${SHOW_INFO[targetShowKey].short}`);
       }
     }
@@ -2005,12 +2101,18 @@
         showToast(`${SHOW_INFO[targetShowKey].short} already has an Intermission!`);
         return;
       }
+      if (item === "GAMES" && targetLineup.includes("GAMES")) {
+        showToast(`${SHOW_INFO[targetShowKey].short} already has Games!`);
+        return;
+      }
       sourceLineup.splice(multiDragSourceIdx, 1);
       targetLineup.push(item);
       renderAllActiveShows();
       renderTabs();
       showToast(typeof item === "number"
         ? `Moved Act ${item} to ${SHOW_INFO[targetShowKey].short}`
+        : item === "GAMES"
+        ? `Moved Games to ${SHOW_INFO[targetShowKey].short}`
         : `Moved Intermission to ${SHOW_INFO[targetShowKey].short}`);
     }
 
@@ -2134,6 +2236,25 @@
       }
     }
 
+    function toggleGamesForShow(showKey) {
+      const lineup = showLineups[showKey];
+      if (!lineup) return;
+      const existingIdx = lineup.indexOf("GAMES");
+      if (existingIdx > -1) {
+        lineup.splice(existingIdx, 1);
+        showToast(`Games removed from ${SHOW_INFO[showKey].short}`);
+      } else {
+        const mid = Math.floor(lineup.length / 2);
+        lineup.splice(mid, 0, "GAMES");
+        showToast(`Games inserted in ${SHOW_INFO[showKey].short}`);
+      }
+      if (isAllShowsView) {
+        renderAllActiveShows();
+      } else {
+        renderLineup();
+      }
+    }
+
     function moveItem(index, direction) {
       const lineup = showLineups[currentShowKey];
       const targetIndex = index + direction;
@@ -2194,6 +2315,22 @@
         const mid = Math.floor(lineup.length / 2);
         lineup.splice(mid, 0, "INTERMISSION");
         showToast("Intermission inserted at halfway point");
+      }
+
+      renderLineup();
+    }
+
+    function toggleGames() {
+      const lineup = showLineups[currentShowKey];
+      const existingIdx = lineup.indexOf("GAMES");
+
+      if (existingIdx > -1) {
+        lineup.splice(existingIdx, 1);
+        showToast("Games removed");
+      } else {
+        const mid = Math.floor(lineup.length / 2);
+        lineup.splice(mid, 0, "GAMES");
+        showToast("Games inserted into lineup");
       }
 
       renderLineup();
@@ -2349,6 +2486,8 @@
         analysis.resolvedActs.forEach(item => {
           if (item.type === "intermission") {
             text += `⏸️ INTERMISSION\n`;
+          } else if (item.type === "games") {
+            text += `🎲 GAMES\n`;
           } else {
             if (item.hasChangeover) {
               text += `⚠️ Rigging Change: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;
@@ -2374,6 +2513,8 @@
       analysis.resolvedActs.forEach(item => {
         if (item.type === "intermission") {
           text += `⏸️ INTERMISSION\n`;
+        } else if (item.type === "games") {
+          text += `🎲 GAMES\n`;
         } else {
           if (item.hasChangeover) {
             text += `⚠️ Change: Rigging: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;

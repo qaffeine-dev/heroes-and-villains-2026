@@ -183,9 +183,15 @@
             <button onclick="toggleIntermission()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded font-medium transition">
               ⏸️ Toggle Intermission
             </button>
-            <button onclick="toggleGames()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded font-medium transition">
-              🎲 Toggle Games
-            </button>
+            <div class="inline-flex items-center rounded overflow-hidden border border-emerald-500/30 bg-slate-800">
+              <button onclick="addGameToCurrentShow()" class="text-xs px-2.5 py-1 hover:bg-slate-700 text-emerald-300 font-medium transition flex items-center gap-1" title="Insert a Game break into this show (can add multiple)">
+                <span>🎲</span>
+                <span id="add-game-btn-text">+ Add Game</span>
+              </button>
+              <button id="remove-game-btn" onclick="removeLastGameFromCurrentShow()" class="hidden text-xs px-2 py-1 bg-slate-900/60 hover:bg-rose-950 text-rose-300 border-l border-emerald-500/30 font-semibold transition" title="Remove last Game break from this show">
+                ✕
+              </button>
+            </div>
             <button onclick="exportLineupMarkdown()" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded font-medium transition">
               📋 Copy Lineup
             </button>
@@ -828,6 +834,8 @@
 
       let currentStage = { ...initialStage };
       let actSlotCounter = 1;
+      let gamesCounter = 1;
+      const totalGamesInShow = lineup.filter(x => x === "GAMES").length;
       let justHadIntermission = false;
 
       for (let i = 0; i < lineup.length; i++) {
@@ -843,9 +851,12 @@
         }
 
         if (item === "GAMES") {
+          const gameNum = gamesCounter++;
           resolvedActs.push({
             type: "games",
-            index: i
+            index: i,
+            gameNum: gameNum,
+            label: totalGamesInShow > 1 ? `Games #${gameNum}` : "Games"
           });
           justHadIntermission = true;
           continue;
@@ -1209,8 +1220,10 @@
 
         // Build options for "+ Add Act" select in this column (used when isAllShowsEditMode is true)
         const scheduledSet = new Set(lineup.filter(x => typeof x === "number"));
-        let addOptionsHtml = `<option value="">+ Add act to ${info.short}...</option>`;
+        const gamesCountInCol = lineup.filter(x => x === "GAMES").length;
+        let addOptionsHtml = `<option value="">+ Add act or game to ${info.short}...</option>`;
         if (isAllShowsEditMode) {
+          addOptionsHtml += `<option value="GAMES">🎲 + Add Game Break (${gamesCountInCol} in show)</option>`;
           for (const [idStr, aObj] of Object.entries(ACTS)) {
             const aid = parseInt(idStr);
             if (scheduledSet.has(aid)) continue;
@@ -1247,9 +1260,16 @@
                   <button onclick="toggleIntermissionForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded text-[10px] font-medium transition" title="Toggle Intermission in ${info.short}">
                     ⏸️
                   </button>
-                  <button onclick="toggleGamesForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded text-[10px] font-medium transition" title="Toggle Games in ${info.short}">
-                    🎲
-                  </button>
+                  <div class="inline-flex items-center rounded overflow-hidden border border-emerald-500/30 bg-slate-800">
+                    <button onclick="addGameToShow('${showKey}')" class="px-1.5 py-1 hover:bg-slate-700 text-emerald-300 text-[10px] font-semibold transition flex items-center gap-0.5" title="Add a Game break to ${info.short} (${gamesCountInCol} currently)">
+                      <span>+🎲</span>${gamesCountInCol > 0 ? `<span class="text-[9px] text-emerald-200">(${gamesCountInCol})</span>` : ''}
+                    </button>
+                    ${gamesCountInCol > 0 ? `
+                      <button onclick="removeLastGameFromShow('${showKey}')" class="px-1 py-1 bg-slate-900/70 hover:bg-rose-950 text-rose-300 border-l border-emerald-500/30 text-[9px] font-bold transition" title="Remove last Game break from ${info.short}">
+                        ✕
+                      </button>
+                    ` : ''}
+                  </div>
                 ` : ''}
                 <button onclick="selectShow('${showKey}')" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700 rounded text-[11px] font-semibold transition" title="Open single-show view for ${info.short}">
                   ⤢ Focus
@@ -1260,7 +1280,7 @@
             ${isAllShowsEditMode ? `
               <!-- Quick Add Act Dropdown -->
               <div class="flex items-center gap-1.5">
-                <select onchange="if(this.value){ addActToSpecificShow('${showKey}', parseInt(this.value)); this.value=''; }"
+                <select onchange="if(this.value === 'GAMES'){ addGameToShow('${showKey}'); this.value=''; } else if(this.value){ addActToSpecificShow('${showKey}', parseInt(this.value)); this.value=''; }"
                         class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-indigo-500">
                   ${addOptionsHtml}
                 </select>
@@ -1344,18 +1364,18 @@
                      ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
                      ondragend="handleMultiDragEnd(event)"
                      class="group bg-emerald-950/50 border border-dashed border-emerald-500/40 hover:border-emerald-400 rounded py-1 px-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing transition">
-                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 Games</span>
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 ${item.label}</span>
                   <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition">
                     <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
                     <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
-                    <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove Games">✕</button>
+                    <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove ${item.label}">✕</button>
                   </div>
                 </div>
               `;
             } else {
               colHtml += `
                 <div class="bg-emerald-950/50 border border-dashed border-emerald-500/40 rounded py-1 px-2.5 text-center">
-                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 Games</span>
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[10px]">🎲 ${item.label}</span>
                 </div>
               `;
             }
@@ -1477,6 +1497,18 @@
       const analysis = calculateShowRiggingAndConflicts(lineup, currentShowKey);
 
       document.getElementById("current-show-title").textContent = `${SHOW_INFO[currentShowKey].title} Lineup`;
+
+      // Update Add/Remove Game toolbar buttons
+      const gamesCount = lineup.filter(x => x === "GAMES").length;
+      const addGameBtnText = document.getElementById("add-game-btn-text");
+      const removeGameBtn = document.getElementById("remove-game-btn");
+      if (addGameBtnText) {
+        addGameBtnText.textContent = gamesCount > 0 ? `+ Add Game (${gamesCount})` : "+ Add Game";
+      }
+      if (removeGameBtn) {
+        if (gamesCount > 0) removeGameBtn.classList.remove("hidden");
+        else removeGameBtn.classList.add("hidden");
+      }
       
       // Update Top Stats
       document.getElementById("stat-total-acts").textContent = analysis.totalActs;
@@ -1660,13 +1692,13 @@
               <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
                   <span>🎲</span>
-                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[11px]">Games</span>
+                  <span class="font-bold text-emerald-300 tracking-wider uppercase text-[11px]">${item.label}</span>
                   <span class="text-[10px] text-slate-400 hidden sm:inline">(Audience games & stage transition break)</span>
                 </div>
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
-                  <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove Games">✕</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-0.5 hover:bg-slate-800 rounded text-rose-400" title="Remove ${item.label}">✕</button>
                 </div>
               </div>
             `;
@@ -1676,13 +1708,13 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="text-base">🎲</span>
-                  <span class="font-bold text-emerald-300 text-xs tracking-wider uppercase">Games</span>
+                  <span class="font-bold text-emerald-300 text-xs tracking-wider uppercase">${item.label}</span>
                   <span class="text-[11px] text-slate-400">(Audience games & stage transition break)</span>
                 </div>
                 <div class="flex items-center gap-1">
                   <button onclick="moveItem(${item.index}, -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Up">▲</button>
                   <button onclick="moveItem(${item.index}, 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Move Down">▼</button>
-                  <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove Games">✕</button>
+                  <button onclick="removeLineupItem(${item.index})" class="p-1 hover:bg-slate-800 rounded text-rose-400" title="Remove ${item.label}">✕</button>
                 </div>
               </div>
             `;
@@ -2062,10 +2094,6 @@
           showToast(`${SHOW_INFO[targetShowKey].short} already has an Intermission!`);
           return;
         }
-        if (item === "GAMES" && targetLineup.includes("GAMES")) {
-          showToast(`${SHOW_INFO[targetShowKey].short} already has Games!`);
-          return;
-        }
         sourceLineup.splice(multiDragSourceIdx, 1);
         targetLineup.splice(targetIdx, 0, item);
         renderAllActiveShows();
@@ -2073,7 +2101,7 @@
         showToast(typeof item === "number"
           ? `Moved Act ${item} to ${SHOW_INFO[targetShowKey].short}`
           : item === "GAMES"
-          ? `Moved Games to ${SHOW_INFO[targetShowKey].short}`
+          ? `Moved Game break to ${SHOW_INFO[targetShowKey].short}`
           : `Moved Intermission to ${SHOW_INFO[targetShowKey].short}`);
       }
     }
@@ -2101,10 +2129,6 @@
         showToast(`${SHOW_INFO[targetShowKey].short} already has an Intermission!`);
         return;
       }
-      if (item === "GAMES" && targetLineup.includes("GAMES")) {
-        showToast(`${SHOW_INFO[targetShowKey].short} already has Games!`);
-        return;
-      }
       sourceLineup.splice(multiDragSourceIdx, 1);
       targetLineup.push(item);
       renderAllActiveShows();
@@ -2112,7 +2136,7 @@
       showToast(typeof item === "number"
         ? `Moved Act ${item} to ${SHOW_INFO[targetShowKey].short}`
         : item === "GAMES"
-        ? `Moved Games to ${SHOW_INFO[targetShowKey].short}`
+        ? `Moved Game break to ${SHOW_INFO[targetShowKey].short}`
         : `Moved Intermission to ${SHOW_INFO[targetShowKey].short}`);
     }
 
@@ -2236,17 +2260,38 @@
       }
     }
 
-    function toggleGamesForShow(showKey) {
+    function getNextGameInsertIndex(lineup) {
+      const existingGames = lineup.filter(x => x === "GAMES").length;
+      if (existingGames === 0) {
+        return Math.max(1, Math.floor(lineup.length / 3));
+      } else if (existingGames === 1) {
+        return Math.max(1, Math.floor((lineup.length * 2) / 3));
+      }
+      return lineup.length;
+    }
+
+    function addGameToShow(showKey) {
       const lineup = showLineups[showKey];
       if (!lineup) return;
-      const existingIdx = lineup.indexOf("GAMES");
-      if (existingIdx > -1) {
-        lineup.splice(existingIdx, 1);
-        showToast(`Games removed from ${SHOW_INFO[showKey].short}`);
+      const insertIdx = getNextGameInsertIndex(lineup);
+      lineup.splice(insertIdx, 0, "GAMES");
+      const count = lineup.filter(x => x === "GAMES").length;
+      showToast(`Added Game break #${count} to ${SHOW_INFO[showKey].short}`);
+      if (isAllShowsView) {
+        renderAllActiveShows();
       } else {
-        const mid = Math.floor(lineup.length / 2);
-        lineup.splice(mid, 0, "GAMES");
-        showToast(`Games inserted in ${SHOW_INFO[showKey].short}`);
+        renderLineup();
+      }
+    }
+
+    function removeLastGameFromShow(showKey) {
+      const lineup = showLineups[showKey];
+      if (!lineup) return;
+      const lastIdx = lineup.lastIndexOf("GAMES");
+      if (lastIdx > -1) {
+        lineup.splice(lastIdx, 1);
+        const remaining = lineup.filter(x => x === "GAMES").length;
+        showToast(`Removed Game break from ${SHOW_INFO[showKey].short} (${remaining} remaining)`);
       }
       if (isAllShowsView) {
         renderAllActiveShows();
@@ -2320,20 +2365,12 @@
       renderLineup();
     }
 
-    function toggleGames() {
-      const lineup = showLineups[currentShowKey];
-      const existingIdx = lineup.indexOf("GAMES");
+    function addGameToCurrentShow() {
+      addGameToShow(currentShowKey);
+    }
 
-      if (existingIdx > -1) {
-        lineup.splice(existingIdx, 1);
-        showToast("Games removed");
-      } else {
-        const mid = Math.floor(lineup.length / 2);
-        lineup.splice(mid, 0, "GAMES");
-        showToast("Games inserted into lineup");
-      }
-
-      renderLineup();
+    function removeLastGameFromCurrentShow() {
+      removeLastGameFromShow(currentShowKey);
     }
 
     function saveNewPreset() {
@@ -2487,7 +2524,7 @@
           if (item.type === "intermission") {
             text += `⏸️ INTERMISSION\n`;
           } else if (item.type === "games") {
-            text += `🎲 GAMES\n`;
+            text += `🎲 ${item.label.toUpperCase()}\n`;
           } else {
             if (item.hasChangeover) {
               text += `⚠️ Rigging Change: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;
@@ -2514,7 +2551,7 @@
         if (item.type === "intermission") {
           text += `⏸️ INTERMISSION\n`;
         } else if (item.type === "games") {
-          text += `🎲 GAMES\n`;
+          text += `🎲 ${item.label.toUpperCase()}\n`;
         } else {
           if (item.hasChangeover) {
             text += `⚠️ Change: Rigging: Front: ${item.stageRigging.front} | Mid: ${item.stageRigging.mid} | Back: ${item.stageRigging.back}\n`;

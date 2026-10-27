@@ -795,6 +795,7 @@
     let isAllShowsView = false;
     let isAllShowsEditMode = false;
     let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
+    let riggingOverrides = JSON.parse(JSON.stringify(PRESETS.config1.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
     let draggedIndex = null;
     let isCompactView = false;
 
@@ -965,12 +966,21 @@
           }
         }
 
-        // Resolve rigging points (if right after Intermission or entering a multi-pole block, resolve Any to the block's target state)
-        let lookaheadFront = justHadIntermission ? getNextExplicitPoint(lineup, i, "front") : null;
-        let lookaheadMid = (justHadIntermission || act.id === 24 || act.id === 23) ? getNextExplicitPoint(lineup, i, "mid") : null;
-        let lookaheadBack = (justHadIntermission || act.id === 8) ? getNextExplicitPoint(lineup, i, "back") : null;
+        // Resolve rigging points:
+        // 1. Check if the user has configured an explicit override for an "Any" point on this act in this show
+        const showOverrides = (riggingOverrides && riggingOverrides[showKey] && riggingOverrides[showKey][act.id]) || {};
+        // 2. Otherwise, only look ahead on "Any" if right after Intermission/Games OR if another point on this act is ALREADY forcing a changeover
+        const explicitChangeHappening =
+          (act.rigging.front !== "Any" && act.rigging.front !== currentStage.front) ||
+          (act.rigging.mid !== "Any" && act.rigging.mid !== currentStage.mid) ||
+          (act.rigging.back !== "Any" && act.rigging.back !== currentStage.back);
+
+        let lookaheadFront = showOverrides.front || (justHadIntermission ? getNextExplicitPoint(lineup, i, "front") : null);
+        let lookaheadMid = showOverrides.mid || ((justHadIntermission || (explicitChangeHappening && (act.id === 24 || act.id === 23))) ? getNextExplicitPoint(lineup, i, "mid") : null);
+        let lookaheadBack = showOverrides.back || ((justHadIntermission || (explicitChangeHappening && act.id === 8)) ? getNextExplicitPoint(lineup, i, "back") : null);
         justHadIntermission = false;
 
+        let prevStage = { ...currentStage };
         let nextStage = {
           front: resolveStagePoint(act.rigging.front, currentStage.front, "Aerial/Floor", lookaheadFront),
           mid: resolveStagePoint(act.rigging.mid, currentStage.mid, "Aerial/Floor", lookaheadMid),
@@ -979,14 +989,18 @@
 
         // Determine if changeover happened (only state final state for readability)
         let changes = [];
+        let changedPointKeys = [];
         if (nextStage.front !== currentStage.front) {
           changes.push(`Front: ${nextStage.front}`);
+          changedPointKeys.push("front");
         }
         if (nextStage.mid !== currentStage.mid) {
           changes.push(`Mid: ${nextStage.mid}`);
+          changedPointKeys.push("mid");
         }
         if (nextStage.back !== currentStage.back) {
           changes.push(`Back: ${nextStage.back}`);
+          changedPointKeys.push("back");
         }
 
         let finalStateSummary = [
@@ -1000,13 +1014,37 @@
           changeovers++;
         }
 
+        // Check if this rigging change can be shifted after this act or before the previous act
+        let shiftBeforeActId = null;
+        let shiftAfterActId = null;
+        if (hasChangeover && changedPointKeys.length > 0) {
+          const canShiftAfterCurrent = changedPointKeys.every(pk => act.rigging[pk] === "Any");
+          if (canShiftAfterCurrent) {
+            shiftAfterActId = act.id;
+          }
+          // Find preceding act in resolvedActs
+          for (let pIdx = resolvedActs.length - 1; pIdx >= 0; pIdx--) {
+            if (resolvedActs[pIdx].type === "act") {
+              const prevActObj = resolvedActs[pIdx].act;
+              if (changedPointKeys.every(pk => prevActObj.rigging[pk] === "Any")) {
+                shiftBeforeActId = prevActObj.id;
+              }
+              break;
+            }
+          }
+        }
+
         resolvedActs.push({
           type: "act",
           act: act,
           slot: slot,
           index: i,
+          prevStageRigging: prevStage,
           stageRigging: { ...nextStage },
           hasChangeover: hasChangeover,
+          changedPointKeys: changedPointKeys,
+          shiftBeforeActId: shiftBeforeActId,
+          shiftAfterActId: shiftAfterActId,
           changeoverDetails: changes,
           finalStateSummary: finalStateSummary
         });
@@ -1391,13 +1429,24 @@
               `<span class="text-amber-100 font-bold">B: ${item.stageRigging.back === 'Pole' ? 'Pole' : 'Air/Flr'}</span>`
             ].join(' <span class="text-amber-500/60">|</span> ');
 
+            let shiftBtnsHtml = "";
+            if (isAllShowsEditMode) {
+              if (item.shiftBeforeActId) {
+                shiftBtnsHtml += `<button onclick="shiftRiggingChangeBefore('${showKey}', ${item.shiftBeforeActId}, ${item.act.id})" class="px-1.5 py-0.2 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[9px] font-bold transition shrink-0" title="Move this rigging change earlier (before Act ${item.shiftBeforeActId}: ${ACTS[item.shiftBeforeActId].title})">▲ Before Act ${item.shiftBeforeActId}</button>`;
+              }
+              if (item.shiftAfterActId) {
+                shiftBtnsHtml += `<button onclick="shiftRiggingChangeAfter('${showKey}', ${item.shiftAfterActId})" class="px-1.5 py-0.2 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[9px] font-bold transition shrink-0" title="Move this rigging change later (after Act ${item.shiftAfterActId}: ${ACTS[item.shiftAfterActId].title})">▼ After Act ${item.shiftAfterActId}</button>`;
+              }
+            }
+
             colHtml += `
-              <div class="bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between">
+              <div class="bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between gap-1.5">
                 <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
                   <span>⚠️</span>
                   <span>Rigging Change:</span>
                   <span class="font-normal">${compactFinal}</span>
                 </div>
+                ${shiftBtnsHtml ? `<div class="flex items-center gap-1 shrink-0">${shiftBtnsHtml}</div>` : ''}
               </div>
             `;
           }
@@ -1683,25 +1732,39 @@
         // Rigging Change Alert Banner (if preceding act required a rigging shift)
         if (item.type === "act" && item.hasChangeover && rIdx > 0) {
           const changeEl = document.createElement("div");
+          let shiftBtnsHtml = "";
+          if (item.shiftBeforeActId) {
+            shiftBtnsHtml += `<button onclick="shiftRiggingChangeBefore('${currentShowKey}', ${item.shiftBeforeActId}, ${item.act.id})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change earlier (before Act ${item.shiftBeforeActId}: ${ACTS[item.shiftBeforeActId].title})">▲ Move Before Act ${item.shiftBeforeActId}</button>`;
+          }
+          if (item.shiftAfterActId) {
+            shiftBtnsHtml += `<button onclick="shiftRiggingChangeAfter('${currentShowKey}', ${item.shiftAfterActId})" class="px-2 py-0.5 rounded bg-amber-900/70 hover:bg-amber-800 text-amber-200 border border-amber-500/50 text-[10px] font-bold transition shrink-0" title="Move this rigging change later (after Act ${item.shiftAfterActId}: ${ACTS[item.shiftAfterActId].title})">▼ Move After Act ${item.shiftAfterActId}</button>`;
+          }
+
           if (isCompactView) {
-            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between";
+            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded px-2.5 py-1 text-[11px] flex items-center justify-between gap-2";
             changeEl.innerHTML = `
               <div class="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
                 <span>⚠️</span>
                 <span>Rigging Change:</span>
                 <span class="font-normal">${item.finalStateSummary}</span>
               </div>
-              <span class="text-[9px] uppercase font-bold text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded border border-amber-700/40 shrink-0">Stage Shift</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${shiftBtnsHtml}
+                <span class="text-[9px] uppercase font-bold text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded border border-amber-700/40 shrink-0">Stage Shift</span>
+              </div>
             `;
           } else {
-            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between";
+            changeEl.className = "bg-amber-950/40 border border-amber-600/40 rounded-lg px-3 py-2 text-xs flex items-center justify-between gap-2";
             changeEl.innerHTML = `
               <div class="flex items-center gap-2 text-amber-300 font-semibold">
                 <span class="text-sm">⚠️</span>
                 <span>Rigging Change:</span>
                 <span class="font-normal">${item.finalStateSummary}</span>
               </div>
-              <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${shiftBtnsHtml}
+                <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-700/40">Stage Shift</span>
+              </div>
             `;
           }
           listContainer.appendChild(changeEl);
@@ -1877,9 +1940,9 @@
             <!-- Right: Rigging Point Badges & Controls in single row -->
             <div class="flex items-center gap-2 shrink-0">
               <div class="flex items-center gap-1">
-                ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, true)}
-                ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, true)}
-                ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, true)}
+                ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, true, act.id)}
+                ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, true, act.id)}
+                ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, true, act.id)}
               </div>
               <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition pl-1.5 border-l border-slate-800">
                 <button onclick="moveItem(${item.index}, -1)" class="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition" title="Move Up">▲</button>
@@ -1934,9 +1997,9 @@
               <div class="flex flex-col items-end">
                 <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-wider mb-1">Act Rigging Needs</span>
                 <div class="flex items-center gap-1.5">
-                  ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, false)}
-                  ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, false)}
-                  ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, false)}
+                  ${renderActRiggingBadge('Front', act.rigging.front, item.stageRigging.front, false, act.id)}
+                  ${renderActRiggingBadge('Mid', act.rigging.mid, item.stageRigging.mid, false, act.id)}
+                  ${renderActRiggingBadge('Back', act.rigging.back, item.stageRigging.back, false, act.id)}
                 </div>
               </div>
 
@@ -1954,16 +2017,24 @@
       });
     }
 
-    function renderActRiggingBadge(pointName, actReq, resolvedStageState, isCompact = false) {
+    function renderActRiggingBadge(pointName, actReq, resolvedStageState, isCompact = false, actId = null) {
       const label = isCompact ? pointName[0] : pointName;
+      const pointKey = pointName.toLowerCase();
       if (actReq === "Any") {
+        const hasManualOverride = actId && riggingOverrides && riggingOverrides[currentShowKey] && riggingOverrides[currentShowKey][actId] && riggingOverrides[currentShowKey][actId][pointKey];
         return `
-          <span class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700" 
-                title="${pointName}: Flexible (Any). Adapts to current stage (${resolvedStageState}) with 0 changeover">
+          <button type="button"
+                  onclick="event.stopPropagation(); toggleActAnyPoint('${currentShowKey}', ${actId}, '${pointKey}', '${resolvedStageState}')"
+                  class="${isCompact ? 'px-1.5 py-0.2 text-[10px]' : 'px-2 py-0.5 text-[11px]'} rounded font-medium flex items-center gap-1 ${
+                    hasManualOverride
+                      ? 'bg-indigo-950/90 text-indigo-200 border border-indigo-500/60 hover:border-indigo-400'
+                      : 'bg-slate-800 text-slate-300 border border-slate-700 hover:border-indigo-500/60'
+                  } cursor-pointer transition" 
+                  title="${pointName}: Flexible (Any). Currently ${resolvedStageState}. Click to toggle between Pole & Aerial/Floor to shift where the rigging change happens!">
             <span class="text-[10px] text-slate-400">${label}:</span>
             <span class="text-indigo-300 font-semibold">Any</span>
-            <span class="text-[9px] text-slate-400">(${resolvedStageState === 'Pole' ? 'Pole' : (isCompact ? 'Air/Flr' : 'Aerial/Floor')})</span>
-          </span>
+            <span class="text-[9px] ${hasManualOverride ? 'text-indigo-200 font-bold' : 'text-slate-400'}">(${resolvedStageState === 'Pole' ? 'Pole' : (isCompact ? 'Air/Flr' : 'Aerial/Floor')})</span>
+          </button>
         `;
       }
       const isPole = actReq === "Pole";
@@ -2462,6 +2533,63 @@
       removeLastGameFromShow(currentShowKey);
     }
 
+    function ensureShowOverrideObj(showKey, actId) {
+      if (!riggingOverrides) riggingOverrides = { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} };
+      if (!riggingOverrides[showKey]) riggingOverrides[showKey] = {};
+      if (!riggingOverrides[showKey][actId]) riggingOverrides[showKey][actId] = {};
+      return riggingOverrides[showKey][actId];
+    }
+
+    function shiftRiggingChangeBefore(showKey, prevActId, currentActId) {
+      const lineup = showLineups[showKey] || [];
+      const analysis = calculateShowRiggingAndConflicts(lineup, showKey);
+      const currItem = analysis.resolvedActs.find(r => r.type === "act" && r.act.id === currentActId);
+      if (!currItem || !currItem.changedPointKeys) return;
+
+      const ov = ensureShowOverrideObj(showKey, prevActId);
+      currItem.changedPointKeys.forEach(pk => {
+        if (ACTS[prevActId] && ACTS[prevActId].rigging[pk] === "Any") {
+          ov[pk] = currItem.stageRigging[pk];
+        }
+      });
+
+      if (isAllShowsView) renderAllActiveShows();
+      else renderLineup();
+      renderTabs();
+      showToast(`Moved rigging change before Act ${prevActId} (${ACTS[prevActId].title})`);
+    }
+
+    function shiftRiggingChangeAfter(showKey, currentActId) {
+      const lineup = showLineups[showKey] || [];
+      const analysis = calculateShowRiggingAndConflicts(lineup, showKey);
+      const currItem = analysis.resolvedActs.find(r => r.type === "act" && r.act.id === currentActId);
+      if (!currItem || !currItem.changedPointKeys) return;
+
+      const ov = ensureShowOverrideObj(showKey, currentActId);
+      currItem.changedPointKeys.forEach(pk => {
+        if (ACTS[currentActId] && ACTS[currentActId].rigging[pk] === "Any") {
+          ov[pk] = currItem.prevStageRigging[pk];
+        }
+      });
+
+      if (isAllShowsView) renderAllActiveShows();
+      else renderLineup();
+      renderTabs();
+      showToast(`Moved rigging change after Act ${currentActId} (${ACTS[currentActId].title})`);
+    }
+
+    function toggleActAnyPoint(showKey, actId, pointKey, currentResolvedState) {
+      if (!ACTS[actId] || ACTS[actId].rigging[pointKey] !== "Any") return;
+      const ov = ensureShowOverrideObj(showKey, actId);
+      const nextState = currentResolvedState === "Pole" ? "Aerial/Floor" : "Pole";
+      ov[pointKey] = nextState;
+
+      if (isAllShowsView) renderAllActiveShows();
+      else renderLineup();
+      renderTabs();
+      showToast(`Act ${actId} (${pointKey.toUpperCase()}): set to ${nextState}`);
+    }
+
     function saveNewPreset() {
       const input = document.getElementById("new-preset-name");
       const rawName = (input ? input.value : "").trim();
@@ -2472,7 +2600,8 @@
       PRESETS[key] = {
         name: name,
         custom: true,
-        shows: JSON.parse(JSON.stringify(showLineups))
+        shows: JSON.parse(JSON.stringify(showLineups)),
+        riggingOverrides: JSON.parse(JSON.stringify(riggingOverrides || {}))
       };
       currentPresetKey = key;
       persistPresetsToStorage();
@@ -2494,6 +2623,7 @@
       }
 
       preset.shows = JSON.parse(JSON.stringify(showLineups));
+      preset.riggingOverrides = JSON.parse(JSON.stringify(riggingOverrides || {}));
       if (preset.builtIn) {
         preset.modified = true;
       }
@@ -2563,6 +2693,7 @@
 
       currentPresetKey = presetKey;
       showLineups = JSON.parse(JSON.stringify(preset.shows));
+      riggingOverrides = JSON.parse(JSON.stringify(preset.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
       
       // Auto-select first non-empty show in preset
       for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
@@ -2585,6 +2716,9 @@
 
     function resetCurrentShow() {
       showLineups[currentShowKey] = [];
+      if (riggingOverrides && riggingOverrides[currentShowKey]) {
+        riggingOverrides[currentShowKey] = {};
+      }
       renderTabs();
       if (isAllShowsView) {
         renderAllActiveShows();

@@ -69,6 +69,9 @@
         <button onclick="renameCurrentPreset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded transition" title="Rename the active preset using the name typed in the box">
           ✏️ Rename
         </button>
+        <button onclick="optimizeCurrentPresetRigging()" class="px-2.5 py-1 bg-amber-950/70 hover:bg-amber-900/70 text-amber-300 border border-amber-700/60 font-semibold rounded transition" title="Reorder acts in active shows for the least amount of rigging changes">
+          ⚡ Min Rigging
+        </button>
         <button onclick="resetCurrentShow()" class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold rounded transition" title="Clear acts from current show tab">
           ↺ Clear Show
         </button>
@@ -736,11 +739,234 @@
           sun_early: [17, 19, 8, 2, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
           sun_late:  [9, 7, 11, 24, 2, 23, 3, "INTERMISSION", 26, 25, 13, 10, 14, 28]
         }
+      },
+      qt_energy_min: {
+        name: "QT - Energy Flow (Min Rigging)",
+        builtIn: true,
+        shows: {
+          sat_early: [18, 25, 5, 21, 15, 14, 1, "INTERMISSION", 6, 17, 12, 24, 8, 11],
+          sat_late:  [9, 22, 6, 18, 3, 4, "INTERMISSION", 29, 26, 16, 21, 15, 20, 28],
+          sun_early: [17, 19, 8, 2, "GAMES", 1, 27, 25, "INTERMISSION", 13, 7, 10, 4, 20, 5],
+          sun_late:  [9, 7, 11, 24, 23, 2, "INTERMISSION", 3, 26, 13, 10, 14, 28]
+        }
       }
     };
 
     const PRESET_STORAGE_KEY = "revel_hv_saved_presets_v1";
     let PRESETS = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+
+    // Reorders a show lineup to achieve the minimum possible rigging changes while preserving
+    // all constraints (Act 9 at #1, Act 21->15 consecutive, 3-pole acts grouped, Act 18 in first 4,
+    // Act 25 in first half, and 1-act performer buffer)
+    function optimizeShowLineupForMinRigging(lineup) {
+      const acts = (lineup || []).filter(x => typeof x === "number" && ACTS[x]);
+      if (acts.length <= 2) return [...(lineup || [])];
+
+      const breaks = [];
+      let actIdxSoFar = 0;
+      for (const item of lineup) {
+        if (item === "INTERMISSION" || item === "GAMES") {
+          breaks.push({ type: item, pos: actIdxSoFar });
+        } else if (typeof item === "number" && ACTS[item]) {
+          actIdxSoFar++;
+        }
+      }
+
+      const has9 = acts.includes(9);
+      const has18 = acts.includes(18);
+      const has25 = acts.includes(25);
+      const threePoleIds = [17, 19, 12].filter(id => acts.includes(id));
+
+      const used = new Set();
+      const units = [];
+      if (has9) used.add(9);
+      if (acts.includes(21) && acts.includes(15)) {
+        units.push([21, 15]);
+        used.add(21);
+        used.add(15);
+      }
+      if (threePoleIds.length > 1) {
+        units.push(threePoleIds);
+        threePoleIds.forEach(id => used.add(id));
+      }
+      for (const a of acts) {
+        if (!used.has(a)) {
+          units.push([a]);
+          used.add(a);
+        }
+      }
+
+      function checkBufferOk(seq) {
+        const apps = {};
+        for (let idx = 0; idx < seq.length; idx++) {
+          const slot = idx + 1;
+          const aid = seq[idx];
+          const act = ACTS[aid];
+          const people = [...(act.performers || []), ...(act.cameos || [])];
+          for (const rawP of people) {
+            const p = rawP.trim();
+            if (apps[p]) {
+              const prev = apps[p];
+              if (!((prev.aid === 21 && aid === 15) || (prev.aid === 15 && aid === 21))) {
+                if (Math.abs(slot - prev.slot) < 2) return false;
+              }
+            }
+            apps[p] = { aid, slot };
+          }
+        }
+        return true;
+      }
+
+      function countSeqChangeovers(seq) {
+        const firstR = ACTS[seq[0]].rigging;
+        let stage = { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Pole" };
+        if (firstR.front === "Pole") stage.front = "Pole";
+        if (firstR.mid === "Pole") stage.mid = "Pole";
+        if (firstR.back === "Aerial/Floor") stage.back = "Aerial/Floor";
+        else if (firstR.back === "Any") {
+          const expBack = seq.map(id => ACTS[id].rigging.back).find(b => b === "Pole" || b === "Aerial/Floor");
+          stage.back = expBack || "Aerial/Floor";
+        }
+
+        let chg = 0;
+        for (let i = 0; i < seq.length; i++) {
+          const aid = seq[i];
+          const r = ACTS[aid].rigging;
+          const expChg =
+            (r.front !== "Any" && r.front !== stage.front) ||
+            (r.mid !== "Any" && r.mid !== stage.mid) ||
+            (r.back !== "Any" && r.back !== stage.back);
+          let nf = r.front !== "Any" ? r.front : stage.front;
+          let nm = r.mid !== "Any" ? r.mid : stage.mid;
+          let nb = r.back !== "Any" ? r.back : stage.back;
+          if (r.mid === "Any" && expChg && (aid === 23 || aid === 24)) {
+            const nxtM = seq.slice(i).map(id => ACTS[id].rigging.mid).find(m => m === "Pole" || m === "Aerial/Floor");
+            if (nxtM) nm = nxtM;
+          }
+          if (r.back === "Any" && expChg && aid === 8) {
+            const nxtB = seq.slice(i).map(id => ACTS[id].rigging.back).find(b => b === "Pole" || b === "Aerial/Floor");
+            if (nxtB) nb = nxtB;
+          }
+          if (nf !== stage.front || nm !== stage.mid || nb !== stage.back) {
+            chg++;
+            stage = { front: nf, mid: nm, back: nb };
+          }
+        }
+        return chg;
+      }
+
+      const templates = [
+        u => {
+          const id = u[0];
+          if (id === 9 || id === 11) return 0;
+          if (id === 7 && has9 && acts.includes(11)) return 0.5;
+          if (id === 22 || id === 6) return 1;
+          if (id === 24) return 2;
+          if (id === 12 || id === 17 || id === 19) return 2.2;
+          if (id === 8) return 2.5;
+          if (id === 23) return 2.8;
+          if (id === 2) return 3;
+          if (id === 18 && has9) return 3.5;
+          if (id === 1 || id === 3 || id === 27) return 4;
+          if (id === 29) return 4.2;
+          if (id === 26) return 4.5;
+          if (id === 25) return 4.7;
+          if (id === 4) return 4.9;
+          if (id === 28) return 5.5;
+          return 5;
+        },
+        u => {
+          const id = u[0];
+          if (id === 18) return 0.1;
+          if (id === 25) return 0.2;
+          if ([5, 21, 14, 20, 13, 10, 16, 7].includes(id)) return 0.5;
+          if (id === 4 || id === 29) return 0.8;
+          if (id === 1 || id === 3 || id === 27) return 1.0;
+          if (id === 26) return 1.5;
+          if (id === 6 || id === 22) return 2.0;
+          if (id === 12 || id === 17 || id === 19) return 3.0;
+          if (id === 24) return 3.2;
+          if (id === 8) return 3.5;
+          if (id === 2 || id === 23) return 3.8;
+          if (id === 11) return 4.5;
+          return 5.0;
+        },
+        u => {
+          const id = u[0];
+          if (id === 22) return 0.1;
+          if (id === 6) return 0.2;
+          if (id === 18) return 0.5;
+          if (id === 1 || id === 3 || id === 27) return 1.0;
+          if (id === 4) return 1.2;
+          if (id === 29) return 1.4;
+          if (id === 26) return 1.6;
+          if (id === 25) return 2.0;
+          if ([16, 21, 13, 7, 10, 14, 20, 5].includes(id)) return 2.5;
+          if (id === 28) return 3.0;
+          return 4.0;
+        }
+      ];
+
+      let bestSeq = null;
+      let bestScore = [999, 999, 999];
+
+      for (const tFn of templates) {
+        const sortedUnits = [...units].sort((a, b) => tFn(a) - tFn(b));
+        const candidatesU = [[0, sortedUnits]];
+        for (let i = 0; i < sortedUnits.length; i++) {
+          for (let j = i + 1; j < sortedUnits.length; j++) {
+            const dist = Math.abs(tFn(sortedUnits[i]) - tFn(sortedUnits[j]));
+            const cost = Math.round(dist * 10) + 1;
+            const copy1 = [...sortedUnits];
+            [copy1[i], copy1[j]] = [copy1[j], copy1[i]];
+            candidatesU.push([cost, copy1]);
+            const copy2 = [...sortedUnits];
+            const [elem] = copy2.splice(i, 1);
+            copy2.splice(j, 0, elem);
+            candidatesU.push([cost, copy2]);
+          }
+        }
+
+        for (const [swapCost, cand] of candidatesU) {
+          const seq = [...(has9 ? [9] : []), ...cand.flat()];
+          if (!checkBufferOk(seq)) continue;
+          const chg = countSeqChangeovers(seq);
+          let pen = 0;
+          if (has18 && seq.indexOf(18) >= 4) pen += 100;
+          if (has25 && seq.indexOf(25) > Math.floor(seq.length / 2)) pen += 50;
+          if (seq.includes(28) && seq[seq.length - 1] !== 28) pen += 10;
+
+          if (
+            chg < bestScore[0] ||
+            (chg === bestScore[0] && pen < bestScore[1]) ||
+            (chg === bestScore[0] && pen === bestScore[1] && swapCost < bestScore[2])
+          ) {
+            bestScore = [chg, pen, swapCost];
+            bestSeq = seq;
+          }
+        }
+      }
+
+      if (!bestSeq) return [...lineup];
+
+      const breaksByPos = {};
+      for (const b of breaks) {
+        let pos = Math.max(1, Math.min(bestSeq.length - 1, b.pos));
+        if (pos > 0 && bestSeq[pos - 1] === 21 && bestSeq[pos] === 15) pos++;
+        if (pos > 0 && [12, 17, 19].includes(bestSeq[pos - 1]) && [12, 17, 19].includes(bestSeq[pos])) pos++;
+        if (!breaksByPos[pos]) breaksByPos[pos] = [];
+        breaksByPos[pos].push(b.type);
+      }
+
+      const result = [];
+      for (let idx = 0; idx < bestSeq.length; idx++) {
+        if (breaksByPos[idx]) {
+          for (const bType of breaksByPos[idx]) result.push(bType);
+        }
+        result.push(bestSeq[idx]);
+      }
+      return result;
+    }
 
     function loadStoredPresets() {
       try {
@@ -750,6 +976,25 @@
           for (const [k, v] of Object.entries(saved)) {
             if (k === "config4") continue;
             PRESETS[k] = v;
+          }
+          // If the user has "QT - Energy Flow" in localStorage and hasn't manually customized qt_energy_min,
+          // automatically derive "QT - Energy Flow (Min Rigging)" from their exact "QT - Energy Flow" shows!
+          if (!saved.qt_energy_min) {
+            const qtSource = Object.values(saved).find(
+              p => p && p.name && p.name.trim().toLowerCase() === "qt - energy flow"
+            );
+            if (qtSource && qtSource.shows) {
+              PRESETS.qt_energy_min = {
+                name: "QT - Energy Flow (Min Rigging)",
+                builtIn: true,
+                shows: {
+                  sat_early: optimizeShowLineupForMinRigging(qtSource.shows.sat_early || []),
+                  sat_late:  optimizeShowLineupForMinRigging(qtSource.shows.sat_late || []),
+                  sun_early: optimizeShowLineupForMinRigging(qtSource.shows.sun_early || []),
+                  sun_late:  optimizeShowLineupForMinRigging(qtSource.shows.sun_late || [])
+                }
+              };
+            }
           }
         }
       } catch (e) {
@@ -2579,6 +2824,25 @@
       else renderLineup();
       renderTabs();
       showToast(`Act ${actId} (${pointKey.toUpperCase()}): set to ${nextState}`);
+    }
+
+    function optimizeCurrentPresetRigging() {
+      let beforeTotal = 0;
+      let afterTotal = 0;
+      for (const sKey of Object.keys(SHOW_INFO)) {
+        const currentList = showLineups[sKey] || [];
+        if (currentList.some(x => typeof x === "number")) {
+          beforeTotal += calculateShowRiggingAndConflicts(currentList, sKey).changeovers;
+          showLineups[sKey] = optimizeShowLineupForMinRigging(currentList);
+          if (riggingOverrides && riggingOverrides[sKey]) riggingOverrides[sKey] = {};
+          afterTotal += calculateShowRiggingAndConflicts(showLineups[sKey], sKey).changeovers;
+        }
+      }
+      renderTabs();
+      if (isAllShowsView) renderAllActiveShows();
+      else renderLineup();
+      renderBench();
+      showToast(`Optimized all active shows for minimum rigging (${beforeTotal} → ${afterTotal} total changes)!`);
     }
 
     function saveNewPreset() {

@@ -130,17 +130,29 @@
       </div>
     </div>
 
-    <!-- ALL ACTIVE SHOWS QUICK VIEW (Editable Multi-Column) -->
+    <!-- ALL ACTIVE SHOWS QUICK VIEW (Read-Only / Editable Multi-Column) -->
     <div id="all-shows-workspace" class="hidden space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
         <div class="flex items-center gap-2.5 flex-wrap">
           <h2 class="text-lg font-bold text-white flex items-center gap-2">
             <span>📊</span>
-            <span>All Active Shows — Side-by-Side Editor</span>
+            <span id="all-shows-heading-text">All Active Shows — Side-by-Side Overview</span>
           </h2>
-          <span class="text-xs text-slate-400">(Drag acts within or across shows • Use ▲ ▼ ✕ or + Add Act in any column)</span>
+          <span id="all-shows-subtitle-text" class="text-xs text-slate-400">(Read-only quick view • Switch to Editable to reorder or move acts)</span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Mode Segmented Toggle: Read-Only vs Editable -->
+          <div class="inline-flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-xs">
+            <button id="mode-readonly-btn" onclick="setAllShowsEditMode(false)" class="px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 bg-indigo-600 text-white shadow-sm">
+              <span>🔒</span>
+              <span>Read-Only</span>
+            </button>
+            <button id="mode-editable-btn" onclick="setAllShowsEditMode(true)" class="px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 text-slate-400 hover:text-white">
+              <span>✏️</span>
+              <span>Editable</span>
+            </button>
+          </div>
+
           <button onclick="exportAllActiveShowsMarkdown()" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-medium transition flex items-center gap-1.5">
             <span>📋</span>
             <span>Copy All Active Shows</span>
@@ -758,6 +770,7 @@
     let currentPresetKey = "config1";
     let currentShowKey = "sat_early";
     let isAllShowsView = false;
+    let isAllShowsEditMode = false;
     let showLineups = JSON.parse(JSON.stringify(PRESETS.config1.shows));
     let draggedIndex = null;
     let isCompactView = false;
@@ -1182,20 +1195,22 @@
           ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-fuchsia-950 text-fuchsia-300 border border-fuchsia-700/60">🗓️ ${prefC.length}</span>`
           : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/50">✓ Clear</span>`;
 
-        // Build options for "+ Add Act" select in this column
+        // Build options for "+ Add Act" select in this column (used when isAllShowsEditMode is true)
         const scheduledSet = new Set(lineup.filter(x => typeof x === "number"));
         let addOptionsHtml = `<option value="">+ Add act to ${info.short}...</option>`;
-        for (const [idStr, aObj] of Object.entries(ACTS)) {
-          const aid = parseInt(idStr);
-          if (scheduledSet.has(aid)) continue;
-          const sCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(aid)).length;
-          const mShows = aObj.maxShows || 2;
-          const availTag = aObj.pending
-            ? "Pending"
-            : aObj.availability.includes(showKey)
-            ? "Avail"
-            : "Unavail";
-          addOptionsHtml += `<option value="${aid}">Act ${aid}: ${aObj.title} [${availTag} • ${sCount}/${mShows}]</option>`;
+        if (isAllShowsEditMode) {
+          for (const [idStr, aObj] of Object.entries(ACTS)) {
+            const aid = parseInt(idStr);
+            if (scheduledSet.has(aid)) continue;
+            const sCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(aid)).length;
+            const mShows = aObj.maxShows || 2;
+            const availTag = aObj.pending
+              ? "Pending"
+              : aObj.availability.includes(showKey)
+              ? "Avail"
+              : "Unavail";
+            addOptionsHtml += `<option value="${aid}">Act ${aid}: ${aObj.title} [${availTag} • ${sCount}/${mShows}]</option>`;
+          }
         }
 
         let colHtml = `
@@ -1216,22 +1231,26 @@
                 </div>
               </div>
               <div class="flex items-center gap-1 shrink-0">
-                <button onclick="toggleIntermissionForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded text-[10px] font-medium transition" title="Toggle Intermission in ${info.short}">
-                  ⏸️
-                </button>
+                ${isAllShowsEditMode ? `
+                  <button onclick="toggleIntermissionForShow('${showKey}')" class="px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded text-[10px] font-medium transition" title="Toggle Intermission in ${info.short}">
+                    ⏸️
+                  </button>
+                ` : ''}
                 <button onclick="selectShow('${showKey}')" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700 rounded text-[11px] font-semibold transition" title="Open single-show view for ${info.short}">
                   ⤢ Focus
                 </button>
               </div>
             </div>
 
-            <!-- Quick Add Act Dropdown -->
-            <div class="flex items-center gap-1.5">
-              <select onchange="if(this.value){ addActToSpecificShow('${showKey}', parseInt(this.value)); this.value=''; }"
-                      class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-indigo-500">
-                ${addOptionsHtml}
-              </select>
-            </div>
+            ${isAllShowsEditMode ? `
+              <!-- Quick Add Act Dropdown -->
+              <div class="flex items-center gap-1.5">
+                <select onchange="if(this.value){ addActToSpecificShow('${showKey}', parseInt(this.value)); this.value=''; }"
+                        class="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-indigo-500">
+                  ${addOptionsHtml}
+                </select>
+              </div>
+            ` : ''}
           </div>
 
           <!-- Initial Setup Card -->
@@ -1250,8 +1269,7 @@
           </div>
 
           <div class="space-y-1.5 min-h-[120px]"
-               ondragover="handleMultiDragOverColumn(event)"
-               ondrop="handleMultiDropColumn(event, '${showKey}')">
+               ${isAllShowsEditMode ? `ondragover="handleMultiDragOverColumn(event)" ondrop="handleMultiDropColumn(event, '${showKey}')"` : ''}>
         `;
 
         analysis.resolvedActs.forEach((item, rIdx) => {
@@ -1274,22 +1292,30 @@
           }
 
           if (item.type === "intermission") {
-            colHtml += `
-              <div draggable="true"
-                   ondragstart="handleMultiDragStart(event, '${showKey}', ${item.index})"
-                   ondragover="handleMultiDragOver(event)"
-                   ondragleave="handleMultiDragLeave(event)"
-                   ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
-                   ondragend="handleMultiDragEnd(event)"
-                   class="group bg-indigo-950/50 border border-dashed border-indigo-500/40 hover:border-indigo-400 rounded py-1 px-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing transition">
-                <span class="font-bold text-indigo-300 tracking-wider uppercase text-[10px]">⏸️ Intermission</span>
-                <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition">
-                  <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
-                  <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
-                  <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove Intermission">✕</button>
+            if (isAllShowsEditMode) {
+              colHtml += `
+                <div draggable="true"
+                     ondragstart="handleMultiDragStart(event, '${showKey}', ${item.index})"
+                     ondragover="handleMultiDragOver(event)"
+                     ondragleave="handleMultiDragLeave(event)"
+                     ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
+                     ondragend="handleMultiDragEnd(event)"
+                     class="group bg-indigo-950/50 border border-dashed border-indigo-500/40 hover:border-indigo-400 rounded py-1 px-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing transition">
+                  <span class="font-bold text-indigo-300 tracking-wider uppercase text-[10px]">⏸️ Intermission</span>
+                  <div class="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition">
+                    <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
+                    <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
+                    <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.2 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove Intermission">✕</button>
+                  </div>
                 </div>
-              </div>
-            `;
+              `;
+            } else {
+              colHtml += `
+                <div class="bg-indigo-950/50 border border-dashed border-indigo-500/40 rounded py-1 px-2.5 text-center">
+                  <span class="font-bold text-indigo-300 tracking-wider uppercase text-[10px]">⏸️ Intermission</span>
+                </div>
+              `;
+            }
             return;
           }
 
@@ -1301,21 +1327,23 @@
           const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id)).length;
 
           const borderCls = hasHard
-            ? "border-rose-500/70 bg-rose-950/15 hover:border-rose-400"
+            ? "border-rose-500/70 bg-rose-950/15" + (isAllShowsEditMode ? " hover:border-rose-400" : "")
             : hasPref
-            ? "border-fuchsia-500/70 bg-fuchsia-950/15 hover:border-fuchsia-400"
-            : "border-slate-800/90 bg-slate-950/80 hover:border-slate-700";
+            ? "border-fuchsia-500/70 bg-fuchsia-950/15" + (isAllShowsEditMode ? " hover:border-fuchsia-400" : "")
+            : "border-slate-800/90 bg-slate-950/80" + (isAllShowsEditMode ? " hover:border-slate-700" : "");
 
           const conflictTooltip = actConflicts.map(c => c.message).join(" | ");
 
           colHtml += `
-            <div draggable="true"
+            <div ${isAllShowsEditMode ? `
+                 draggable="true"
                  ondragstart="handleMultiDragStart(event, '${showKey}', ${item.index})"
                  ondragover="handleMultiDragOver(event)"
                  ondragleave="handleMultiDragLeave(event)"
                  ondrop="handleMultiDrop(event, '${showKey}', ${item.index})"
                  ondragend="handleMultiDragEnd(event)"
-                 class="group border ${borderCls} rounded-lg py-1.5 px-2 flex items-center justify-between gap-1.5 cursor-grab active:cursor-grabbing transition"
+                 ` : ''}
+                 class="group border ${borderCls} rounded-lg py-1.5 px-2 flex items-center justify-between gap-1.5 ${isAllShowsEditMode ? 'cursor-grab active:cursor-grabbing' : ''} transition"
                  ${conflictTooltip ? `title="${conflictTooltip.replace(/"/g, '&quot;')}"` : ''}>
               <div class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-800 border border-slate-700/70 text-[11px] font-extrabold text-white flex items-center justify-center shrink-0">${item.slot}</span>
@@ -1337,11 +1365,13 @@
                   </div>
                 </div>
               </div>
-              <div class="flex items-center gap-0.5 shrink-0 opacity-75 group-hover:opacity-100 transition pl-1 border-l border-slate-800/80">
-                <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
-                <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
-                <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove from ${info.short}">✕</button>
-              </div>
+              ${isAllShowsEditMode ? `
+                <div class="flex items-center gap-0.5 shrink-0 opacity-75 group-hover:opacity-100 transition pl-1 border-l border-slate-800/80">
+                  <button onclick="moveItemInShow('${showKey}', ${item.index}, -1)" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Up">▲</button>
+                  <button onclick="moveItemInShow('${showKey}', ${item.index}, 1)" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-slate-400 hover:text-white" title="Move Down">▼</button>
+                  <button onclick="removeLineupItemFromShow('${showKey}', ${item.index})" class="px-1 py-0.5 hover:bg-slate-800 rounded text-[10px] text-rose-400 hover:text-rose-300" title="Remove from ${info.short}">✕</button>
+                </div>
+              ` : ''}
             </div>
           `;
         });
@@ -2015,6 +2045,29 @@
       } else {
         selectShow(currentShowKey);
       }
+    }
+
+    function setAllShowsEditMode(editable) {
+      isAllShowsEditMode = !!editable;
+      const roBtn = document.getElementById("mode-readonly-btn");
+      const edBtn = document.getElementById("mode-editable-btn");
+      const heading = document.getElementById("all-shows-heading-text");
+      const subtitle = document.getElementById("all-shows-subtitle-text");
+
+      if (isAllShowsEditMode) {
+        if (roBtn) roBtn.className = "px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 text-slate-400 hover:text-white";
+        if (edBtn) edBtn.className = "px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 bg-indigo-600 text-white shadow-sm";
+        if (heading) heading.textContent = "All Active Shows — Side-by-Side Editor";
+        if (subtitle) subtitle.textContent = "(Drag acts within or across shows • Use ▲ ▼ ✕ or + Add Act in any column)";
+      } else {
+        if (roBtn) roBtn.className = "px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 bg-indigo-600 text-white shadow-sm";
+        if (edBtn) edBtn.className = "px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 text-slate-400 hover:text-white";
+        if (heading) heading.textContent = "All Active Shows — Side-by-Side Overview";
+        if (subtitle) subtitle.textContent = "(Read-only quick view • Switch to Editable to reorder or move acts)";
+      }
+
+      renderAllActiveShows();
+      showToast(isAllShowsEditMode ? "Side-by-side Editable mode enabled" : "Side-by-side Read-Only mode enabled");
     }
 
     function moveItemInShow(showKey, index, direction) {

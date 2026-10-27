@@ -472,11 +472,11 @@
         rigging: { front: "Aerial/Floor", mid: "Aerial/Floor", back: "Aerial/Floor" },
         performers: ["Emily C", "Erica C", "Zoe", "Kim G"],
         cameos: ["Selina"],
-        availability: ["sat_early", "sat_late", "sun_early", "sun_late"],
+        availability: ["sat_early", "sat_late", "sun_early"],
         maxShows: 2,
-        dayPref: "same_day",
+        dayPref: "no_pref",
         pending: false,
-        notes: "Available all 4 shows; prefers 2 shows same day. Continuation act immediately after Act 21 (Mama Morton)."
+        notes: "Available Sat Early, Sat Late & Sun Early; requested 2 shows (no pref). Continuation act immediately after Act 21 (Mama Morton)."
       },
       16: {
         id: 16,
@@ -527,7 +527,7 @@
         concept: "Lois & Clark",
         type: "Group",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        rigging: { front: "Pole", mid: "Pole", back: "Pole" },
         performers: ["Cece", "Josh J"],
         cameos: [],
         availability: ["sat_early", "sat_late", "sun_early"],
@@ -571,14 +571,14 @@
         concept: "Ratatouille",
         type: "Solo",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        rigging: { front: "Any", mid: "Pole", back: "Pole" },
         performers: ["Josh P"],
         cameos: ["Cheng J"],
-        availability: [],
+        availability: ["sat_late"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Cheng J cameos here (needs buffer with Act 24)."
+        dayPref: "separate_days",
+        pending: false,
+        notes: "Josh P available Sat Late & Sun Early; Cameo (Cheng J) available Sat Early, Sat Late & Sun Late. Only mutually available show is Sat Late."
       },
       23: {
         id: 23,
@@ -600,14 +600,14 @@
         concept: "Masked Assassin",
         type: "Solo",
         apparatus: "Pole (No Heels)",
-        rigging: { front: "Aerial/Floor", mid: "Pole", back: "Aerial/Floor" },
+        rigging: { front: "Pole", mid: "Any", back: "Pole" },
         performers: ["Cheng J"],
         cameos: ["Elly Z"],
-        availability: [],
+        availability: ["sat_early", "sat_late", "sun_late"],
         maxShows: 2,
-        dayPref: "pending",
-        pending: true,
-        notes: "Elly Z is human prop (needs buffer with Act 4)."
+        dayPref: "no_pref",
+        pending: false,
+        notes: "Available Sat Early, Sat Late & Sun Late; requested 2 shows (no pref). Elly Z is human prop (needs buffer with Act 4); Cheng J cameos in Act 22."
       },
       25: {
         id: 25,
@@ -698,10 +698,10 @@
         name: "Config 1 (Sat E, Sat L, Sun L)",
         builtIn: true,
         shows: {
-          sat_early: [11, 8, 12, 17, 6, 18, 19, 1, "INTERMISSION", 21, 15, 13, 7, 14, 20, 5],
-          sat_late:  [9, 17, 6, 3, 18, 4, 29, 26, "INTERMISSION", 16, 21, 15, 25, 13, 28, 20],
+          sat_early: [11, 8, 12, 19, 17, 24, 6, 18, "INTERMISSION", 1, 21, 15, 13, 7, 14, 20, 5],
+          sat_late:  [9, 17, 6, 22, 3, 18, 4, 29, "INTERMISSION", 26, 16, 21, 15, 25, 13, 28, 20],
           sun_early: [],
-          sun_late:  [9, 7, 11, 3, 1, 23, 26, 27, "INTERMISSION", 8, 2, 25, 10, 14, 5, 28]
+          sun_late:  [9, 7, 11, 24, 8, 2, 3, 1, "INTERMISSION", 23, 26, 27, 25, 10, 14, 5, 28]
         }
       },
       config2: {
@@ -709,19 +709,19 @@
         builtIn: true,
         shows: {
           sat_early: [],
-          sat_late:  [9, 7, 11, 12, 8, 17, 6, "INTERMISSION", 18, 4, 23, 26, 16, 29, 14, 28],
-          sun_early: [17, 8, 2, 19, 1, 3, 4, 27, "INTERMISSION", 13, 10, 20, 25, 21, 15, 14, 5],
-          sun_late:  [9, 7, 11, 3, 1, 26, 2, "INTERMISSION", 13, 21, 15, 25, 5, 10, 20, 28]
+          sat_late:  [9, 7, 11, 24, 12, 17, 6, 22, "INTERMISSION", 3, 18, 4, 29, 26, 16, 21, 15, 14],
+          sun_early: [17, 19, 8, 2, 3, 4, 27, 1, "INTERMISSION", 21, 15, 13, 25, 10, 20, 5, 28],
+          sun_late:  [9, 7, 11, 24, 8, 2, 1, 23, "INTERMISSION", 26, 13, 10, 14, 25, 20, 5, 28]
         }
       },
       config3: {
         name: "Config 3 (All 4 Shows)",
         builtIn: true,
         shows: {
-          sat_early: [11, 8, 12, 6, 18, 1, "INTERMISSION", 21, 15, 25, 14, 20, 5],
-          sat_late:  [9, 17, 6, 3, 18, 4, "INTERMISSION", 29, 26, 16, 21, 15, 28],
-          sun_early: [17, 8, 2, 19, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
-          sun_late:  [9, 7, 11, 2, 23, 3, "INTERMISSION", 26, 25, 13, 10, 14, 28]
+          sat_early: [11, 8, 12, 24, 6, 18, "INTERMISSION", 1, 21, 15, 25, 14, 20, 5],
+          sat_late:  [9, 17, 6, 22, 3, 18, 4, "INTERMISSION", 29, 26, 16, 21, 15, 28],
+          sun_early: [17, 19, 8, 2, 1, 27, "INTERMISSION", 13, 7, 10, 4, 20, 5],
+          sun_late:  [9, 7, 11, 24, 2, 23, 3, "INTERMISSION", 26, 25, 13, 10, 14, 28]
         }
       }
     };
@@ -928,10 +928,10 @@
           }
         }
 
-        // Resolve rigging points (if right after Intermission, resolve Any to the post-Intermission block's target state)
+        // Resolve rigging points (if right after Intermission or entering a multi-pole block, resolve Any to the block's target state)
         let lookaheadFront = justHadIntermission ? getNextExplicitPoint(lineup, i, "front") : null;
-        let lookaheadMid = justHadIntermission ? getNextExplicitPoint(lineup, i, "mid") : null;
-        let lookaheadBack = justHadIntermission ? getNextExplicitPoint(lineup, i, "back") : null;
+        let lookaheadMid = (justHadIntermission || act.id === 24 || act.id === 23) ? getNextExplicitPoint(lineup, i, "mid") : null;
+        let lookaheadBack = (justHadIntermission || act.id === 8) ? getNextExplicitPoint(lineup, i, "back") : null;
         justHadIntermission = false;
 
         let nextStage = {

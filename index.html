@@ -1067,6 +1067,28 @@
           sun_late:  [9, 7, 11, 3, 26, 1, "INTERMISSION", 2, 24, 25, 10, 23, 5, 28]
         },
         riggingOverrides: { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }
+      },
+      dress_rehearsal_preset: {
+        name: "🎭 Dress Rehearsal",
+        builtIn: true,
+        locked: false,
+        isDressRehearsal: true,
+        shows: {
+          sat_early: [],
+          sat_late:  [],
+          sun_early: [],
+          sun_late:  [],
+          dress_rehearsal: [
+            9, 7, 11, 22, 6, 26,
+            "GAMES",
+            18, 1, 27, 4, 3, 16, 25, 21, 15,
+            "INTERMISSION",
+            24, 19, 12, 8, 23, 2,
+            "GAMES",
+            14, 5, 13, 10, 20, 28
+          ]
+        },
+        riggingOverrides: { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, dress_rehearsal: {} }
       }
     };
 
@@ -1344,25 +1366,25 @@
     };
 
     const DRESS_REHEARSAL_KEY = "dress_rehearsal";
-    const DRESS_REHEARSAL_STORAGE_KEY = "revel_hv_dress_rehearsal_v1";
+    const DRESS_REHEARSAL_STORAGE_KEY = "revel_hv_dress_rehearsal_v2";
     const DRESS_REHEARSAL_INFO = {
       title: "Dress Rehearsal — All 29 Acts (QT - Flow #2 Practice Flow)",
       short: "🎭 Dress Rehearsal"
     };
 
-    // Continuous 29-act Dress Rehearsal lineup mirroring QT - Flow #2's rigging transitions & act blocks
+    // Continuous Dress Rehearsal preset lineup mirroring QT - Flow #2's rigging transitions & act blocks
     const DEFAULT_DRESS_REHEARSAL_LINEUP = [
-      // Block 1 (Front: A/F | Mid: A/F | Back: Pole -> Mid: Pole): Opener block from Sun Late & Sat Late
-      9, 7, 11, 6,
+      // Block 1 (Front: A/F | Mid: A/F | Back: Pole -> Mid: Pole)
+      9, 7, 11, 22, 6, 26,
       "GAMES",
-      // Block 2 (Front: A/F | Mid: Pole | Back: A/F): Pre-Intermission Mid-Pole flow from Sat Early, Sun Early & Sat Late
-      18, 1, 27, 4, 3, 26,
+      // Block 2 (Front: A/F | Mid: Pole | Back: A/F -> All A/F)
+      18, 1, 27, 4, 3, 16, 25, 21, 15,
       "INTERMISSION",
-      // Block 3 (Front: Pole | Mid: Pole | Back: Pole -> Back: A/F): Pole blocks from Sat Late, Sat Early & Sun Late
-      22, 17, 24, 19, 12, 8, 2, 23,
+      // Block 3 (Front: Pole | Mid: Pole | Back: Pole -> Back: A/F)
+      24, 19, 12, 8, 23, 2,
       "GAMES",
-      // Block 4 (Front: A/F | Mid: A/F | Back: A/F): All-Aerial & Finale blocks from Sat Early, Sun Late & Sat Late
-      25, 21, 15, 14, 16, 5, 13, 10, 20, 29, 28
+      // Block 4 (Front: A/F | Mid: A/F | Back: A/F)
+      14, 5, 13, 10, 20, 28
     ];
 
     const DRESS_REHEARSAL_FLOW_NOTES = {
@@ -1447,7 +1469,14 @@
     let draggedIndex = null;
     let isCompactView = false;
     let isReadOnlyShareMode = false;
+    let isSharedDressRehearsalOnly = false;
     let sharedPresetTitle = "";
+
+    function isDressRehearsalOnlyMode() {
+      if (isSharedDressRehearsalOnly) return true;
+      const preset = PRESETS[currentPresetKey];
+      return !!(preset && preset.isDressRehearsal);
+    }
 
     // ==========================================
     // 2B. SHAREABLE READ-ONLY LINK ENCODING
@@ -1493,29 +1522,51 @@
       const targetKey = presetKey || currentPresetKey;
       const preset = PRESETS[targetKey];
       const useLive = (targetKey === currentPresetKey);
+      const isDrShare = !!(
+        (preset && preset.isDressRehearsal) ||
+        (useLive && (isDressRehearsalOnlyMode() || (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY)))
+      );
       const name = isReadOnlyShareMode
-        ? (sharedPresetTitle || "Shared Preset")
-        : (preset ? preset.name : "Custom Preset");
+        ? (sharedPresetTitle || (isDrShare ? "🎭 Dress Rehearsal" : "Shared Preset"))
+        : (preset ? preset.name : (isDrShare ? "🎭 Dress Rehearsal" : "Custom Preset"));
       const showsObj = useLive ? showLineups : (preset ? preset.shows : showLineups);
       const ovObj = useLive ? riggingOverrides : (preset && preset.riggingOverrides ? preset.riggingOverrides : {});
 
-      const payload = {
-        n: name,
-        s: [
-          encodeShowLineupCompact(showsObj.sat_early),
-          encodeShowLineupCompact(showsObj.sat_late),
-          encodeShowLineupCompact(showsObj.sun_early),
-          encodeShowLineupCompact(showsObj.sun_late)
-        ],
-        d: encodeShowLineupCompact(showLineups[DRESS_REHEARSAL_KEY] || DEFAULT_DRESS_REHEARSAL_LINEUP)
-      };
-      if (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY) {
-        payload.t = DRESS_REHEARSAL_KEY;
-      }
-
-      const hasOverrides = ovObj && Object.values(ovObj).some(s => s && Object.keys(s).length > 0);
-      if (hasOverrides) {
-        payload.o = ovObj;
+      let payload;
+      if (isDrShare) {
+        const drLineup = (showsObj && showsObj[DRESS_REHEARSAL_KEY] && showsObj[DRESS_REHEARSAL_KEY].length > 0)
+          ? showsObj[DRESS_REHEARSAL_KEY]
+          : (showLineups[DRESS_REHEARSAL_KEY] || DEFAULT_DRESS_REHEARSAL_LINEUP);
+        payload = {
+          n: name,
+          drOnly: 1,
+          d: encodeShowLineupCompact(drLineup)
+        };
+        const drOv = ovObj && ovObj[DRESS_REHEARSAL_KEY];
+        if (drOv && Object.keys(drOv).length > 0) {
+          payload.o = { [DRESS_REHEARSAL_KEY]: drOv };
+        }
+      } else {
+        payload = {
+          n: name,
+          s: [
+            encodeShowLineupCompact(showsObj.sat_early),
+            encodeShowLineupCompact(showsObj.sat_late),
+            encodeShowLineupCompact(showsObj.sun_early),
+            encodeShowLineupCompact(showsObj.sun_late)
+          ]
+        };
+        const hasOverrides = ovObj && ["sat_early", "sat_late", "sun_early", "sun_late"].some(
+          k => ovObj[k] && Object.keys(ovObj[k]).length > 0
+        );
+        if (hasOverrides) {
+          payload.o = {
+            sat_early: ovObj.sat_early || {},
+            sat_late: ovObj.sat_late || {},
+            sun_early: ovObj.sun_early || {},
+            sun_late: ovObj.sun_late || {}
+          };
+        }
       }
 
       const encoded = toBase64Url(JSON.stringify(payload));
@@ -1544,7 +1595,14 @@
     function sharePresetReadOnly(presetKey) {
       const targetKey = presetKey || currentPresetKey;
       const preset = PRESETS[targetKey];
-      const presetName = preset ? preset.name : "Preset";
+      const useLive = (targetKey === currentPresetKey);
+      const isDrShare = !!(
+        (preset && preset.isDressRehearsal) ||
+        (useLive && (isDressRehearsalOnlyMode() || (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY)))
+      );
+      const presetName = isDrShare && (!preset || !preset.isDressRehearsal)
+        ? `${preset ? preset.name + " — " : ""}🎭 Dress Rehearsal`
+        : (preset ? preset.name : "Preset");
       const url = buildPresetShareUrl(targetKey);
 
       copyTextToClipboard(url);
@@ -1670,7 +1728,11 @@
           roBanner.classList.add("flex");
         }
         if (roTitle) roTitle.textContent = sharedPresetTitle;
-        if (headerSub) headerSub.textContent = `Viewing shared read-only preset "${sharedPresetTitle}". Switch between tabs or hover over acts to inspect availability & rigging.`;
+        if (headerSub) {
+          headerSub.textContent = isDressRehearsalOnlyMode()
+            ? `Viewing shared read-only Dress Rehearsal preset "${sharedPresetTitle}". Hover over acts to inspect apparatus & rigging.`
+            : `Viewing shared read-only preset "${sharedPresetTitle}". Switch between tabs or hover over acts to inspect availability & rigging.`;
+        }
         if (allShowsModeToggle) allShowsModeToggle.classList.add("hidden");
         if (allShowsSub) allShowsSub.textContent = `(🔒 Read-only shared preset "${sharedPresetTitle}")`;
         if (singleShowSub) singleShowSub.textContent = `(🔒 Read-only shared view)`;
@@ -1734,8 +1796,28 @@
         if (pParam) {
           const decodedJson = fromBase64Url(pParam);
           const payload = JSON.parse(decodedJson);
-          if (payload && Array.isArray(payload.s)) {
+          if (payload && (payload.drOnly || payload.t === DRESS_REHEARSAL_KEY || (!payload.s && payload.d))) {
             isReadOnlyShareMode = true;
+            isSharedDressRehearsalOnly = true;
+            currentPresetKey = "dress_rehearsal_preset";
+            sharedPresetTitle = payload.n || "🎭 Dress Rehearsal";
+            showLineups = {
+              sat_early: [],
+              sat_late:  [],
+              sun_early: [],
+              sun_late:  [],
+              [DRESS_REHEARSAL_KEY]: payload.d
+                ? decodeShowLineupCompact(payload.d)
+                : [...DEFAULT_DRESS_REHEARSAL_LINEUP]
+            };
+            riggingOverrides = payload.o || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, [DRESS_REHEARSAL_KEY]: {} };
+            currentShowKey = DRESS_REHEARSAL_KEY;
+            isAllShowsView = false;
+            applyReadOnlyUiMode();
+            return true;
+          } else if (payload && Array.isArray(payload.s)) {
+            isReadOnlyShareMode = true;
+            isSharedDressRehearsalOnly = false;
             sharedPresetTitle = payload.n || "Shared Preset";
             showLineups = {
               sat_early: decodeShowLineupCompact(payload.s[0]),
@@ -1747,12 +1829,8 @@
                 : [...DEFAULT_DRESS_REHEARSAL_LINEUP]
             };
             riggingOverrides = payload.o || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, [DRESS_REHEARSAL_KEY]: {} };
-            if (payload.t === DRESS_REHEARSAL_KEY) {
-              currentShowKey = DRESS_REHEARSAL_KEY;
-            } else {
-              const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
-              if (firstActive) currentShowKey = firstActive;
-            }
+            const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
+            if (firstActive) currentShowKey = firstActive;
             applyReadOnlyUiMode();
             return true;
           }
@@ -1760,10 +1838,19 @@
           isReadOnlyShareMode = true;
           currentPresetKey = presetParam;
           sharedPresetTitle = PRESETS[presetParam].name;
+          isSharedDressRehearsalOnly = !!PRESETS[presetParam].isDressRehearsal;
           showLineups = JSON.parse(JSON.stringify(PRESETS[presetParam].shows));
-          riggingOverrides = JSON.parse(JSON.stringify(PRESETS[presetParam].riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }));
-          const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
-          if (firstActive) currentShowKey = firstActive;
+          if (!showLineups[DRESS_REHEARSAL_KEY]) {
+            showLineups[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
+          }
+          riggingOverrides = JSON.parse(JSON.stringify(PRESETS[presetParam].riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, [DRESS_REHEARSAL_KEY]: {} }));
+          if (isSharedDressRehearsalOnly) {
+            currentShowKey = DRESS_REHEARSAL_KEY;
+            isAllShowsView = false;
+          } else {
+            const firstActive = Object.keys(SHOW_INFO).find(k => (showLineups[k] || []).some(x => typeof x === "number"));
+            if (firstActive) currentShowKey = firstActive;
+          }
           applyReadOnlyUiMode();
           return true;
         }
@@ -1774,7 +1861,9 @@
     }
 
     function exitReadOnlyMode() {
+      const wasDrOnly = isSharedDressRehearsalOnly;
       isReadOnlyShareMode = false;
+      isSharedDressRehearsalOnly = false;
       // Save the shared preset into PRESETS if it isn't already there so user can edit it
       const existingEntry = Object.entries(PRESETS).find(([k, v]) => v.name === sharedPresetTitle);
       if (existingEntry) {
@@ -1784,6 +1873,7 @@
         PRESETS[newKey] = {
           name: sharedPresetTitle,
           custom: true,
+          isDressRehearsal: wasDrOnly,
           shows: JSON.parse(JSON.stringify(showLineups)),
           riggingOverrides: JSON.parse(JSON.stringify(riggingOverrides || {}))
         };
@@ -2255,6 +2345,20 @@
       const container = document.getElementById("show-tabs");
       container.innerHTML = "";
 
+      if (isDressRehearsalOnlyMode()) {
+        const drCount = (showLineups[DRESS_REHEARSAL_KEY] || []).filter(x => typeof x === "number").length;
+        const drBtn = document.createElement("button");
+        drBtn.onclick = () => selectShow(DRESS_REHEARSAL_KEY);
+        drBtn.className = "px-3.5 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition border bg-purple-600 text-white border-purple-400/60 shadow-md shadow-purple-600/30";
+        drBtn.title = "Single-day continuous Dress Rehearsal lineup (independent of the 4 weekend shows)";
+        drBtn.innerHTML = `
+          <span>${DRESS_REHEARSAL_INFO.short}</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-800 text-purple-100">${drCount}</span>
+        `;
+        container.appendChild(drBtn);
+        return;
+      }
+
       let activeShowsCount = 0;
 
       for (const [key, info] of Object.entries(SHOW_INFO)) {
@@ -2295,28 +2399,6 @@
         <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isAllShowsView ? "bg-emerald-800 text-emerald-100" : "bg-slate-900 text-emerald-400"}">${activeShowsCount}</span>
       `;
       container.appendChild(allBtn);
-
-      // Divider before Dress Rehearsal
-      const sepDr = document.createElement("div");
-      sepDr.className = "h-5 w-px bg-slate-700/80 mx-0.5 hidden sm:block";
-      container.appendChild(sepDr);
-
-      // Independent Dress Rehearsal (All 29 Acts) Tab
-      const drCount = (showLineups[DRESS_REHEARSAL_KEY] || []).filter(x => typeof x === "number").length;
-      const isDrActive = !isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY;
-      const drBtn = document.createElement("button");
-      drBtn.onclick = () => selectShow(DRESS_REHEARSAL_KEY);
-      drBtn.className = `px-3.5 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition border ${
-        isDrActive
-          ? "bg-purple-600 text-white border-purple-400/60 shadow-md shadow-purple-600/30"
-          : "bg-slate-800/90 text-purple-300 border-purple-700/50 hover:bg-slate-700 hover:text-purple-200"
-      }`;
-      drBtn.title = "Single-day continuous Dress Rehearsal lineup for all 29 acts (independent of the 4 weekend shows)";
-      drBtn.innerHTML = `
-        <span>${DRESS_REHEARSAL_INFO.short}</span>
-        <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isDrActive ? "bg-purple-800 text-purple-100" : "bg-slate-900 text-purple-300"}">${drCount}</span>
-      `;
-      container.appendChild(drBtn);
     }
 
     function renderAllActiveShows() {
@@ -3198,9 +3280,10 @@
         const isMarkedAvail = act.availability.includes(currentShowKey);
         const maxShows = act.maxShows || 2;
 
-        // Count how many shows this act is currently scheduled in across all tabs
+        // Count how many shows this act is currently scheduled in across all tabs (hide in Dress Rehearsal mode)
+        const isDrBench = currentShowKey === DRESS_REHEARSAL_KEY || isDressRehearsalOnlyMode();
         const scheduledShowsCount = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(id)).length;
-        const showCountBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
+        const showCountBadge = isDrBench ? "" : `<span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${
           scheduledShowsCount > maxShows
             ? 'bg-rose-950 text-rose-300 border border-rose-700/60'
             : scheduledShowsCount === maxShows
@@ -3208,11 +3291,11 @@
             : 'bg-slate-900 text-slate-400 border border-slate-800'
         }" title="Scheduled in ${scheduledShowsCount} of max ${maxShows} shows across all tabs (${DAY_PREF_LABELS[act.dayPref] || ''})">${scheduledShowsCount}/${maxShows} Shows</span>`;
 
-        const prefBadge = act.dayPref === "same_day"
+        const prefBadge = isDrBench ? "" : (act.dayPref === "same_day"
           ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-fuchsia-950/60 text-fuchsia-300 border border-fuchsia-800/40">Same Day</span>`
           : act.dayPref === "separate_days"
           ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-950/60 text-sky-300 border border-sky-800/40">1/Day</span>`
-          : "";
+          : "");
 
         let statusBadge = "";
         if (currentShowKey === DRESS_REHEARSAL_KEY) {
@@ -3714,6 +3797,19 @@
         if (isCurrentPresetLocked()) focusUnlockInputForPreset(currentPresetKey);
         return;
       }
+      if (isDressRehearsalOnlyMode() || (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY)) {
+        const currentList = showLineups[DRESS_REHEARSAL_KEY] || [];
+        const beforeTotal = calculateShowRiggingAndConflicts(currentList, DRESS_REHEARSAL_KEY).changeovers;
+        showLineups[DRESS_REHEARSAL_KEY] = optimizeShowLineupForMinRigging(currentList);
+        if (riggingOverrides && riggingOverrides[DRESS_REHEARSAL_KEY]) riggingOverrides[DRESS_REHEARSAL_KEY] = {};
+        const afterTotal = calculateShowRiggingAndConflicts(showLineups[DRESS_REHEARSAL_KEY], DRESS_REHEARSAL_KEY).changeovers;
+        persistDressRehearsal();
+        renderTabs();
+        renderLineup();
+        renderBench();
+        showToast(`Optimized Dress Rehearsal for minimum rigging (${beforeTotal} → ${afterTotal} changes)!`);
+        return;
+      }
       let beforeTotal = 0;
       let afterTotal = 0;
       for (const sKey of Object.keys(SHOW_INFO)) {
@@ -3736,20 +3832,39 @@
       const input = document.getElementById("new-preset-name");
       const rawName = (input ? input.value : "").trim();
       const customCount = Object.values(PRESETS).filter(p => p.custom).length + 1;
-      const name = rawName || `Custom Preset ${customCount}`;
+      const isDrMode = isDressRehearsalOnlyMode() || (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY);
+      const name = rawName || (isDrMode ? `🎭 Dress Rehearsal ${customCount}` : `Custom Preset ${customCount}`);
       const key = "custom_" + Date.now();
+
+      const savedShows = isDrMode
+        ? {
+            sat_early: [],
+            sat_late:  [],
+            sun_early: [],
+            sun_late:  [],
+            [DRESS_REHEARSAL_KEY]: JSON.parse(JSON.stringify(showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP]))
+          }
+        : JSON.parse(JSON.stringify(showLineups));
 
       PRESETS[key] = {
         name: name,
         custom: true,
         locked: false,
-        shows: JSON.parse(JSON.stringify(showLineups)),
+        isDressRehearsal: isDrMode,
+        shows: savedShows,
         riggingOverrides: JSON.parse(JSON.stringify(riggingOverrides || {}))
       };
       currentPresetKey = key;
+      if (isDrMode) {
+        currentShowKey = DRESS_REHEARSAL_KEY;
+        isAllShowsView = false;
+        document.getElementById("all-shows-workspace").classList.add("hidden");
+        document.getElementById("single-show-workspace").classList.remove("hidden");
+      }
       persistPresetsToStorage();
       applyReadOnlyUiMode();
       renderPresetButtons();
+      renderTabs();
       if (isAllShowsView) renderAllActiveShows();
       else {
         renderLineup();
@@ -3775,11 +3890,22 @@
         if (input) input.value = "";
       }
 
-      preset.shows = JSON.parse(JSON.stringify(showLineups));
+      if (preset.isDressRehearsal) {
+        preset.shows = {
+          sat_early: [],
+          sat_late:  [],
+          sun_early: [],
+          sun_late:  [],
+          [DRESS_REHEARSAL_KEY]: JSON.parse(JSON.stringify(showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP]))
+        };
+      } else {
+        preset.shows = JSON.parse(JSON.stringify(showLineups));
+      }
       preset.riggingOverrides = JSON.parse(JSON.stringify(riggingOverrides || {}));
       if (preset.builtIn) {
         preset.modified = true;
       }
+      if (preset.isDressRehearsal) persistDressRehearsal();
       persistPresetsToStorage();
       renderPresetButtons();
       showToast(`Saved updates to "${preset.name}"!`);
@@ -3857,27 +3983,47 @@
       const preset = PRESETS[presetKey];
       if (!preset) return;
 
-      const savedDrLineup = showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP];
-      const savedDrOverrides = (riggingOverrides && riggingOverrides[DRESS_REHEARSAL_KEY]) || {};
+      const savedDrLineup = (preset.shows && preset.shows[DRESS_REHEARSAL_KEY] && preset.shows[DRESS_REHEARSAL_KEY].length > 0)
+        ? JSON.parse(JSON.stringify(preset.shows[DRESS_REHEARSAL_KEY]))
+        : (showLineups[DRESS_REHEARSAL_KEY] || [...DEFAULT_DRESS_REHEARSAL_LINEUP]);
+      const savedDrOverrides = (preset.riggingOverrides && preset.riggingOverrides[DRESS_REHEARSAL_KEY])
+        ? JSON.parse(JSON.stringify(preset.riggingOverrides[DRESS_REHEARSAL_KEY]))
+        : ((riggingOverrides && riggingOverrides[DRESS_REHEARSAL_KEY]) || {});
 
       currentPresetKey = presetKey;
       showLineups = {
-        ...JSON.parse(JSON.stringify(preset.shows)),
+        sat_early: [],
+        sat_late:  [],
+        sun_early: [],
+        sun_late:  [],
+        ...JSON.parse(JSON.stringify(preset.shows || {})),
         [DRESS_REHEARSAL_KEY]: savedDrLineup
       };
       riggingOverrides = {
-        ...JSON.parse(JSON.stringify(preset.riggingOverrides || { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} })),
+        sat_early: {},
+        sat_late: {},
+        sun_early: {},
+        sun_late: {},
+        ...JSON.parse(JSON.stringify(preset.riggingOverrides || {})),
         [DRESS_REHEARSAL_KEY]: savedDrOverrides
       };
       const unlockInput = document.getElementById("unlock-preset-input");
       if (unlockInput) unlockInput.value = "";
-      
-      // Auto-select first non-empty show in preset (unless currently viewing Dress Rehearsal)
-      if (currentShowKey !== DRESS_REHEARSAL_KEY) {
-        for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
-          if (showLineups[key] && showLineups[key].length > 0) {
-            currentShowKey = key;
-            break;
+
+      if (preset.isDressRehearsal) {
+        currentShowKey = DRESS_REHEARSAL_KEY;
+        isAllShowsView = false;
+        document.getElementById("all-shows-workspace").classList.add("hidden");
+        document.getElementById("single-show-workspace").classList.remove("hidden");
+      } else {
+        // Switching to a 4-show preset: select first non-empty weekend show if currently on Dress Rehearsal or empty show
+        if (currentShowKey === DRESS_REHEARSAL_KEY || !(showLineups[currentShowKey] && showLineups[currentShowKey].length > 0)) {
+          currentShowKey = "sat_early";
+          for (const key of ["sat_early", "sat_late", "sun_early", "sun_late"]) {
+            if (showLineups[key] && showLineups[key].length > 0) {
+              currentShowKey = key;
+              break;
+            }
           }
         }
       }
@@ -3901,11 +4047,14 @@
       }
       showLineups[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
       if (riggingOverrides) riggingOverrides[DRESS_REHEARSAL_KEY] = {};
+      if (PRESETS[currentPresetKey] && PRESETS[currentPresetKey].isDressRehearsal) {
+        PRESETS[currentPresetKey].shows[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
+      }
       persistDressRehearsal();
       renderTabs();
       renderLineup();
       renderBench();
-      showToast("Reset Dress Rehearsal to default 29-act QT - Flow #2 order!");
+      showToast("Reset Dress Rehearsal to default preset order!");
     }
 
     function resetCurrentShow() {
@@ -3995,6 +4144,7 @@
       const tooltip = document.getElementById("act-hover-tooltip");
       if (!act || !tooltip) return;
 
+      const isDrTooltip = isDressRehearsalOnlyMode() || (!isAllShowsView && currentShowKey === DRESS_REHEARSAL_KEY);
       const maxShows = act.maxShows || 2;
       const scheduledShowKeys = Object.keys(SHOW_INFO).filter(k => (showLineups[k] || []).includes(act.id));
 
@@ -4018,7 +4168,7 @@
       }).join("");
 
       tooltip.innerHTML = `
-        <div class="border-b border-slate-800 pb-1.5">
+        <div class="${isDrTooltip ? '' : 'border-b border-slate-800 pb-1.5'}">
           <div class="flex items-center justify-between gap-1.5">
             <span class="font-bold text-white text-xs truncate">Act ${act.id}: ${act.title}</span>
             <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold shrink-0 ${
@@ -4027,23 +4177,27 @@
               'bg-purple-950 text-purple-300 border border-purple-800/50'
             }">${act.type === 'Instructor-led Series' ? 'Series' : act.type}</span>
           </div>
+          ${isDrTooltip ? '' : `
           <div class="text-[10px] text-slate-400 mt-0.5 flex items-center justify-between">
             <span>${DAY_PREF_LABELS[act.dayPref] || ''}</span>
             <span class="font-semibold ${scheduledShowKeys.length > maxShows ? 'text-rose-400' : 'text-indigo-300'}">${scheduledShowKeys.length}/${maxShows} Shows Scheduled</span>
           </div>
+          `}
         </div>
 
+        ${isDrTooltip ? '' : `
         <div>
           <div class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Available Shows</div>
           <div class="grid grid-cols-2 gap-1">
             ${showPillsHtml}
           </div>
         </div>
+        `}
 
         <div class="pt-1 border-t border-slate-800/80 text-[10px] text-slate-300 space-y-0.5">
           <div><span class="text-slate-400">Apparatus:</span> <span class="font-medium">${act.apparatus}</span></div>
           <div><span class="text-slate-400">Rigging:</span> <span class="font-medium">F: ${act.rigging.front} | M: ${act.rigging.mid} | B: ${act.rigging.back}</span></div>
-          ${act.cameos && act.cameos.length > 0 ? `<div><span class="text-amber-300/90">Cameo/Prop:</span> ${act.cameos.join(", ")}${act.cameoUnavailable ? ` <span class="text-rose-400">(${Object.entries(act.cameoUnavailable).map(([sk, cName]) => `${cName} N/A ${SHOW_INFO[sk]?.short || sk}`).join("; ")})</span>` : ""}</div>` : ''}
+          ${act.cameos && act.cameos.length > 0 ? `<div><span class="text-amber-300/90">Cameo/Prop:</span> ${act.cameos.join(", ")}</div>` : ''}
         </div>
       `;
 
@@ -4121,7 +4275,7 @@
       const openedShared = checkUrlForSharedPreset();
       applyReadOnlyUiMode();
       renderPresetButtons();
-      if (openedShared && currentShowKey !== DRESS_REHEARSAL_KEY) {
+      if (openedShared && !isDressRehearsalOnlyMode() && currentShowKey !== DRESS_REHEARSAL_KEY) {
         isAllShowsView = true;
         document.getElementById("single-show-workspace").classList.add("hidden");
         document.getElementById("all-shows-workspace").classList.remove("hidden");
@@ -4131,7 +4285,8 @@
       } else {
         const params = new URLSearchParams(window.location.search);
         if (params.get("tab") === "dress_rehearsal" || params.get("tab") === "dr") {
-          currentShowKey = DRESS_REHEARSAL_KEY;
+          loadPreset("dress_rehearsal_preset");
+          return;
         }
         renderTabs();
         renderLineup();

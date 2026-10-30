@@ -1018,9 +1018,10 @@
         name: "QT - Flow #2",
         builtIn: true,
         locked: false,
+        presetVersion: 2,
         shows: {
-          sat_early: [6, 18, 1, "GAMES", 25, 21, 15, "INTERMISSION", 14, 16, 5, "GAMES", 19, 12, 8, 11],
-          sat_late:  [9, 7, 6, "GAMES", 4, 3, 26, "INTERMISSION", 22, 17, 24, "GAMES", 13, 29, 28],
+          sat_early: [6, 18, 1, "GAMES", 25, 21, 15, "INTERMISSION", 14, 16, 5, 13, "GAMES", 19, 8, 11],
+          sat_late:  [9, 7, 6, "GAMES", 4, 3, 26, "INTERMISSION", 22, 12, 24, 17, "GAMES", 29, 28],
           sun_early: [14, 4, 10, "GAMES", 27, 1, "INTERMISSION", 20, 5, 21, 15, "GAMES", 2, 8, 17],
           sun_late:  [9, 7, 11, "GAMES", 13, 10, 25, "INTERMISSION", 2, 23, "GAMES", 3, 26, 20, 28]
         },
@@ -1315,6 +1316,7 @@
           const saved = JSON.parse(raw);
           for (const [k, v] of Object.entries(saved)) {
             if (k === "config1" || k === "config2" || k === "config4") continue;
+            if (k === "qt_flow_2" && v.presetVersion !== DEFAULT_PRESETS.qt_flow_2.presetVersion) continue;
             PRESETS[k] = v;
           }
           // If the user has "QT - Energy Flow" in localStorage and hasn't manually customized qt_energy_min,
@@ -1398,21 +1400,21 @@
       4:  "QT Flow #2: Sat L #4 (starts 4 → 3 → 26 block)",
       3:  "QT Flow #2: Sat L #5 & Sun L #9 (before Act 26)",
       26: "QT Flow #2: Sat L #6 & Sun L #10 (after Act 3)",
-      22: "QT Flow #2: Sat L #7 (starts 22 → 17 → 24 block)",
-      17: "QT Flow #2: Sat L #8 (between Act 22 & Act 24)",
-      24: "QT Flow #2: Sat L #9 (after Act 17)",
-      19: "QT Flow #2: Sat E #10 (starts 19 → 12 → 8 block)",
-      12: "QT Flow #2: Sat E #11 (between Act 19 & Act 8)",
+      22: "QT Flow #2: Sat L #7 (starts 22 → 12 → 24 → 17 block)",
+      17: "QT Flow #2: Sat L #10 (after Act 24) / Sun E #12",
+      24: "QT Flow #2: Sat L #9 (between Act 12 & Act 17)",
+      19: "QT Flow #2: Sat E #11 (starts 19 → 8 block)",
+      12: "QT Flow #2: Sat L #8 (between Act 22 & Act 24)",
       8:  "QT Flow #2: Sat E #12 / Sun E #11",
       2:  "QT Flow #2: Sun L #7 (starts 2 → 23 block) / Sun E #10",
       23: "QT Flow #2: Sun L #8 (after Act 2)",
       25: "QT Flow #2: Sat E #4 (starts 25 → 21 → 15 block)",
       21: "QT Flow #2: Sat E #5 & Sun E #8 (paired before Act 15)",
       15: "QT Flow #2: Sat E #6 & Sun E #9 (continuation of Act 21)",
-      14: "QT Flow #2: Sat E #7 (starts 14 → 16 → 5 block)",
+      14: "QT Flow #2: Sat E #7 (starts 14 → 16 → 5 → 13 block)",
       16: "QT Flow #2: Sat E #8 (between Act 14 & Act 5)",
-      5:  "QT Flow #2: Sat E #9 (after Act 16) / Sun E #7",
-      13: "QT Flow #2: Sun L #4 (starts 13 → 10 block) / Sat L #10",
+      5:  "QT Flow #2: Sat E #9 (between Act 16 & Act 13) / Sun E #7",
+      13: "QT Flow #2: Sat E #10 (after Act 5) / Sun L #4",
       10: "QT Flow #2: Sun L #5 (after Act 13) / Sun E #3",
       20: "QT Flow #2: Sun L #11 (before Finale Act 28) / Sun E #6",
       29: "QT Flow #2: Sat L #11 (before Finale Act 28)",

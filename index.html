@@ -1073,6 +1073,7 @@
         name: "🎭 Dress Rehearsal",
         builtIn: true,
         locked: false,
+        presetVersion: 2,
         isDressRehearsal: true,
         shows: {
           sat_early: [],
@@ -1080,16 +1081,16 @@
           sun_early: [],
           sun_late:  [],
           dress_rehearsal: [
-            9, 7, 11, 22, 6, 26,
+            9, 7, 11, 22, 6,
             "GAMES",
-            18, 1, 27, 4, 3, 16, 25, 21, 15,
+            26, 18, 1, 3, 4, 27, 16, 25, 21, 15,
             "INTERMISSION",
             24, 19, 12, 8, 23, 2,
             "GAMES",
             14, 5, 13, 10, 20, 28
           ]
         },
-        riggingOverrides: { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, dress_rehearsal: {} }
+        riggingOverrides: { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {}, dress_rehearsal: { 26: { back: "Aerial/Floor" } } }
       }
     };
 
@@ -1316,7 +1317,7 @@
           const saved = JSON.parse(raw);
           for (const [k, v] of Object.entries(saved)) {
             if (k === "config1" || k === "config2" || k === "config4") continue;
-            if (k === "qt_flow_2" && v.presetVersion !== DEFAULT_PRESETS.qt_flow_2.presetVersion) continue;
+            if ((k === "qt_flow_2" || k === "dress_rehearsal_preset") && v.presetVersion !== DEFAULT_PRESETS[k].presetVersion) continue;
             PRESETS[k] = v;
           }
           // If the user has "QT - Energy Flow" in localStorage and hasn't manually customized qt_energy_min,
@@ -1368,7 +1369,7 @@
     };
 
     const DRESS_REHEARSAL_KEY = "dress_rehearsal";
-    const DRESS_REHEARSAL_STORAGE_KEY = "revel_hv_dress_rehearsal_v2";
+    const DRESS_REHEARSAL_STORAGE_KEY = "revel_hv_dress_rehearsal_v3";
     const DRESS_REHEARSAL_INFO = {
       title: "Dress Rehearsal — All 29 Acts (QT - Flow #2 Practice Flow)",
       short: "🎭 Dress Rehearsal"
@@ -1377,10 +1378,10 @@
     // Continuous Dress Rehearsal preset lineup mirroring QT - Flow #2's rigging transitions & act blocks
     const DEFAULT_DRESS_REHEARSAL_LINEUP = [
       // Block 1 (Front: A/F | Mid: A/F | Back: Pole -> Mid: Pole)
-      9, 7, 11, 22, 6, 26,
+      9, 7, 11, 22, 6,
       "GAMES",
       // Block 2 (Front: A/F | Mid: Pole | Back: A/F -> All A/F)
-      18, 1, 27, 4, 3, 16, 25, 21, 15,
+      26, 18, 1, 3, 4, 27, 16, 25, 21, 15,
       "INTERMISSION",
       // Block 3 (Front: Pole | Mid: Pole | Back: Pole -> Back: A/F)
       24, 19, 12, 8, 23, 2,
@@ -1388,6 +1389,10 @@
       // Block 4 (Front: A/F | Mid: A/F | Back: A/F)
       14, 5, 13, 10, 20, 28
     ];
+
+    const DEFAULT_DRESS_REHEARSAL_OVERRIDES = {
+      26: { back: "Aerial/Floor" }
+    };
 
     const DRESS_REHEARSAL_FLOW_NOTES = {
       9:  "QT Flow #2: Sat L & Sun L #1 Opener",
@@ -1441,7 +1446,7 @@
       } catch (e) {}
       return {
         lineup: [...DEFAULT_DRESS_REHEARSAL_LINEUP],
-        overrides: {}
+        overrides: JSON.parse(JSON.stringify(DEFAULT_DRESS_REHEARSAL_OVERRIDES))
       };
     }
 
@@ -4048,9 +4053,11 @@
         return;
       }
       showLineups[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
-      if (riggingOverrides) riggingOverrides[DRESS_REHEARSAL_KEY] = {};
+      if (riggingOverrides) riggingOverrides[DRESS_REHEARSAL_KEY] = JSON.parse(JSON.stringify(DEFAULT_DRESS_REHEARSAL_OVERRIDES));
       if (PRESETS[currentPresetKey] && PRESETS[currentPresetKey].isDressRehearsal) {
         PRESETS[currentPresetKey].shows[DRESS_REHEARSAL_KEY] = [...DEFAULT_DRESS_REHEARSAL_LINEUP];
+        if (!PRESETS[currentPresetKey].riggingOverrides) PRESETS[currentPresetKey].riggingOverrides = {};
+        PRESETS[currentPresetKey].riggingOverrides[DRESS_REHEARSAL_KEY] = JSON.parse(JSON.stringify(DEFAULT_DRESS_REHEARSAL_OVERRIDES));
       }
       persistDressRehearsal();
       renderTabs();

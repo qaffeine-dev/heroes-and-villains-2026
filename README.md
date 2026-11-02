@@ -46,7 +46,7 @@ An interactive production scheduler, conflict validator, and rigging changeover 
 
 ### 4. Built-In Presets, Locking & Shareable Read-Only Links
 - **Built-In 4-Show Presets:**
-  - **`QT - Flow #2`** — Primary 4-show production schedule (`49` total performances across 4 shows, `15` rigging changes, `2` Games breaks + `1` Intermission per show, `0` hard conflicts).
+  - **`QT - Flow #2`** — Primary 4-show production schedule (`50` total performances across 4 shows, `15` rigging changes, `2` Games breaks + `1` Intermission per show, `0` hard conflicts).
   - **`QT - Energy Flow`** — Energy-paced 4-show schedule (🔒 locked by default).
   - **`QT - Energy Flow (Min Rigging)`** — Rigging-minimized variant of `QT - Energy Flow`.
   - **`Min Rigging (Honors Prefs)`** & **`QT - Min Rig Honor Prefs`** — Minimum-rigging 4-show schedule (`11` total rigging changes, `0` hard conflicts, `0` day-preference violations).

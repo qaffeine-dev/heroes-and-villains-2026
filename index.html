@@ -945,10 +945,10 @@
         performers: ["Sal"],
         cameos: ["Britt C", "Lauren G", "Seema", "Jon", "Rissa"],
         availability: ["sat_late", "sun_early", "sun_late"],
-        maxShows: 1,
-        dayPref: "1_show",
+        maxShows: 2,
+        dayPref: "no_pref",
         pending: false,
-        notes: "Available Sat Late, Sun Early & Sun Late; requested 1 show only. Shares Rissa with Act 3 (needs 1-act buffer)."
+        notes: "Available Sat Late, Sun Early & Sun Late (up to 2 shows). Shares Rissa with Act 3 (needs 1-act buffer)."
       },
       28: {
         id: 28,
@@ -1018,12 +1018,12 @@
         name: "QT - Flow #2",
         builtIn: true,
         locked: false,
-        presetVersion: 2,
+        presetVersion: 3,
         shows: {
           sat_early: [6, 18, 1, "GAMES", 25, 21, 15, "INTERMISSION", 14, 16, 5, 13, "GAMES", 19, 8, 11],
           sat_late:  [9, 7, 6, "GAMES", 4, 3, 26, "INTERMISSION", 22, 12, 24, 17, "GAMES", 29, 28],
           sun_early: [14, 4, 10, "GAMES", 27, 1, "INTERMISSION", 20, 5, 21, 15, "GAMES", 2, 8, 17],
-          sun_late:  [9, 7, 11, "GAMES", 13, 10, 25, "INTERMISSION", 2, 23, "GAMES", 3, 26, 20, 28]
+          sun_late:  [9, 7, 11, "GAMES", 13, 10, 25, "INTERMISSION", 2, 23, "GAMES", 3, 26, 27, 20, 28]
         },
         riggingOverrides: { sat_early: {}, sat_late: {}, sun_early: {}, sun_late: {} }
       },
@@ -1396,7 +1396,7 @@
       6:  "QT Flow #2: Sat L #3 (after Act 7) / Sat E #1",
       18: "QT Flow #2: Sat E #2 (after Act 6, before Act 1)",
       1:  "QT Flow #2: Sat E #3 (after Act 18) / Sun E #5",
-      27: "QT Flow #2: Sun E #4 (paired with Act 1)",
+      27: "QT Flow #2: Sun E #4 (paired with Act 1) / Sun L #11 (after Act 26)",
       4:  "QT Flow #2: Sat L #4 (starts 4 → 3 → 26 block)",
       3:  "QT Flow #2: Sat L #5 & Sun L #9 (before Act 26)",
       26: "QT Flow #2: Sat L #6 & Sun L #10 (after Act 3)",
@@ -1416,9 +1416,9 @@
       5:  "QT Flow #2: Sat E #9 (between Act 16 & Act 13) / Sun E #7",
       13: "QT Flow #2: Sat E #10 (after Act 5) / Sun L #4",
       10: "QT Flow #2: Sun L #5 (after Act 13) / Sun E #3",
-      20: "QT Flow #2: Sun L #11 (before Finale Act 28) / Sun E #6",
+      20: "QT Flow #2: Sun L #12 (before Finale Act 28) / Sun E #6",
       29: "QT Flow #2: Sat L #11 (before Finale Act 28)",
-      28: "QT Flow #2: Sat L #12 & Sun L #12 Grand Finale"
+      28: "QT Flow #2: Sat L #12 & Sun L #13 Grand Finale"
     };
 
     function getShowInfo(key) {

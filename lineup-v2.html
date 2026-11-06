@@ -895,17 +895,12 @@
       }
       .broadsheet-footer {
         padding: 18px 16px;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .footer-right {
-        text-align: left;
       }
     }
 
     @media (max-width: 640px) {
       .broadsheet-inner {
-        padding: 14px 14px 36px;
+        padding: 14px 14px 24px;
       }
       .issue-topbar {
         font-size: 0.68rem;
@@ -1065,6 +1060,49 @@
       .cast-performers-inline {
         font-size: 0.8rem;
         max-width: 55%;
+      }
+      .program-colophon {
+        margin-top: 40px;
+        padding-top: 22px;
+      }
+      .colophon-kicker {
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+      }
+      .colophon-copy {
+        font-size: 0.84rem;
+      }
+      .reserve-link {
+        font-size: 0.96rem;
+      }
+      .broadsheet-footer {
+        padding: 16px 14px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      .footer-left .brand {
+        font-size: 0.88rem;
+        line-height: 1.15;
+      }
+      .footer-left .sub {
+        font-size: 0.65rem;
+        letter-spacing: 0.04em;
+        line-height: 1.2;
+      }
+      .footer-right {
+        text-align: right;
+      }
+      .footer-right .url {
+        font-size: 0.8rem;
+        display: block;
+        line-height: 1.15;
+      }
+      .footer-right .social {
+        font-size: 0.65rem;
+        line-height: 1.2;
       }
     }
   </style>

@@ -158,7 +158,7 @@
       padding: 6px 44px;
       transform: skewX(14deg);
       display: inline-block;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       max-width: 95%;
     }
 
@@ -173,16 +173,6 @@
       text-shadow: 1.5px 1.5px 0 #052c42;
     }
 
-    .tagline-primary {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: clamp(0.95rem, 2.1vw, 1.18rem);
-      letter-spacing: 0.12em;
-      color: var(--comic-yellow);
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
     .tagline-secondary {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
@@ -191,67 +181,6 @@
       color: var(--text-cream);
       text-transform: uppercase;
       opacity: 0.9;
-    }
-
-    /* ==================== 5-PANEL COMIC ACCENT STRIP ==================== */
-    .comic-divider-strip {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      margin: 20px 0 24px;
-      padding: 5px;
-      background: #ffffff;
-      border: 1px solid #ffffff;
-    }
-
-    .strip-panel {
-      height: 28px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-size: 8px 8px;
-    }
-
-    .strip-panel.p1 {
-      background-color: #044369;
-      background-image: radial-gradient(circle, rgba(0, 200, 255, 0.45) 2px, transparent 2.2px);
-    }
-    .strip-panel.p2 {
-      background-color: #6b3804;
-      background-image: radial-gradient(circle, rgba(255, 174, 25, 0.45) 2px, transparent 2.2px);
-    }
-    .strip-panel.p3 {
-      background-color: #4c117a;
-      background-image: radial-gradient(circle, rgba(216, 115, 255, 0.45) 2px, transparent 2.2px);
-    }
-    .strip-panel.p4 {
-      background-color: #5e4b04;
-      background-image: radial-gradient(circle, rgba(246, 220, 30, 0.45) 2px, transparent 2.2px);
-    }
-    .strip-panel.p5 {
-      background-color: #6e0d14;
-      background-image: radial-gradient(circle, rgba(239, 59, 45, 0.45) 2px, transparent 2.2px);
-    }
-
-    .strip-badge {
-      background: #0a0912;
-      border: 1.5px solid #ffffff;
-      color: #ffffff;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 0.7rem;
-      letter-spacing: 0.14em;
-      padding: 1px 10px;
-      transform: skewX(-12deg);
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .strip-badge span {
-      display: inline-block;
-      transform: skewX(12deg);
     }
 
     /* ==================== FILTER & SEARCH CONTROLS ==================== */
@@ -697,13 +626,6 @@
       .shows-grid {
         grid-template-columns: 1fr;
       }
-      .comic-divider-strip {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .comic-divider-strip .strip-panel:nth-child(4),
-      .comic-divider-strip .strip-panel:nth-child(5) {
-        display: none;
-      }
       .flyer-footer-bar {
         flex-direction: column;
         text-align: center;
@@ -751,18 +673,8 @@
           <span>AN AERIAL &amp; POLE ACROBATICS SHOWCASE &bull; OFFICIAL LINEUP</span>
         </div>
 
-        <p class="tagline-primary">&#9733; OVER 25 JAW-DROPPING ACTS &bull; GOOD VS. EVIL LIVE ON STAGE &#9733;</p>
         <p class="tagline-secondary">LYRA &bull; AERIAL SILKS &bull; FLYING POLE &bull; STRAPS &bull; POLE ARTISTRY &bull; CHAIR &amp; HEELS</p>
       </header>
-
-      <!-- 5-PANEL COMIC ACCENT STRIP -->
-      <div class="comic-divider-strip" aria-hidden="true">
-        <div class="strip-panel p1"><div class="strip-badge"><span>FLYING POLE</span></div></div>
-        <div class="strip-panel p2"><div class="strip-badge"><span>STRAPS</span></div></div>
-        <div class="strip-panel p3"><div class="strip-badge"><span>AERIAL SILKS</span></div></div>
-        <div class="strip-panel p4"><div class="strip-badge"><span>LYRA HOOP</span></div></div>
-        <div class="strip-panel p5"><div class="strip-badge"><span>POLE &amp; CHAIR</span></div></div>
-      </div>
 
       <!-- INTERACTIVE SHOW FILTER & SEARCH -->
       <section class="controls-section" aria-label="Show filters and performer search">
@@ -810,40 +722,40 @@
   </div>
 
   <script>
-    // Main performers only (no cameos, no rigging changes, no notes, no availability, no games, no intermission)
+    // Master Acts Catalog from index.html (main performers only — no cameos, no rigging changes, no notes, no availability)
     const ACTS = {
-      1:  { name: "Two Sides, Same Flame", performers: ["Amelie C", "Cinthia T"] },
-      2:  { name: "Chaos & Cackle", performers: ["Christine T"] },
-      3:  { name: "Web of Shadows", performers: ["Claudelle V"] },
-      4:  { name: "Agent of Shadow", performers: ["Cinthia T"] },
-      5:  { name: "Dark Temptation", performers: ["Tammy C", "Chika B", "Lilia C"] },
-      6:  { name: "Mulan", performers: ["Tiffany L", "Kathy L", "Karen L", "Christine T", "Elizabeth A", "Melody G", "Tammy C", "Rachel Z", "Joyi L"] },
-      7:  { name: "Man of Steel", performers: ["James M"] },
-      8:  { name: "Symbiote Six", performers: ["Rachel C", "Louise R", "Jennifer L", "Danielle B", "Claudia C", "Sora T"] },
-      9:  { name: "Gotham Siren", performers: ["Amelie C"] },
-      10: { name: "Amazonian Huntress", performers: ["Melody G"] },
-      11: { name: "Coven of The Wicked", performers: ["Tammy C", "Chika B", "Jenni N", "Elizabeth A", "Joyi L", "Claudelle V", "Amiel R", "Tiffany L"] },
-      12: { name: "Siren's Call", performers: ["Jenni N", "Karen L"] },
-      13: { name: "Cruella's Fur Fantasy", performers: ["Tiffany L", "Melody G", "Rachel Z", "Rachel C", "Jennifer L"] },
-      14: { name: "Pink Vigilante", performers: ["Lisa D"] },
-      15: { name: "Sailor Senshi", performers: ["Jenni N", "Elizabeth A", "Lisa D", "Grace C", "Stephanie G"] },
-      16: { name: "Demon Queens", performers: ["Rachel Z", "Diana R"] },
+      1:  { name: "Harley Quinn", performers: ["Angel"] },
+      2:  { name: "Teen Titans", performers: ["Lisa Z", "Dorothy T"] },
+      3:  { name: "Lord Farquaad & Dragon", performers: ["Rissa", "Asia"] },
+      4:  { name: "Blind Mag", performers: ["Elly Z"] },
+      5:  { name: "Poison Ivan", performers: ["Brian F"] },
+      6:  { name: "Joker", performers: ["Christina W"] },
+      7:  { name: "Sukuna", performers: ["Jonathan M"] },
+      8:  { name: "Pink Panther", performers: ["Alice K"] },
+      9:  { name: "Team Rocket", performers: ["Ashley C", "Quan T"] },
+      10: { name: "Black & White Swans", performers: ["Ye W", "Jie Z"] },
+      11: { name: "Sailor Scouts", performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"] },
+      12: { name: "Ursula", performers: ["Patricia H"] },
+      13: { name: "Ursula", performers: ["Paige L"] },
+      14: { name: "Spiderman", performers: ["Austin T"] },
+      15: { name: "Prison Break", performers: ["Emily C", "Erica C", "Zoe", "Kim G"] },
+      16: { name: "Mulan & Ping", performers: ["Kim N", "Jen J"] },
       17: { name: "PowerPuff Girls", performers: ["Louise R", "Amiel R", "Claudelle V", "Joyi L"] },
-      18: { name: "Sinister Charm", performers: ["Amiel R"] },
-      19: { name: "Mother Knows Best", performers: ["Joyi L"] },
-      20: { name: "Popstar Heroines", performers: ["Tiffany L", "Karen L", "Joyi L"] },
-      21: { name: "Bitter Symphony", performers: ["Tiffanie A", "Michelle W"] },
-      22: { name: "Red Ronin", performers: ["Kathy L"] },
-      23: { name: "Pop Royals", performers: ["Tiffanie A", "Tammy C", "Chika B", "Amelie C"] },
-      24: { name: "Assassin", performers: ["Elizabeth A"] },
-      25: { name: "All Stars", performers: ["Louise R", "Chika B"] },
-      26: { name: "Phoenix Reborn", performers: ["Joyi L"] },
-      27: { name: "Golden Lasso", performers: ["Rachel Z"] },
-      28: { name: "Avatar Elements", performers: ["Kathy L", "Joyi L", "Jenni N", "James M"] },
-      29: { name: "Tomb Raider", performers: ["Michelle W"] }
+      18: { name: "Angel Dust", performers: ["Karen S"] },
+      19: { name: "Lois & Clark", performers: ["Cece", "Josh J"] },
+      20: { name: "Organ Donor", performers: ["Jenn L"] },
+      21: { name: "Mama Morton", performers: ["Selina"] },
+      22: { name: "Ratatouille", performers: ["Josh P"] },
+      23: { name: "Rumi", performers: ["Christine S"] },
+      24: { name: "Assassin", performers: ["Cheng J"] },
+      25: { name: "Snakes of Medusa", performers: ["Kitty", "Derikka", "Heartley", "Emma", "Chloe", "Anna", "Anne", "Mackenzie"] },
+      26: { name: "Obsession", performers: ["Kristine G", "Scott S"] },
+      27: { name: "The Devil", performers: ["Sal"] },
+      28: { name: "Masked Enigma", performers: ["Masa"] },
+      29: { name: "Poison Ivy", performers: ["Luna"] }
     };
 
-    // QT - Flow #2 preset lineup (acts only — no games or intermission)
+    // Exact QT - Flow #2 (qt_flow_2) preset lineup from index.html (acts only — no games or intermission)
     const DAYS = [
       {
         id: "saturday",
@@ -858,7 +770,7 @@
             label: "EARLY MATINEE",
             time: "3:00 PM",
             doors: "Doors Open at 2:30 PM • All Ages • Family Friendly",
-            sequence: [6, 18, 1, 25, 21, 15, 14, 16, 5, 19, 12, 8, 11]
+            sequence: [6, 18, 1, 25, 21, 15, 14, 16, 5, 13, 19, 8, 11]
           },
           {
             key: "sat_late",
@@ -866,7 +778,7 @@
             label: "LATE EVENING",
             time: "7:00 PM",
             doors: "Doors Open at 6:30 PM • Prime Nighttime Showcase",
-            sequence: [9, 7, 6, 4, 3, 26, 22, 17, 24, 13, 29, 28]
+            sequence: [9, 7, 6, 4, 3, 26, 22, 12, 24, 17, 29, 28]
           }
         ]
       },
@@ -891,7 +803,7 @@
             label: "GRAND FINALE",
             time: "7:00 PM",
             doors: "Doors Open at 6:30 PM • Closing Weekend Spectacular",
-            sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 20, 28]
+            sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 27, 20, 28]
           }
         ]
       }

@@ -98,6 +98,7 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+      container-type: inline-size;
       border-left: 1px solid var(--rule-subtle);
       border-right: 1px solid var(--rule-subtle);
       background-image:
@@ -168,6 +169,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: color 0.15s ease, border-color 0.15s ease;
     }
 
@@ -206,10 +209,11 @@
       font-family: 'Anton', Impact, sans-serif;
       font-style: italic;
       font-weight: 400;
-      font-size: clamp(3.6rem, 10vw, 7.2rem);
+      font-size: clamp(2.1rem, 10.6cqw, 7.2rem);
       line-height: 0.92;
       letter-spacing: 0.03em;
       text-transform: uppercase;
+      white-space: nowrap;
       padding: 4px 12px;
       margin-bottom: 14px;
       background:
@@ -286,15 +290,17 @@
 
     .photo-strip-frame {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 6px;
       height: clamp(230px, 32vw, 350px);
+      width: 100%;
     }
 
     .photo-panel {
       position: relative;
       overflow: hidden;
       background: #090610;
+      min-width: 0;
     }
 
     .photo-panel img {
@@ -849,12 +855,11 @@
 
     @media (max-width: 900px) {
       .broadsheet-inner {
-        padding: 18px 20px 44px;
+        padding: 16px 16px 40px;
       }
       .photo-strip-frame {
-        grid-template-columns: repeat(5, minmax(130px, 1fr));
-        overflow-x: auto;
-        height: 220px;
+        height: clamp(148px, 40vw, 240px);
+        gap: 4px;
       }
       .shows-columns {
         grid-template-columns: 1fr;
@@ -864,15 +869,8 @@
         padding: 0 !important;
         border-right: none !important;
       }
-      .day-monument-header {
-        grid-template-columns: auto 1fr;
-      }
-      .day-sub {
-        grid-column: 1 / -1;
-        justify-self: start;
-      }
       .broadsheet-footer {
-        padding: 18px 20px;
+        padding: 18px 16px;
         flex-direction: column;
         align-items: flex-start;
       }
@@ -881,19 +879,139 @@
       }
     }
 
-    @media (max-width: 560px) {
-      .cast-main-line {
-        flex-wrap: wrap;
-        gap: 4px 8px;
+    @media (max-width: 640px) {
+      .broadsheet-inner {
+        padding: 14px 14px 36px;
       }
-      .cast-leader {
+      .issue-topbar {
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        gap: 6px;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+      }
+      .issue-topbar .issue-left {
+        gap: 6px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        min-width: 0;
+      }
+      .hide-mobile {
         display: none;
       }
-      .cast-performers-inline {
+      .mode-toggle-btn {
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+      }
+      .masthead {
+        margin-bottom: 14px;
+      }
+      .masthead-kicker {
+        font-size: 0.74rem;
+        letter-spacing: 0.16em;
+        margin-bottom: 4px;
+      }
+      .comic-title {
+        padding: 2px 2px;
+        margin-bottom: 8px;
+      }
+      .masthead-subrow {
+        flex-direction: column;
+        gap: 3px;
+        padding: 6px 0;
+      }
+      .masthead-subtitle {
+        font-size: 0.88rem;
+        letter-spacing: 0.07em;
+      }
+      .apparatus-line {
+        font-size: 0.6rem;
+        gap: 3px;
+        letter-spacing: 0.02em;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+      }
+      .photo-strip-wrapper {
+        margin: 12px 0 18px;
+      }
+      .photo-strip-frame {
+        gap: 3px;
+        height: 145px;
+      }
+      .panel-caption {
+        left: 2px;
+        right: 2px;
+        bottom: 5px;
+        text-align: center;
+      }
+      .panel-caption .apparatus-tag {
+        font-size: 0.52rem;
+        letter-spacing: 0.03em;
+        line-height: 1.05;
+        display: block;
+        white-space: nowrap;
+      }
+      .showcase-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding: 8px 0 12px;
+      }
+      .showcase-meta {
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      .tickets-cta {
+        justify-content: center;
         width: 100%;
-        text-align: left;
+        font-size: 1rem;
+        padding: 8px 14px 6px;
+      }
+      .program-index-bar {
+        margin: 14px 0 24px;
+        gap: 8px;
+      }
+      .index-tabs {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0;
+        flex-wrap: nowrap;
+      }
+      .filter-btn {
         font-size: 0.84rem;
-        color: var(--text-muted);
+        letter-spacing: 0.03em;
+        padding: 6px 1px 8px;
+        white-space: nowrap;
+      }
+      .search-box {
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-bottom: 6px;
+      }
+      .day-monument-header {
+        margin-bottom: 18px;
+        padding-bottom: 8px;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      .day-heading {
+        font-size: 1.35rem;
+        white-space: nowrap;
+      }
+      .day-sub {
+        font-size: 0.88rem;
+        white-space: nowrap;
+      }
+      .cast-act-title {
+        font-size: 1.04rem;
+      }
+      .cast-performers-inline {
+        font-size: 0.8rem;
+        max-width: 55%;
       }
     }
   </style>
@@ -908,8 +1026,8 @@
       <div class="issue-topbar">
         <div class="issue-left">
           <span class="studio-tag">Revel Room Studios</span>
-          <span>•</span>
-          <span>San Jose, CA</span>
+          <span class="hide-mobile">•</span>
+          <span class="hide-mobile">San Jose, CA</span>
           <span>•</span>
           <span>Official 2026 Program</span>
         </div>
@@ -1313,6 +1431,9 @@
     }
 
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("viewport") === "mobile") {
+      document.body.style.maxWidth = "390px";
+    }
     const paramMode = urlParams.get("mode");
     let savedMode = null;
     try {

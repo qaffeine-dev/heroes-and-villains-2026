@@ -810,6 +810,49 @@
       height: 16px;
     }
 
+    /* ==================== SPECIAL THANKS (CAMEOS & VOLUNTEERS) ==================== */
+    .special-thanks-section {
+      margin-top: 32px;
+      padding-top: 26px;
+      border-top: 1px solid var(--rule-subtle);
+      text-align: center;
+    }
+
+    .special-thanks-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+
+    .special-thanks-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .special-thanks-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.03em;
+      color: var(--hero-gold-bright);
+    }
+
+    .thanks-names {
+      max-width: 780px;
+      margin: 0 auto;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+
     .broadsheet-footer {
       border-top: 1px solid var(--rule-subtle);
       padding: 20px 40px;
@@ -892,6 +935,10 @@
       .show-column {
         padding: 0 !important;
         border-right: none !important;
+      }
+      .special-thanks-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
       }
       .broadsheet-footer {
         padding: 18px 16px;
@@ -1066,14 +1113,33 @@
         padding-top: 22px;
       }
       .colophon-kicker {
-        font-size: 1rem;
-        letter-spacing: 0.1em;
+        font-size: 0.92rem;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
       }
       .colophon-copy {
         font-size: 0.84rem;
       }
       .reserve-link {
-        font-size: 0.96rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+      .special-thanks-section {
+        margin-top: 24px;
+        padding-top: 20px;
+      }
+      .special-thanks-header {
+        margin-bottom: 14px;
+      }
+      .special-thanks-title {
+        font-size: 1.05rem;
+      }
+      .special-thanks-sub {
+        font-size: 0.95rem;
+      }
+      .thanks-names {
+        font-size: 0.8rem;
+        line-height: 1.55;
       }
       .broadsheet-footer {
         padding: 16px 14px;
@@ -1083,25 +1149,29 @@
         flex-wrap: nowrap;
         gap: 8px;
       }
+      .footer-left,
+      .footer-right {
+        white-space: nowrap;
+      }
       .footer-left .brand {
-        font-size: 0.88rem;
+        font-size: 0.86rem;
         line-height: 1.15;
       }
       .footer-left .sub {
-        font-size: 0.65rem;
-        letter-spacing: 0.04em;
+        font-size: 0.62rem;
+        letter-spacing: 0.03em;
         line-height: 1.2;
       }
       .footer-right {
         text-align: right;
       }
       .footer-right .url {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         display: block;
         line-height: 1.15;
       }
       .footer-right .social {
-        font-size: 0.65rem;
+        font-size: 0.62rem;
         line-height: 1.2;
       }
     }
@@ -1242,6 +1312,41 @@
             <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
           </svg>
         </a>
+      </section>
+
+      <!-- Special Thanks: Cameos, Volunteers, & Production Team -->
+      <section class="special-thanks-section" aria-label="Special Thanks">
+        <div class="special-thanks-header">
+          <h3 class="special-thanks-title">Special Thanks</h3>
+          <span class="special-thanks-sub">Cameos, Volunteers, &amp; Production Team</span>
+        </div>
+        <div class="thanks-names">
+          <span class="perf-name">Alex V</span> &middot;
+          <span class="perf-name">Alicia</span> &middot;
+          <span class="perf-name">Alyx J</span> &middot;
+          <span class="perf-name">Amy J</span> &middot;
+          <span class="perf-name">Angelica</span> &middot;
+          <span class="perf-name">Bobbi U</span> &middot;
+          <span class="perf-name">Britt C</span> &middot;
+          <span class="perf-name">Celeste</span> &middot;
+          <span class="perf-name">Cindy L</span> &middot;
+          <span class="perf-name">Connie T</span> &middot;
+          <span class="perf-name">Debbie L</span> &middot;
+          <span class="perf-name">Jacquie</span> &middot;
+          <span class="perf-name">Janine</span> &middot;
+          <span class="perf-name">Jenn P</span> &middot;
+          <span class="perf-name">Jon B</span> &middot;
+          <span class="perf-name">Kat M</span> &middot;
+          <span class="perf-name">Kelly N</span> &middot;
+          <span class="perf-name">Lara A</span> &middot;
+          <span class="perf-name">Lauren G</span> &middot;
+          <span class="perf-name">Lisa O</span> &middot;
+          <span class="perf-name">Lisa Q</span> &middot;
+          <span class="perf-name">Mia L</span> &middot;
+          <span class="perf-name">Priscilla</span> &middot;
+          <span class="perf-name">Seema</span> &middot;
+          <span class="perf-name">Summer</span>
+        </div>
       </section>
     </div>
 

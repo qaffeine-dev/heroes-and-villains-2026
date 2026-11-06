@@ -105,19 +105,16 @@
         radial-gradient(ellipse 55% 28% at 85% 0%, rgba(147, 51, 234, 0.14) 0%, transparent 70%);
     }
 
-    /* Subtle Print Grain & Halftone Texture */
+    /* Subtle Print Grain Texture (No Halftone Dots) */
     .texture-layer {
       position: absolute;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.45;
+      opacity: 0.35;
       background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E"),
-        radial-gradient(circle, rgba(245, 158, 11, 0.12) 1px, transparent 1.5px);
-      background-size: 180px 180px, 12px 12px;
-      mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, rgba(0,0,0,0.15) 45%, #000 100%);
-      -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, rgba(0,0,0,0.15) 45%, #000 100%);
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
     }
 
     .broadsheet-inner {
@@ -291,66 +288,40 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
-      height: clamp(230px, 32vw, 360px);
-      padding: 8px;
-      background: #050308;
-      border: 2px solid var(--photo-border);
-      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
-      overflow: hidden;
-    }
-
-    html[data-mode="light"] .photo-strip-frame {
-      background: #18181b;
-      box-shadow: 0 18px 40px rgba(24, 24, 27, 0.18);
+      height: clamp(230px, 32vw, 350px);
     }
 
     .photo-panel {
       position: relative;
       overflow: hidden;
       background: #090610;
-      border: 1.5px solid rgba(255, 255, 255, 0.22);
-      transform: skewX(-5deg);
-      margin: 0 -4px;
-    }
-
-    .photo-panel:first-child {
-      margin-left: -10px;
-    }
-
-    .photo-panel:last-child {
-      margin-right: -10px;
     }
 
     .photo-panel img {
-      width: 118%;
+      width: 100%;
       height: 100%;
-      margin-left: -9%;
       object-fit: cover;
       object-position: center 22%;
       display: block;
-      transform: skewX(5deg) scale(1.03);
-      filter: contrast(1.06) saturate(1.08);
       transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .photo-panel:hover img {
-      transform: skewX(5deg) scale(1.09);
+      transform: scale(1.04);
     }
 
-    /* Subtle Comic Halftone & Bottom Gradient Overlay on Panels */
+    /* Clean Bottom Gradient Only for Caption Legibility (No Halftones) */
     .photo-panel::after {
       content: "";
       position: absolute;
       inset: 0;
-      background:
-        radial-gradient(circle, rgba(0, 0, 0, 0.28) 1px, transparent 1.6px) 0 0 / 5px 5px,
-        linear-gradient(180deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.15) 58%, rgba(5, 3, 8, 0.9) 100%);
+      background: linear-gradient(180deg, transparent 55%, rgba(5, 3, 8, 0.86) 100%);
       pointer-events: none;
     }
 
     .panel-caption {
       position: absolute;
-      left: 14px;
+      left: 12px;
       right: 10px;
       bottom: 10px;
       z-index: 2;
@@ -358,7 +329,6 @@
       flex-direction: column;
       gap: 1px;
       pointer-events: none;
-      transform: skewX(5deg);
     }
 
     .panel-caption .apparatus-tag {
@@ -550,51 +520,19 @@
 
     /* Monumental Editorial Day Header — High Contrast Hierarchy */
     .day-monument-header {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: end;
-      gap: 20px;
-      padding-bottom: 16px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 14px;
       border-bottom: 3px double var(--rule-heavy);
       margin-bottom: 34px;
     }
 
-    .day-numeral {
-      font-family: 'Anton', sans-serif;
-      font-size: clamp(3rem, 6vw, 4.6rem);
-      line-height: 0.82;
-      color: transparent;
-      -webkit-text-stroke: 1.5px var(--hero-gold);
-      letter-spacing: 0.02em;
-      user-select: none;
-    }
-
-    .sunday-section .day-numeral {
-      -webkit-text-stroke-color: var(--villain-emerald);
-    }
-
-    .day-title-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .day-kicker {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--hero-crimson);
-    }
-
-    .sunday-section .day-kicker {
-      color: var(--villain-accent);
-    }
-
     .day-heading {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(1.85rem, 4vw, 2.75rem);
+      font-size: clamp(2rem, 4.2vw, 2.85rem);
       font-weight: 800;
       line-height: 0.98;
       letter-spacing: 0.03em;
@@ -607,7 +545,6 @@
       font-size: 1.15rem;
       letter-spacing: 0.14em;
       color: var(--text-muted);
-      align-self: end;
     }
 
     /* Open Architectural 2-Column Show Layout Separated by Vertical Hairline */
@@ -654,7 +591,6 @@
       height: 135px;
       margin-bottom: 16px;
       overflow: hidden;
-      border: 1px solid var(--photo-border);
       background: #07050a;
     }
 
@@ -663,14 +599,13 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      filter: contrast(1.08) saturate(1.05);
     }
 
     .show-photo-banner::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, rgba(8, 6, 12, 0.78) 0%, rgba(8, 6, 12, 0.2) 55%, rgba(8, 6, 12, 0.72) 100%);
+      background: linear-gradient(90deg, rgba(8, 6, 12, 0.65) 0%, rgba(8, 6, 12, 0.15) 55%, rgba(8, 6, 12, 0.65) 100%);
       pointer-events: none;
     }
 
@@ -751,31 +686,11 @@
     }
 
     /* ==================== THEATRICAL CAST PROGRAM LIST (NOT A DATABASE) ==================== */
-    .order-rubric {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 600;
-      font-size: 0.98rem;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .order-rubric::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--rule-faint);
-    }
-
     .cast-program-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 14px;
     }
 
     .cast-entry {
@@ -783,37 +698,22 @@
       padding: 2px 0;
     }
 
-    /* Opening & Finale Act Accents */
-    .cast-role-tag {
-      display: inline-block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--hero-gold-bright);
-      margin-bottom: 2px;
-    }
-
-    .show-column.late-evening .cast-role-tag {
-      color: var(--villain-emerald-bright);
-    }
-
     /* Main Line: Character/Act Title + Dotted Playbill Leader + Cast Credit */
     .cast-main-line {
       display: flex;
       align-items: baseline;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     .cast-act-title {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 800;
-      font-size: 1.24rem;
+      font-size: 1.22rem;
       letter-spacing: 0.045em;
       text-transform: uppercase;
       color: var(--text-primary);
-      line-height: 1.12;
+      line-height: 1.15;
       flex-shrink: 0;
     }
 
@@ -826,43 +726,16 @@
     }
 
     .cast-performers-inline {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-secondary);
       text-align: right;
-      flex-shrink: 0;
+      max-width: 60%;
+      line-height: 1.38;
     }
 
-    /* Ensemble Acts (4+ Performers): Featured Stage Block */
-    .cast-entry.is-ensemble {
-      padding: 8px 0 8px 14px;
-      border-left: 2px solid var(--hero-gold);
-      margin: 2px 0;
-    }
-
-    .show-column.late-evening .cast-entry.is-ensemble {
-      border-left-color: var(--villain-emerald);
-    }
-
-    .cast-ensemble-block {
-      margin-top: 3px;
-      font-size: 0.86rem;
-      font-weight: 500;
-      line-height: 1.48;
-      color: var(--text-muted);
-    }
-
-    .cast-ensemble-block .feat-word {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 600;
-      font-size: 0.98rem;
-      color: var(--hero-gold-bright);
-      margin-right: 6px;
-    }
-
-    .show-column.late-evening .cast-ensemble-block .feat-word {
-      color: var(--villain-emerald-bright);
+    .perf-name {
+      white-space: nowrap;
     }
 
     mark.hl {
@@ -1061,7 +934,7 @@
           <span>•</span>
           <span>San Jose, CA</span>
           <span>•</span>
-          <span>Official 2026 Stagebill</span>
+          <span>Official 2026 Program</span>
         </div>
 
         <button class="mode-toggle-btn" id="modeToggleBtn" type="button" aria-label="Toggle Light and Dark Mode">
@@ -1136,7 +1009,7 @@
 
         <div class="showcase-action-bar">
           <div class="showcase-meta">
-            <strong>November 14 &amp; 15, 2026</strong> &nbsp;·&nbsp; Four Performances &nbsp;·&nbsp; 29 Unique Acts
+            <strong>November 14 &amp; 15, 2026</strong> &nbsp;·&nbsp; Four Shows &nbsp;·&nbsp; 29 Unique Acts
           </div>
           <a href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener noreferrer" class="tickets-cta">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1151,7 +1024,7 @@
       <!-- Open Editorial Index Bar (No Rounded Pills or Toolbar Boxes) -->
       <nav class="program-index-bar" aria-label="Filter by performance">
         <div class="index-tabs" id="filterPills">
-          <button class="filter-btn active" data-show="all">All Performances</button>
+          <button class="filter-btn active" data-show="all">All Shows</button>
           <button class="filter-btn" data-show="sat_early">Sat 3:00 PM</button>
           <button class="filter-btn" data-show="sat_late">Sat 7:00 PM</button>
           <button class="filter-btn" data-show="sun_early">Sun 3:00 PM</button>
@@ -1358,10 +1231,8 @@
         for (const show of visibleShows) {
           let rowsHtml = "";
           let matchedInShow = 0;
-          const totalInShow = show.sequence.length;
 
-          for (let idx = 0; idx < totalInShow; idx++) {
-            const item = show.sequence[idx];
+          for (const item of show.sequence) {
             const act = ACTS[item];
             if (!act) continue;
 
@@ -1369,41 +1240,19 @@
             matchedInShow++;
 
             const highlightedTitle = highlightText(act.name, q);
-            const performersJoined = act.performers.join(" · ");
-            const highlightedPerformers = highlightText(performersJoined, q);
-            const isEnsemble = act.performers.length >= 4;
+            const highlightedPerformers = act.performers
+              .map(p => `<span class="perf-name">${highlightText(p, q)}</span>`)
+              .join(" · ");
 
-            let roleTagHtml = "";
-            if (idx === 0) {
-              roleTagHtml = `<div class="cast-role-tag">Opening Act</div>`;
-            } else if (idx === totalInShow - 1) {
-              roleTagHtml = `<div class="cast-role-tag">Show Finale</div>`;
-            }
-
-            if (isEnsemble) {
-              rowsHtml += `
-                <li class="cast-entry is-ensemble">
-                  ${roleTagHtml}
-                  <div class="cast-main-line">
-                    <span class="cast-act-title">${highlightedTitle}</span>
-                  </div>
-                  <div class="cast-ensemble-block">
-                    <span class="feat-word">Ensemble Cast —</span> ${highlightedPerformers}
-                  </div>
-                </li>
-              `;
-            } else {
-              rowsHtml += `
-                <li class="cast-entry">
-                  ${roleTagHtml}
-                  <div class="cast-main-line">
-                    <span class="cast-act-title">${highlightedTitle}</span>
-                    <span class="cast-leader" aria-hidden="true"></span>
-                    <span class="cast-performers-inline">${highlightedPerformers}</span>
-                  </div>
-                </li>
-              `;
-            }
+            rowsHtml += `
+              <li class="cast-entry">
+                <div class="cast-main-line">
+                  <span class="cast-act-title">${highlightedTitle}</span>
+                  <span class="cast-leader" aria-hidden="true"></span>
+                  <span class="cast-performers-inline">${highlightedPerformers}</span>
+                </div>
+              </li>
+            `;
           }
 
           if (q && matchedInShow === 0) {
@@ -1428,7 +1277,6 @@
                   </div>
                 </div>
               </header>
-              <div class="order-rubric">In Order of Appearance</div>
               <ol class="cast-program-list">
                 ${rowsHtml}
               </ol>
@@ -1441,11 +1289,7 @@
           html += `
             <section class="day-section ${day.frameClass}">
               <div class="day-monument-header">
-                <span class="day-numeral" aria-hidden="true">${escapeHtml(day.numeral)}</span>
-                <div class="day-title-stack">
-                  <span class="day-kicker">${escapeHtml(day.actTag)}</span>
-                  <h2 class="day-heading">${escapeHtml(day.heading)}</h2>
-                </div>
+                <h2 class="day-heading">${escapeHtml(day.heading)}</h2>
                 <span class="day-sub">${escapeHtml(day.sub)}</span>
               </div>
               <div class="${gridClass}">

@@ -6,72 +6,72 @@
   <title>Heroes &amp; Villains 2026 — Official Stage Program | Revel Room Studios</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     /* ==========================================================================
        EDITORIAL STAGE PROGRAM & GRAPHIC-NOVEL BROADSHEET
        - Open architectural layout (zero rounded cards, zero nested boxes, zero pills)
-       - High-contrast scale hierarchy between monumental headers & cast credits
-       - Real performance photography from the official showcase flyers
-       - Authentic playbill cast billing (no zebra-striped database rows)
+       - Bespoke "Stage Curtain Noir & Bruised Violet" palette (zero stock Tailwind)
+       - Disciplined 3+1 type system: Anton, Barlow Condensed, Cormorant Garamond Italic, Plus Jakarta Sans
+       - Full-bleed hero show banners with overlaid stage-lit typography
        ========================================================================== */
     :root,
     html[data-mode="dark"] {
-      --bg-stage: #08060c;
-      --bg-paper: #0d0914;
-      --bg-elevated: rgba(255, 255, 255, 0.025);
+      --bg-stage: #07050a;
+      --bg-paper: #0c0811;
+      --bg-elevated: rgba(242, 235, 225, 0.03);
 
-      --hero-gold: #f59e0b;
-      --hero-gold-bright: #fde047;
-      --hero-crimson: #e11d48;
-      --hero-accent: #fb7185;
+      --hero-gold: #df8a2b;
+      --hero-gold-bright: #f2b866;
+      --hero-crimson: #b32436;
+      --hero-accent: #ff7585;
 
-      --villain-emerald: #10b981;
-      --villain-emerald-bright: #6ee7b7;
-      --villain-violet: #9333ea;
-      --villain-accent: #c084fc;
+      --villain-emerald: #2d8a6e;
+      --villain-emerald-bright: #63bfa0;
+      --villain-violet: #6c2dc7;
+      --villain-accent: #c8a6ff;
 
-      --text-primary: #faf8f5;
-      --text-secondary: #e4e4e7;
-      --text-muted: #a1a1aa;
-      --text-dim: #71717a;
+      --text-primary: #f2ebe1;
+      --text-secondary: #cfc6dc;
+      --text-muted: #9c92a6;
+      --text-dim: #6e6578;
 
-      --rule-heavy: #faf8f5;
-      --rule-gold: rgba(245, 158, 11, 0.55);
-      --rule-subtle: rgba(255, 255, 255, 0.14);
-      --rule-faint: rgba(255, 255, 255, 0.07);
-      --leader-color: rgba(255, 255, 255, 0.18);
+      --rule-heavy: #f2ebe1;
+      --rule-gold: rgba(223, 138, 43, 0.55);
+      --rule-subtle: rgba(242, 235, 225, 0.15);
+      --rule-faint: rgba(242, 235, 225, 0.07);
+      --leader-color: rgba(242, 235, 225, 0.2);
 
-      --photo-border: rgba(255, 255, 255, 0.22);
+      --photo-border: rgba(242, 235, 225, 0.22);
     }
 
     html[data-mode="light"] {
-      --bg-stage: #e6dfd3;
-      --bg-paper: #f8f4ec;
-      --bg-elevated: rgba(24, 24, 27, 0.03);
+      --bg-stage: #e4ddd0;
+      --bg-paper: #f6f1e7;
+      --bg-elevated: rgba(26, 20, 35, 0.035);
 
-      --hero-gold: #b45309;
-      --hero-gold-bright: #92400e;
-      --hero-crimson: #be123c;
-      --hero-accent: #9f1239;
+      --hero-gold: #a85810;
+      --hero-gold-bright: #8c4608;
+      --hero-crimson: #961b2b;
+      --hero-accent: #821422;
 
-      --villain-emerald: #047857;
-      --villain-emerald-bright: #065f46;
-      --villain-violet: #6b21a8;
-      --villain-accent: #581c87;
+      --villain-emerald: #1b664f;
+      --villain-emerald-bright: #13523e;
+      --villain-violet: #5520a3;
+      --villain-accent: #441687;
 
-      --text-primary: #18181b;
-      --text-secondary: #27272a;
-      --text-muted: #57534e;
-      --text-dim: #78716c;
+      --text-primary: #181320;
+      --text-secondary: #2b2436;
+      --text-muted: #5e546b;
+      --text-dim: #7d738a;
 
-      --rule-heavy: #18181b;
-      --rule-gold: rgba(180, 83, 9, 0.5);
-      --rule-subtle: rgba(24, 24, 27, 0.18);
-      --rule-faint: rgba(24, 24, 27, 0.09);
-      --leader-color: rgba(24, 24, 27, 0.22);
+      --rule-heavy: #181320;
+      --rule-gold: rgba(168, 88, 16, 0.5);
+      --rule-subtle: rgba(24, 19, 32, 0.18);
+      --rule-faint: rgba(24, 19, 32, 0.09);
+      --leader-color: rgba(24, 19, 32, 0.22);
 
-      --photo-border: rgba(24, 24, 27, 0.85);
+      --photo-border: rgba(24, 19, 32, 0.85);
     }
 
     * {
@@ -102,8 +102,8 @@
       border-left: 1px solid var(--rule-subtle);
       border-right: 1px solid var(--rule-subtle);
       background-image:
-        radial-gradient(ellipse 55% 28% at 15% 0%, rgba(225, 29, 72, 0.14) 0%, transparent 70%),
-        radial-gradient(ellipse 55% 28% at 85% 0%, rgba(147, 51, 234, 0.14) 0%, transparent 70%);
+        radial-gradient(ellipse 55% 28% at 15% 0%, rgba(179, 36, 54, 0.16) 0%, transparent 70%),
+        radial-gradient(ellipse 55% 28% at 85% 0%, rgba(108, 45, 199, 0.16) 0%, transparent 70%);
     }
 
     /* Subtle Print Grain Texture (No Halftone Dots) */
@@ -184,8 +184,8 @@
       height: 13px;
     }
 
-    .mode-toggle-btn .icon-sun { display: inline-block; color: #fde047; }
-    .mode-toggle-btn .icon-moon { display: none; color: #b45309; }
+    .mode-toggle-btn .icon-sun { display: inline-block; color: #f2b866; }
+    .mode-toggle-btn .icon-moon { display: none; color: #a85810; }
     html[data-mode="light"] .mode-toggle-btn .icon-sun { display: none; }
     html[data-mode="light"] .mode-toggle-btn .icon-moon { display: inline-block; }
 
@@ -217,28 +217,28 @@
       padding: 4px 12px;
       margin-bottom: 14px;
       background:
-        radial-gradient(circle, rgba(140, 20, 0, 0.26) 1.5px, transparent 2px) 0 0 / 7px 7px,
-        linear-gradient(180deg, #fff36d 0%, #f59e0b 48%, #e11d48 96%);
+        radial-gradient(circle, rgba(120, 18, 0, 0.24) 1.5px, transparent 2px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #f7d27c 0%, #df8a2b 48%, #b32436 96%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      -webkit-text-stroke: 1.5px #090610;
+      -webkit-text-stroke: 1.5px #07050a;
       filter:
-        drop-shadow(4px 5px 0 #090610)
-        drop-shadow(0 12px 32px rgba(225, 29, 72, 0.26));
+        drop-shadow(4px 5px 0 #07050a)
+        drop-shadow(0 12px 32px rgba(179, 36, 54, 0.28));
     }
 
     html[data-mode="light"] .comic-title {
       background:
-        radial-gradient(circle, rgba(140, 20, 0, 0.18) 1.5px, transparent 2px) 0 0 / 7px 7px,
-        linear-gradient(180deg, #fbbf24 0%, #ea580c 52%, #be123c 100%);
+        radial-gradient(circle, rgba(120, 18, 0, 0.16) 1.5px, transparent 2px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #df8a2b 0%, #b85312 52%, #961b2b 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      -webkit-text-stroke: 1.5px #18181b;
+      -webkit-text-stroke: 1.5px #181320;
       filter:
-        drop-shadow(3px 4px 0 #18181b)
-        drop-shadow(0 8px 20px rgba(190, 18, 60, 0.15));
+        drop-shadow(3px 4px 0 #181320)
+        drop-shadow(0 8px 20px rgba(150, 27, 43, 0.15));
     }
 
     .masthead-subrow {
@@ -376,18 +376,20 @@
       gap: 10px;
       background: var(--hero-crimson);
       color: #ffffff;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.15rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
       letter-spacing: 0.1em;
-      padding: 8px 22px 6px;
+      text-transform: uppercase;
+      padding: 8px 22px 7px;
       text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 4px 4px 0 #090610;
+      border: 1px solid rgba(242, 235, 225, 0.25);
+      box-shadow: 4px 4px 0 #07050a;
       transition: transform 0.15s ease, background-color 0.15s ease;
     }
 
     .tickets-cta:hover {
-      background: #f43f5e;
+      background: #c92d41;
       transform: translate(-1px, -1px);
     }
 
@@ -423,9 +425,11 @@
       border-bottom: 3px solid transparent;
       padding: 8px 2px 10px;
       margin-bottom: -2px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.18rem;
-      letter-spacing: 0.09em;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.12rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       cursor: pointer;
       transition: color 0.15s ease, border-color 0.15s ease;
     }
@@ -536,10 +540,16 @@
     }
 
     .day-sub {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.15rem;
-      letter-spacing: 0.14em;
-      color: var(--text-muted);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.22rem;
+      letter-spacing: 0.03em;
+      color: var(--hero-gold-bright);
+    }
+
+    .sunday-section .day-sub {
+      color: var(--villain-emerald-bright);
     }
 
     /* Open Architectural 2-Column Show Layout Separated by Vertical Hairline */
@@ -574,19 +584,21 @@
       border-right: none;
     }
 
-    /* ==================== SHOW HEADER WITH STAGE PHOTO VIGNETTE ==================== */
+    /* ==================== SHOW HEADER WITH HERO PHOTO OVERLAY ==================== */
     .show-header-block {
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--rule-heavy);
+      margin-bottom: 22px;
     }
 
     .show-photo-banner {
       position: relative;
-      height: 135px;
-      margin-bottom: 16px;
+      height: 165px;
       overflow: hidden;
       background: #07050a;
+      border-bottom: 3px solid var(--hero-gold);
+    }
+
+    .show-column.late-evening .show-photo-banner {
+      border-bottom-color: var(--villain-emerald);
     }
 
     .show-photo-banner img {
@@ -600,11 +612,18 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, rgba(8, 6, 12, 0.65) 0%, rgba(8, 6, 12, 0.15) 55%, rgba(8, 6, 12, 0.65) 100%);
+      background:
+        linear-gradient(180deg, rgba(12, 8, 17, 0.05) 0%, rgba(12, 8, 17, 0.45) 48%, rgba(12, 8, 17, 0.94) 100%),
+        linear-gradient(90deg, rgba(12, 8, 17, 0.82) 0%, transparent 65%);
       pointer-events: none;
     }
 
     .show-title-lockup {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 12px;
+      z-index: 2;
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
@@ -620,52 +639,55 @@
 
     .show-time {
       font-family: 'Anton', sans-serif;
-      font-size: clamp(2.3rem, 4vw, 3.1rem);
+      font-size: clamp(2.35rem, 4vw, 3.1rem);
       line-height: 0.78;
       letter-spacing: 0.03em;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
     }
 
     .show-column.early-matinee .show-time {
-      color: var(--hero-gold-bright);
+      color: #f2b866;
     }
 
     .show-column.late-evening .show-time {
-      color: var(--villain-emerald-bright);
+      color: #63bfa0;
     }
 
     .show-edition-stack {
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding-bottom: 3px;
+      padding-bottom: 2px;
     }
 
     .show-label {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 1.22rem;
+      font-size: 1.24rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       line-height: 1;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
     }
 
     .show-column.early-matinee .show-label {
-      color: var(--hero-accent);
+      color: #ff7585;
     }
 
     .show-column.late-evening .show-label {
-      color: var(--villain-accent);
+      color: #c8a6ff;
     }
 
     .show-doors {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      line-height: 0.9;
-      margin-top: 5px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 0.98rem;
+      letter-spacing: 0.02em;
+      color: #e6dfd5;
+      line-height: 1;
+      margin-top: 3px;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95);
     }
 
     /* ==================== THEATRICAL CAST PROGRAM LIST (NOT A DATABASE) ==================== */
@@ -722,8 +744,8 @@
     }
 
     mark.hl {
-      background: #fde047;
-      color: #090610;
+      background: #f2b866;
+      color: #07050a;
       padding: 0 3px;
       font-weight: 700;
     }
@@ -748,8 +770,10 @@
     }
 
     .colophon-kicker {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.15rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 1.12rem;
       letter-spacing: 0.14em;
       color: var(--hero-gold-bright);
     }
@@ -995,37 +1019,45 @@
       .day-monument-header {
         margin-bottom: 18px;
         padding-bottom: 8px;
-        flex-wrap: nowrap;
-        gap: 8px;
+        flex-wrap: wrap;
+        gap: 4px 10px;
       }
       .day-heading {
-        font-size: 1.35rem;
+        font-size: 1.22rem;
         white-space: nowrap;
       }
       .day-sub {
         font-size: 0.88rem;
         white-space: nowrap;
       }
+      .show-photo-banner {
+        height: 150px;
+      }
+      .show-title-lockup {
+        left: 14px;
+        right: 14px;
+        bottom: 11px;
+      }
       .show-time-group {
-        align-items: center;
+        align-items: flex-end;
         gap: 12px;
       }
       .show-time {
-        font-size: 2.55rem;
-        line-height: 0.88;
+        font-size: 2.45rem;
+        line-height: 0.8;
       }
       .show-edition-stack {
-        padding-bottom: 0;
-        justify-content: center;
+        padding-bottom: 1px;
+        justify-content: flex-end;
       }
       .show-label {
         font-size: 1.12rem;
         line-height: 1;
       }
       .show-doors {
-        font-size: 0.78rem;
+        font-size: 0.9rem;
         line-height: 1;
-        margin-top: 4px;
+        margin-top: 3px;
       }
       .cast-act-title {
         font-size: 1.04rem;
@@ -1233,7 +1265,7 @@
         numeral: "01",
         actTag: "Act I • Opening Day",
         heading: "Saturday, November 14, 2026",
-        sub: "Two Shows",
+        sub: "Matinee & Evening Shows",
         frameClass: "saturday-section",
         shows: [
           {
@@ -1265,7 +1297,7 @@
         numeral: "02",
         actTag: "Act II • Closing Day",
         heading: "Sunday, November 15, 2026",
-        sub: "Two Shows",
+        sub: "Matinee & Evening Shows",
         frameClass: "sunday-section",
         shows: [
           {
@@ -1376,13 +1408,13 @@
               <header class="show-header-block">
                 <div class="show-photo-banner">
                   <img src="${show.photo}" alt="${escapeHtml(show.label)}" style="object-position: ${show.photoPos};" loading="lazy" />
-                </div>
-                <div class="show-title-lockup">
-                  <div class="show-time-group">
-                    <div class="show-time">${escapeHtml(show.time)}</div>
-                    <div class="show-edition-stack">
-                      <span class="show-label">${escapeHtml(show.label)}</span>
-                      <span class="show-doors">${escapeHtml(show.doors)}</span>
+                  <div class="show-title-lockup">
+                    <div class="show-time-group">
+                      <div class="show-time">${escapeHtml(show.time)}</div>
+                      <div class="show-edition-stack">
+                        <span class="show-label">${escapeHtml(show.label)}</span>
+                        <span class="show-doors">${escapeHtml(show.doors)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

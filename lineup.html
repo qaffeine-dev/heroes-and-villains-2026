@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revel: Heroes &amp; Villains — Show Lineup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Light Mode Overrides */
+    body.light-mode {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+    body.light-mode .card-surface {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.06) !important;
+    }
+    body.light-mode .show-header-sat {
+      background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
+      border-color: #C7D2FE !important;
+    }
+    body.light-mode .show-header-sun {
+      background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%) !important;
+      border-color: #E9D5FF !important;
+    }
+    body.light-mode .text-title {
+      color: #0f172a !important;
+    }
+    body.light-mode .text-subtitle {
+      color: #475569 !important;
+    }
+    body.light-mode .text-performer {
+      color: #334155 !important;
+    }
+    body.light-mode .act-row-odd {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.light-mode .act-row-even {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.light-mode .slot-badge {
+      background-color: #e2e8f0 !important;
+      color: #1e293b !important;
+    }
+    body.light-mode .intermission-row {
+      background-color: #ecfdf5 !important;
+      border-color: #6ee7b7 !important;
+      color: #065f46 !important;
+    }
+    body.light-mode .games-row {
+      background-color: #f5f3ff !important;
+      border-color: #c4b5fd !important;
+      color: #5b21b6 !important;
+    }
+    body.light-mode .tab-inactive {
+      background-color: #ffffff !important;
+      color: #334155 !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.light-mode .tab-inactive:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    body.light-mode .search-input {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.light-mode .theme-btn {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+    <!-- Header -->
+    <header class="card-surface bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-7 mb-6 shadow-xl">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-2">
+            <span>🎭 Official Show Lineup</span>
+            <span>•</span>
+            <span>Nov 14–15, 2026</span>
+          </div>
+          <h1 class="text-title text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Revel: Heroes &amp; Villains
+          </h1>
+          <p class="text-subtitle text-xs sm:text-sm text-slate-400 mt-1">
+            Select a show below or search by performer or act name.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 self-start sm:self-center">
+          <button onclick="toggleTheme()" class="theme-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-label">Light Mode</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls: Show Filter Tabs + Search -->
+      <div class="mt-5 pt-4 border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- Show Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-1.5" id="filter-tabs">
+          <button onclick="setShowFilter('all')" data-filter="all" class="filter-tab px-3.5 py-2 rounded-xl text-xs font-bold transition border bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20">
+            All 4 Shows
+          </button>
+          <button onclick="setShowFilter('sat_early')" data-filter="sat_early" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
+            Sat Early (3PM)
+          </button>
+          <button onclick="setShowFilter('sat_late')" data-filter="sat_late" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
+            Sat Late (7PM)
+          </button>
+          <button onclick="setShowFilter('sun_early')" data-filter="sun_early" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
+            Sun Early (3PM)
+          </button>
+          <button onclick="setShowFilter('sun_late')" data-filter="sun_late" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
+            Sun Late (7PM)
+          </button>
+        </div>
+
+        <!-- Performer / Act Search -->
+        <div class="relative w-full md:w-64">
+          <input
+            type="text"
+            id="search-input"
+            oninput="renderShows()"
+            placeholder="Search performer or act..."
+            class="search-input w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-3.5 pr-8 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+          />
+          <button
+            id="clear-search-btn"
+            onclick="clearSearch()"
+            class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs font-bold"
+            title="Clear search"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Shows Grid -->
+    <main id="shows-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-start">
+      <!-- Populated by JS -->
+    </main>
+
+  </div>
+
+  <script>
+    // Act Catalog (Act Name & Performers only — no cameos, no rigging, no notes)
+    const ACTS = {
+      1:  { name: "Harley Quinn",           performers: ["Angel"] },
+      2:  { name: "Teen Titans",            performers: ["Lisa Z", "Dorothy T"] },
+      3:  { name: "Lord Farquaad & Dragon", performers: ["Rissa", "Asia"] },
+      4:  { name: "Blind Mag",              performers: ["Elly Z"] },
+      5:  { name: "Poison Ivan",            performers: ["Brian F"] },
+      6:  { name: "Joker",                  performers: ["Christina W"] },
+      7:  { name: "Sukuna",                 performers: ["Jonathan M"] },
+      8:  { name: "Pink Panther",           performers: ["Alice K"] },
+      9:  { name: "Team Rocket",            performers: ["Ashley C", "Quan T"] },
+      10: { name: "Black & White Swans",    performers: ["Ye W", "Jie Z"] },
+      11: { name: "Sailor Scouts",          performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"] },
+      12: { name: "Ursula",                 performers: ["Patricia H"] },
+      13: { name: "Ursula",                 performers: ["Paige L"] },
+      14: { name: "Spiderman",              performers: ["Austin T"] },
+      15: { name: "Prison Break",           performers: ["Emily C", "Erica C", "Zoe", "Kim G"] },
+      16: { name: "Mulan & Ping",           performers: ["Kim N", "Jen J"] },
+      17: { name: "PowerPuff Girls",        performers: ["Louise R", "Amiel R", "Claudelle V", "Joyi L"] },
+      18: { name: "Angel Dust",             performers: ["Karen S"] },
+      19: { name: "Lois & Clark",           performers: ["Cece", "Josh J"] },
+      20: { name: "Organ Donor",            performers: ["Jenn L"] },
+      21: { name: "Mama Morton",            performers: ["Selina"] },
+      22: { name: "Ratatouille",            performers: ["Josh P"] },
+      23: { name: "Rumi",                   performers: ["Christine S"] },
+      24: { name: "Assassin",               performers: ["Cheng J"] },
+      25: { name: "Snakes of Medusa",       performers: ["Kitty", "Derikka", "Heartley", "Emma", "Chloe", "Anna", "Anne", "Mackenzie"] },
+      26: { name: "Obsession",              performers: ["Kristine G", "Scott S"] },
+      27: { name: "The Devil",              performers: ["Sal"] },
+      28: { name: "Masked Enigma",          performers: ["Masa"] },
+      29: { name: "Poison Ivy",             performers: ["Luna"] }
+    };
+
+    // QT - Flow #2 Lineup
+    const SHOWS = [
+      {
+        key: "sat_early",
+        day: "Saturday, Nov 14",
+        title: "Saturday Early",
+        time: "3:00 PM",
+        accent: "sat",
+        lineup: [6, 18, 1, "GAMES", 25, 21, 15, "INTERMISSION", 14, 16, 5, "GAMES", 19, 12, 8, 11]
+      },
+      {
+        key: "sat_late",
+        day: "Saturday, Nov 14",
+        title: "Saturday Late",
+        time: "7:00 PM",
+        accent: "sat",
+        lineup: [9, 7, 6, "GAMES", 4, 3, 26, "INTERMISSION", 22, 17, 24, "GAMES", 13, 29, 28]
+      },
+      {
+        key: "sun_early",
+        day: "Sunday, Nov 15",
+        title: "Sunday Early",
+        time: "3:00 PM",
+        accent: "sun",
+        lineup: [14, 4, 10, "GAMES", 27, 1, "INTERMISSION", 20, 5, 21, 15, "GAMES", 2, 8, 17]
+      },
+      {
+        key: "sun_late",
+        day: "Sunday, Nov 15",
+        title: "Sunday Late",
+        time: "7:00 PM",
+        accent: "sun",
+        lineup: [9, 7, 11, "GAMES", 13, 10, 25, "INTERMISSION", 2, 23, "GAMES", 3, 26, 20, 28]
+      }
+    ];
+
+    let activeFilter = "all";
+
+    function setShowFilter(filterKey) {
+      activeFilter = filterKey;
+      document.querySelectorAll(".filter-tab").forEach(btn => {
+        const isSelected = btn.getAttribute("data-filter") === filterKey;
+        if (isSelected) {
+          btn.className = "filter-tab px-3.5 py-2 rounded-xl text-xs font-bold transition border bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20";
+        } else {
+          btn.className = "filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white";
+        }
+      });
+      renderShows();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById("search-input");
+      if (input) input.value = "";
+      renderShows();
+    }
+
+    function renderShows() {
+      const grid = document.getElementById("shows-grid");
+      const searchInput = document.getElementById("search-input");
+      const clearBtn = document.getElementById("clear-search-btn");
+      const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+
+      if (clearBtn) {
+        clearBtn.classList.toggle("hidden", !query);
+      }
+
+      const visibleShows = SHOWS.filter(s => activeFilter === "all" || s.key === activeFilter);
+
+      if (visibleShows.length === 1) {
+        grid.className = "max-w-xl mx-auto grid grid-cols-1 gap-5 items-start";
+      } else {
+        grid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-start";
+      }
+
+      grid.innerHTML = visibleShows.map(show => {
+        let slotNum = 0;
+        let gameNum = 0;
+        let matchCount = 0;
+
+        const rowsHtml = show.lineup.map(item => {
+          if (item === "INTERMISSION") {
+            if (query) return "";
+            return `
+              <div class="intermission-row my-1.5 py-1.5 px-3 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-center text-[11px] font-bold tracking-wider uppercase">
+                ⏸️ Intermission
+              </div>
+            `;
+          }
+          if (item === "GAMES") {
+            gameNum++;
+            if (query) return "";
+            return `
+              <div class="games-row my-1.5 py-1.5 px-3 rounded-lg bg-purple-950/50 border border-purple-500/40 text-purple-300 text-center text-[11px] font-bold tracking-wider uppercase">
+                🎲 Games #${gameNum}
+              </div>
+            `;
+          }
+
+          slotNum++;
+          const act = ACTS[item];
+          if (!act) return "";
+
+          const performersStr = act.performers.join(", ");
+          const matchesSearch = !query ||
+            act.name.toLowerCase().includes(query) ||
+            performersStr.toLowerCase().includes(query);
+
+          if (!matchesSearch) return "";
+          matchCount++;
+
+          const rowBgClass = slotNum % 2 === 1
+            ? "act-row-odd bg-slate-900/90"
+            : "act-row-even bg-slate-800/50";
+
+          return `
+            <div class="${rowBgClass} border border-slate-800/90 rounded-xl px-3 py-2.5 flex items-start gap-2.5 transition">
+              <span class="slot-badge w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                ${slotNum}
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="text-title font-bold text-sm text-white leading-snug">
+                  ${act.name}
+                </div>
+                <div class="text-performer text-xs text-slate-300 mt-0.5 leading-relaxed">
+                  ${performersStr}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const totalActs = show.lineup.filter(x => typeof x === "number").length;
+        const headerStyle = show.accent === "sat"
+          ? "show-header-sat bg-gradient-to-br from-indigo-950/90 to-slate-900 border-indigo-500/30"
+          : "show-header-sun bg-gradient-to-br from-purple-950/90 to-slate-900 border-purple-500/30";
+
+        const emptySearchHtml = (query && matchCount === 0)
+          ? `<div class="text-subtitle text-center py-6 text-xs text-slate-500">No matching acts in this show.</div>`
+          : "";
+
+        return `
+          <section class="card-surface bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+            <div class="${headerStyle} border-b px-4 py-3.5 flex items-center justify-between">
+              <div>
+                <div class="text-subtitle text-[11px] font-semibold uppercase tracking-wider text-indigo-300/90">
+                  ${show.day}
+                </div>
+                <h2 class="text-title text-base font-extrabold text-white mt-0.5">
+                  ${show.title} <span class="font-semibold text-indigo-300">• ${show.time}</span>
+                </h2>
+              </div>
+              <span class="slot-badge px-2.5 py-1 rounded-full bg-slate-900/90 text-slate-300 text-[11px] font-bold border border-slate-700/70">
+                ${totalActs} Acts
+              </span>
+            </div>
+
+            <div class="p-3 space-y-1.5">
+              ${rowsHtml}
+              ${emptySearchHtml}
+            </div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    const THEME_KEY = "revel_hv_lineup_theme_v1";
+
+    function applyTheme(mode) {
+      const isLight = mode === "light";
+      document.body.classList.toggle("light-mode", isLight);
+      const icon = document.getElementById("theme-icon");
+      const label = document.getElementById("theme-label");
+      if (icon) icon.textContent = isLight ? "🌙" : "☀️";
+      if (label) label.textContent = isLight ? "Dark Mode" : "Light Mode";
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.contains("light-mode");
+      const next = isLight ? "dark" : "light";
+      applyTheme(next);
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const saved = localStorage.getItem(THEME_KEY);
+        applyTheme(saved === "light" ? "light" : "dark");
+      } catch (e) {
+        applyTheme("dark");
+      }
+      renderShows();
+    });
+  </script>
+</body>
+</html>

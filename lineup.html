@@ -1,264 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="comic-poster">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Heroes &amp; Villains 2026 — Official Show Lineup &amp; Program | Revel Room Studios</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ==========================================================================
-       THEME 1: COMIC POSTER (Default — Flyer-Inspired Midnight, Gold & Cyan)
-       ========================================================================== */
-    :root,
-    [data-theme="comic-poster"] {
-      --bg-void: #05040a;
+    :root {
+      --bg-void: #06050c;
       --bg-canvas: #0b0916;
-      --bg-panel: #131024;
-      --bg-card: #1b1830;
-      --bg-card-header: rgba(255, 255, 255, 0.03);
-      --bg-row-even: rgba(255, 255, 255, 0.022);
+      --bg-panel: rgba(20, 17, 38, 0.72);
+      --bg-card: rgba(28, 24, 50, 0.78);
+      --bg-card-header: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.01) 100%);
+      --bg-row-even: rgba(255, 255, 255, 0.02);
       --bg-row-hover: rgba(255, 255, 255, 0.055);
 
-      --accent-primary: #f6dc1e;
-      --accent-secondary: #00c8ff;
-      --accent-tertiary: #ef3b2d;
-      --sat-border: #ffae19;
-      --sun-border: #00c8ff;
+      --comic-gold: #f5c518;
+      --comic-amber: #f59e0b;
+      --comic-cyan: #22d3ee;
+      --comic-red: #f43f5e;
 
-      --text-main: #ffffff;
-      --text-title: #f1f5f9;
-      --text-muted: #cbd5e1;
-      --text-dim: #94a3b8;
+      --text-white: #f8fafc;
+      --text-light: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
 
-      --frame-border: 2.5px solid #ffffff;
-      --card-border: 1px solid rgba(255, 255, 255, 0.15);
-      --row-divider: 1px solid rgba(255, 255, 255, 0.055);
-
-      --font-display: 'Anton', Impact, sans-serif;
-      --font-condensed: 'Barlow Condensed', sans-serif;
-      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
-
-      --halftone-opacity: 1;
-      --ribbon-skew: -14deg;
-      --ribbon-border: 2.5px solid #000000;
-      --ribbon-shadow: 4px 4px 0 #000000;
-
-      --footer-bg: #f6dc1e;
-      --footer-text: #090812;
-      --footer-sub: #b91c1c;
-      --footer-border: 3px solid #000000;
-    }
-
-    /* ==========================================================================
-       THEME 2: THEATRICAL PLAYBILL (Obsidian Velvet & Champagne Gold)
-       ========================================================================== */
-    [data-theme="playbill-gala"] {
-      --bg-void: #060608;
-      --bg-canvas: #0e0d12;
-      --bg-panel: #15131c;
-      --bg-card: #1a1722;
-      --bg-card-header: linear-gradient(180deg, rgba(212, 175, 55, 0.09) 0%, rgba(212, 175, 55, 0.02) 100%);
-      --bg-row-even: rgba(212, 175, 55, 0.025);
-      --bg-row-hover: rgba(212, 175, 55, 0.07);
-
-      --accent-primary: #d4af37;
-      --accent-secondary: #f3e5ab;
-      --accent-tertiary: #9f1239;
-      --sat-border: rgba(212, 175, 55, 0.55);
-      --sun-border: rgba(212, 175, 55, 0.55);
-
-      --text-main: #faf8f5;
-      --text-title: #fefcf9;
-      --text-muted: #d6d1c7;
-      --text-dim: #a39c93;
-
-      --frame-border: 4px double #d4af37;
-      --card-border: 1px solid rgba(212, 175, 55, 0.28);
-      --row-divider: 1px solid rgba(212, 175, 55, 0.08);
-
-      --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
-      --font-condensed: 'Cinzel', Georgia, serif;
-      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
-
-      --halftone-opacity: 0;
-      --ribbon-skew: 0deg;
-      --ribbon-border: 1px solid rgba(212, 175, 55, 0.6);
-      --ribbon-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-
-      --footer-bg: #15131c;
-      --footer-text: #f3e5ab;
-      --footer-sub: #d4af37;
-      --footer-border: 2px solid rgba(212, 175, 55, 0.5);
-    }
-
-    /* ==========================================================================
-       THEME 3: GOOD VS. EVIL SPLIT (Electric Sapphire & Crimson Neon)
-       ========================================================================== */
-    [data-theme="good-vs-evil"] {
-      --bg-void: #040711;
-      --bg-canvas: #080d1a;
-      --bg-panel: #0f1629;
-      --bg-card: #131c33;
-      --bg-card-header: linear-gradient(90deg, rgba(56, 189, 248, 0.08) 0%, rgba(244, 63, 94, 0.08) 100%);
-      --bg-row-even: rgba(255, 255, 255, 0.02);
-      --bg-row-hover: rgba(56, 189, 248, 0.08);
-
-      --accent-primary: #38bdf8;
-      --accent-secondary: #f43f5e;
-      --accent-tertiary: #f43f5e;
-      --sat-border: #38bdf8;
-      --sun-border: #f43f5e;
-
-      --text-main: #f8fafc;
-      --text-title: #ffffff;
-      --text-muted: #cbd5e1;
-      --text-dim: #94a3b8;
-
-      --frame-border: 2px solid rgba(56, 189, 248, 0.5);
-      --card-border: 1px solid rgba(148, 163, 184, 0.2);
-      --row-divider: 1px solid rgba(148, 163, 184, 0.08);
-
-      --font-display: 'Anton', Impact, sans-serif;
-      --font-condensed: 'Barlow Condensed', sans-serif;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-
-      --halftone-opacity: 0.45;
-      --ribbon-skew: -8deg;
-      --ribbon-border: 1px solid rgba(255, 255, 255, 0.25);
-      --ribbon-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-
-      --footer-bg: #0f172a;
-      --footer-text: #f8fafc;
-      --footer-sub: #38bdf8;
-      --footer-border: 1px solid rgba(56, 189, 248, 0.35);
-    }
-
-    /* ==========================================================================
-       THEME 4: STAGE SPOTLIGHT (Amethyst Plum, Orchid & Rose Gold)
-       ========================================================================== */
-    [data-theme="violet-stage"] {
-      --bg-void: #09040f;
-      --bg-canvas: #12091d;
-      --bg-panel: #1b0f2b;
-      --bg-card: #231436;
-      --bg-card-header: linear-gradient(180deg, rgba(232, 121, 249, 0.1) 0%, rgba(0, 0, 0, 0.15) 100%);
-      --bg-row-even: rgba(232, 121, 249, 0.028);
-      --bg-row-hover: rgba(232, 121, 249, 0.08);
-
-      --accent-primary: #f0abfc;
-      --accent-secondary: #fbbf24;
-      --accent-tertiary: #c084fc;
-      --sat-border: rgba(240, 171, 252, 0.5);
-      --sun-border: rgba(251, 191, 36, 0.5);
-
-      --text-main: #fdf4ff;
-      --text-title: #ffffff;
-      --text-muted: #e9d5ff;
-      --text-dim: #c4b5fd;
-
-      --frame-border: 1.5px solid rgba(240, 171, 252, 0.45);
-      --card-border: 1px solid rgba(232, 121, 249, 0.22);
-      --row-divider: 1px solid rgba(232, 121, 249, 0.08);
-
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-condensed: 'Barlow Condensed', sans-serif;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-
-      --halftone-opacity: 0.25;
-      --ribbon-skew: 0deg;
-      --ribbon-border: 1px solid rgba(240, 171, 252, 0.4);
-      --ribbon-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
-
-      --footer-bg: #1b0f2b;
-      --footer-text: #fdf4ff;
-      --footer-sub: #fbbf24;
-      --footer-border: 1px solid rgba(240, 171, 252, 0.3);
-    }
-
-    /* ==========================================================================
-       THEME 5: MINIMALIST NOIR PROGRAM (Editorial Monochrome & Scarlet)
-       ========================================================================== */
-    [data-theme="noir-editorial"] {
-      --bg-void: #050505;
-      --bg-canvas: #0c0c0e;
-      --bg-panel: #121215;
-      --bg-card: #16161a;
-      --bg-card-header: #1c1c21;
-      --bg-row-even: rgba(255, 255, 255, 0.018);
-      --bg-row-hover: rgba(255, 255, 255, 0.05);
-
-      --accent-primary: #ffffff;
-      --accent-secondary: #ef4444;
-      --accent-tertiary: #ef4444;
-      --sat-border: rgba(255, 255, 255, 0.22);
-      --sun-border: rgba(255, 255, 255, 0.22);
-
-      --text-main: #fafafa;
-      --text-title: #ffffff;
-      --text-muted: #d4d4d8;
-      --text-dim: #a1a1aa;
-
-      --frame-border: 1px solid rgba(255, 255, 255, 0.28);
-      --card-border: 1px solid rgba(255, 255, 255, 0.14);
-      --row-divider: 1px solid rgba(255, 255, 255, 0.06);
-
-      --font-display: 'Space Grotesk', sans-serif;
-      --font-condensed: 'Space Grotesk', sans-serif;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-
-      --halftone-opacity: 0;
-      --ribbon-skew: 0deg;
-      --ribbon-border: 1px solid rgba(255, 255, 255, 0.25);
-      --ribbon-shadow: none;
-
-      --footer-bg: #121215;
-      --footer-text: #fafafa;
-      --footer-sub: #ef4444;
-      --footer-border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    /* ==========================================================================
-       THEME 6: IVORY PRINT PLAYBILL (Light Paper, Burgundy & Warm Gold)
-       ========================================================================== */
-    [data-theme="print-playbill"] {
-      --bg-void: #e7e2d8;
-      --bg-canvas: #faf7f2;
-      --bg-panel: #f3efe6;
-      --bg-card: #ffffff;
-      --bg-card-header: #f5f0e6;
-      --bg-row-even: rgba(153, 27, 27, 0.025);
-      --bg-row-hover: rgba(180, 83, 9, 0.06);
-
-      --accent-primary: #991b1b;
-      --accent-secondary: #b45309;
-      --accent-tertiary: #991b1b;
-      --sat-border: rgba(153, 27, 27, 0.35);
-      --sun-border: rgba(180, 83, 9, 0.4);
-
-      --text-main: #1c1917;
-      --text-title: #18181b;
-      --text-muted: #44403c;
-      --text-dim: #57534e;
-
-      --frame-border: 4px double #292524;
-      --card-border: 1px solid #d6d3d1;
-      --row-divider: 1px solid #e7e5e4;
-
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-condensed: 'Cinzel', Georgia, serif;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-
-      --halftone-opacity: 0;
-      --ribbon-skew: 0deg;
-      --ribbon-border: 1px solid #991b1b;
-      --ribbon-shadow: none;
-
-      --footer-bg: #292524;
-      --footer-text: #faf7f2;
-      --footer-sub: #fbbf24;
-      --footer-border: 2px solid #1c1917;
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --row-divider: rgba(255, 255, 255, 0.06);
     }
 
     * {
@@ -269,406 +40,194 @@
 
     body {
       background-color: var(--bg-void);
-      color: var(--text-main);
-      font-family: var(--font-body);
+      background-image:
+        radial-gradient(circle at 18% 0%, rgba(34, 211, 238, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 82% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 45%);
+      color: var(--text-white);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      padding: 16px;
+      padding: 24px 16px;
       -webkit-font-smoothing: antialiased;
-      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    /* ==================== THEME & LAYOUT SWITCHER BAR ==================== */
-    .theme-Dock {
-      max-width: 1220px;
-      margin: 0 auto 14px;
-      background: rgba(15, 14, 24, 0.94);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: #f8fafc;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .theme-dock-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .theme-dock-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .theme-dock-title span.badge {
-      background: rgba(246, 220, 30, 0.15);
-      color: #fde047;
-      border: 1px solid rgba(246, 220, 30, 0.35);
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-    }
-
-    .layout-toggles {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .layout-btn {
-      background: rgba(255, 255, 255, 0.07);
-      color: #e2e8f0;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .layout-btn:hover {
-      border-color: #38bdf8;
-      color: #ffffff;
-    }
-
-    .layout-btn.active {
-      background: #38bdf8;
-      color: #090812;
-      border-color: #38bdf8;
-      font-weight: 700;
-    }
-
-    .theme-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-      gap: 8px;
-    }
-
-    .theme-chip {
-      appearance: none;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      padding: 8px 10px;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: #f1f5f9;
-      transition: all 0.15s ease;
-    }
-
-    .theme-chip:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .theme-chip.active {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: #f6dc1e;
-      box-shadow: 0 0 0 1px rgba(246, 220, 30, 0.35);
-    }
-
-    .swatch-pair {
-      display: flex;
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-    }
-
-    .swatch-half {
-      flex: 1;
-      height: 100%;
-    }
-
-    .theme-chip-text {
-      min-width: 0;
-    }
-
-    .theme-chip-name {
-      font-size: 0.78rem;
-      font-weight: 700;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .theme-chip-desc {
-      font-size: 0.68rem;
-      color: #94a3b8;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ==================== OUTER PROGRAM / FLYER FRAME ==================== */
+    /* Outer Program Frame — Refined & Modern */
     .flyer-frame {
-      max-width: 1220px;
+      max-width: 1180px;
       margin: 0 auto;
       background-color: var(--bg-canvas);
-      border: var(--frame-border);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
-      transition: background-color 0.25s ease, border 0.25s ease;
+      box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     }
 
-    /* Ben-Day Comic Halftone Corner & Edge Overlays */
+    /* Subtle Ben-Day Comic Halftone Edge Texture */
     .halftone-layer {
       position: absolute;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      opacity: var(--halftone-opacity);
-      transition: opacity 0.25s ease;
+      opacity: 0.55;
       background-image:
-        radial-gradient(circle, rgba(0, 200, 255, 0.22) 2px, transparent 2.5px),
-        radial-gradient(circle, rgba(168, 85, 247, 0.18) 2px, transparent 2.5px),
-        radial-gradient(circle, rgba(246, 220, 30, 0.14) 2px, transparent 2.5px),
-        radial-gradient(circle, rgba(239, 59, 45, 0.16) 2px, transparent 2.5px);
-      background-size: 12px 12px;
-      background-position: 0 0, 6px 6px, 0 6px, 6px 0;
-      mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, transparent 45%, #000 100%);
-      -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, transparent 45%, #000 100%);
+        radial-gradient(circle, rgba(34, 211, 238, 0.18) 1.75px, transparent 2.2px),
+        radial-gradient(circle, rgba(168, 85, 247, 0.15) 1.75px, transparent 2.2px),
+        radial-gradient(circle, rgba(245, 197, 24, 0.13) 1.75px, transparent 2.2px);
+      background-size: 14px 14px;
+      background-position: 0 0, 7px 7px, 0 7px;
+      mask-image: radial-gradient(ellipse 82% 76% at 50% 48%, transparent 52%, #000 100%);
+      -webkit-mask-image: radial-gradient(ellipse 82% 76% at 50% 48%, transparent 52%, #000 100%);
     }
 
     .content-wrap {
       position: relative;
       z-index: 1;
-      padding: 32px 24px 28px;
+      padding: 40px 28px 32px;
     }
 
-    /* ==================== HEADER ==================== */
+    /* ==================== HERO HEADER ==================== */
     .hero-header {
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
     }
 
-    .presents-ribbon {
-      background-color: var(--accent-primary);
-      color: #090812;
-      border: var(--ribbon-border);
-      box-shadow: var(--ribbon-shadow);
-      padding: 5px 34px;
-      transform: skewX(var(--ribbon-skew));
-      display: inline-block;
+    /* Subtle Overline Badge: Revel Room Studios Presents */
+    .presents-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 197, 24, 0.12);
+      border: 1px solid rgba(245, 197, 24, 0.35);
+      color: #fde047;
+      padding: 5px 18px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       margin-bottom: 14px;
+      backdrop-filter: blur(8px);
     }
 
-    [data-theme="playbill-gala"] .presents-ribbon,
-    [data-theme="violet-stage"] .presents-ribbon,
-    [data-theme="noir-editorial"] .presents-ribbon,
-    [data-theme="print-playbill"] .presents-ribbon {
-      background: transparent;
-      color: var(--accent-primary);
-      border: none;
-      border-bottom: 1px solid var(--accent-primary);
-      box-shadow: none;
-      padding: 4px 16px;
-      border-radius: 0;
+    .presents-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--comic-gold);
+      box-shadow: 0 0 8px var(--comic-gold);
     }
 
-    .presents-ribbon span {
-      display: block;
-      transform: skewX(calc(-1 * var(--ribbon-skew)));
-      font-family: var(--font-condensed);
-      font-weight: 800;
-      font-size: clamp(0.88rem, 2vw, 1.15rem);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
+    /* ONLY Uppercase Display Element: HEROES & VILLAINS */
     .main-title-wrap {
       position: relative;
-      margin: 2px 0 12px;
-      padding: 4px 12px;
+      margin: 0 0 14px;
+      padding: 2px 12px;
       width: 100%;
       display: flex;
       justify-content: center;
     }
 
     .comic-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(2.6rem, 7.8vw, 5.6rem);
-      line-height: 1.02;
-      letter-spacing: 0.04em;
+      font-family: 'Anton', 'Bebas Neue', Impact, sans-serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(3rem, 8.2vw, 5.75rem);
+      line-height: 0.98;
+      letter-spacing: 0.035em;
       text-transform: uppercase;
       position: relative;
       display: inline-block;
       padding: 0 10px;
-    }
-
-    /* Theme-Specific Title Treatments */
-    [data-theme="comic-poster"] .comic-title {
-      font-style: italic;
-      font-weight: 400;
       background:
-        radial-gradient(circle, rgba(180, 25, 0, 0.28) 1.7px, transparent 2px) 0 0 / 7px 7px,
-        linear-gradient(180deg, #fff05a 0%, #ffbe24 38%, #ff7b14 72%, #e63517 100%);
+        radial-gradient(circle, rgba(160, 25, 0, 0.22) 1.5px, transparent 2px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #fff36b 0%, #f5b727 42%, #ea6a1f 78%, #e13022 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      -webkit-text-stroke: 2.5px #000000;
+      -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.85);
       filter:
-        drop-shadow(3px 3px 0px #000000)
-        drop-shadow(6px 6px 0px #000000)
-        drop-shadow(0px 8px 20px rgba(245, 110, 24, 0.35));
+        drop-shadow(0 4px 0 rgba(0, 0, 0, 0.85))
+        drop-shadow(0 10px 28px rgba(234, 106, 31, 0.28));
     }
 
-    [data-theme="playbill-gala"] .comic-title {
-      background: linear-gradient(180deg, #fff6d6 0%, #d4af37 55%, #aa7c11 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: 0.08em;
-      font-size: clamp(2.2rem, 6.2vw, 4.4rem);
-      filter: drop-shadow(0 4px 18px rgba(212, 175, 55, 0.22));
-    }
-
-    [data-theme="good-vs-evil"] .comic-title {
-      font-style: italic;
-      font-weight: 400;
-      background: linear-gradient(90deg, #38bdf8 0%, #e2e8f0 50%, #f43f5e 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 4px 24px rgba(56, 189, 248, 0.28));
-    }
-
-    [data-theme="violet-stage"] .comic-title {
-      background: linear-gradient(180deg, #ffffff 0%, #f0abfc 55%, #c084fc 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      font-size: clamp(2.3rem, 6.6vw, 4.7rem);
-      letter-spacing: 0.05em;
-      filter: drop-shadow(0 4px 22px rgba(192, 132, 252, 0.3));
-    }
-
-    [data-theme="noir-editorial"] .comic-title {
-      color: #ffffff;
-      font-size: clamp(2.3rem, 6.6vw, 4.6rem);
-      letter-spacing: -0.02em;
-    }
-
-    [data-theme="print-playbill"] .comic-title {
-      color: #1c1917;
-      font-size: clamp(2.2rem, 6.2vw, 4.3rem);
-      letter-spacing: 0.05em;
-    }
-
-    .showcase-ribbon {
-      background-color: var(--accent-secondary);
-      color: #ffffff;
-      border: var(--ribbon-border);
-      box-shadow: var(--ribbon-shadow);
-      padding: 6px 38px;
-      transform: skewX(calc(-1 * var(--ribbon-skew)));
-      display: inline-block;
-      margin-bottom: 12px;
-      max-width: 95%;
-    }
-
-    [data-theme="playbill-gala"] .showcase-ribbon {
-      background: rgba(212, 175, 55, 0.12);
-      color: #f3e5ab;
-      border-radius: 4px;
-    }
-
-    [data-theme="violet-stage"] .showcase-ribbon {
-      background: rgba(240, 171, 252, 0.12);
-      color: #f0abfc;
-      border-radius: 999px;
-    }
-
-    [data-theme="noir-editorial"] .showcase-ribbon {
-      background: #ef4444;
-      color: #ffffff;
-      border: none;
-    }
-
-    [data-theme="print-playbill"] .showcase-ribbon {
-      background: #991b1b;
-      color: #faf7f2;
-    }
-
-    .showcase-ribbon span {
-      display: block;
-      transform: skewX(var(--ribbon-skew));
-      font-family: var(--font-condensed);
-      font-weight: 800;
-      font-size: clamp(0.85rem, 2vw, 1.15rem);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .tagline-secondary {
-      font-family: var(--font-condensed);
-      font-weight: 700;
-      font-size: clamp(0.76rem, 1.6vw, 0.9rem);
-      letter-spacing: 0.18em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    .tickets-cta {
-      display: inline-block;
-      background-color: var(--accent-primary);
-      color: #090812;
-      border: var(--ribbon-border);
-      box-shadow: var(--ribbon-shadow);
-      padding: 8px 28px;
-      transform: skewX(var(--ribbon-skew));
-      text-decoration: none;
-      border-radius: 4px;
-      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    [data-theme="print-playbill"] .tickets-cta {
-      color: #faf7f2;
-    }
-
-    .tickets-cta span {
+    /* Clean Title Case Subtitle Pill */
+    .showcase-subtitle {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transform: skewX(calc(-1 * var(--ribbon-skew)));
-      font-family: var(--font-condensed);
+      gap: 10px;
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: #e0f2fe;
+      padding: 6px 22px;
+      border-radius: 8px;
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-bottom: 14px;
+    }
+
+    .showcase-subtitle .divider-dot {
+      color: var(--comic-cyan);
       font-weight: 800;
-      font-size: clamp(0.95rem, 2vw, 1.12rem);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+    }
+
+    /* Apparatus List in Clean Title Case */
+    .apparatus-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+      margin-bottom: 22px;
+    }
+
+    .apparatus-line span.sep {
+      width: 3.5px;
+      height: 3.5px;
+      border-radius: 50%;
+      background: rgba(148, 163, 184, 0.45);
+      display: inline-block;
+    }
+
+    /* Primary Header Ticket CTA (Clean SVG Icon + Modern Polish) */
+    .tickets-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #f6dc1e 0%, #f59e0b 100%);
+      color: #090812;
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      padding: 10px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow:
+        0 4px 18px rgba(245, 158, 11, 0.32),
+        0 1px 0 rgba(255, 255, 255, 0.4) inset;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
     }
 
     .tickets-cta:hover {
-      opacity: 0.92;
-      transform: skewX(var(--ribbon-skew)) translateY(-1px);
+      transform: translateY(-1.5px);
+      box-shadow:
+        0 8px 24px rgba(245, 158, 11, 0.45),
+        0 1px 0 rgba(255, 255, 255, 0.5) inset;
+      filter: brightness(1.04);
     }
 
-    .bottom-callout .tickets-cta {
-      margin-top: 14px;
+    .tickets-cta svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
     }
 
     /* ==================== FILTER & SEARCH CONTROLS ==================== */
@@ -678,67 +237,78 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 26px;
+      margin-bottom: 30px;
       padding: 12px 16px;
       background: var(--bg-panel);
-      border: var(--card-border);
-      border-radius: 10px;
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
     }
 
     .filter-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
     .filter-btn {
       appearance: none;
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: var(--card-border);
-      border-radius: 6px;
-      padding: 6px 13px;
-      font-family: var(--font-condensed);
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-light);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.84rem;
+      letter-spacing: 0.01em;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
     .filter-btn:hover {
-      border-color: var(--accent-primary);
+      border-color: rgba(34, 211, 238, 0.45);
+      color: #ffffff;
+      background: rgba(34, 211, 238, 0.08);
     }
 
     .filter-btn.active {
-      background: var(--accent-primary);
+      background: var(--comic-gold);
       color: #090812;
-      border-color: var(--accent-primary);
-      font-weight: 800;
-    }
-
-    [data-theme="print-playbill"] .filter-btn.active {
-      color: #ffffff;
+      border-color: var(--comic-gold);
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(245, 197, 24, 0.25);
     }
 
     .search-box {
       position: relative;
       flex: 1 1 240px;
-      max-width: 340px;
+      max-width: 320px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--text-dim);
+      pointer-events: none;
     }
 
     .search-input {
       width: 100%;
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: var(--card-border);
-      padding: 8px 32px 8px 12px;
-      font-family: var(--font-body);
+      background: rgba(9, 8, 18, 0.75);
+      color: var(--text-white);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 8px 32px 8px 34px;
+      font-family: inherit;
       font-size: 0.85rem;
       font-weight: 500;
       outline: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .search-input::placeholder {
@@ -746,7 +316,8 @@
     }
 
     .search-input:focus {
-      border-color: var(--accent-primary);
+      border-color: var(--comic-cyan);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.14);
     }
 
     .clear-search {
@@ -758,7 +329,7 @@
       border: none;
       color: var(--text-muted);
       font-size: 1rem;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       display: none;
       padding: 4px;
@@ -768,7 +339,7 @@
       display: block;
     }
 
-    /* ==================== DAY BOXES ==================== */
+    /* ==================== DAY SECTIONS ==================== */
     .days-wrapper {
       display: flex;
       flex-direction: column;
@@ -777,89 +348,75 @@
 
     .day-frame {
       background: var(--bg-panel);
-      border-radius: 12px;
-      padding: 22px 20px 20px;
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 22px 22px 22px;
       position: relative;
     }
 
     .day-frame.saturday-frame {
-      border: 1.5px solid var(--sat-border);
+      border: 1px solid rgba(245, 197, 24, 0.3);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(245, 158, 11, 0.04) inset;
     }
 
     .day-frame.sunday-frame {
-      border: 1.5px solid var(--sun-border);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(34, 211, 238, 0.04) inset;
     }
 
-    .day-top-ribbon {
-      position: absolute;
-      top: -13px;
-      left: 50%;
-      transform: translateX(-50%) skewX(var(--ribbon-skew));
-      padding: 3px 22px;
-      border: var(--ribbon-border);
-      box-shadow: var(--ribbon-shadow);
-      white-space: nowrap;
-      z-index: 2;
-      border-radius: 4px;
+    .day-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .saturday-frame .day-top-ribbon {
-      background: var(--accent-tertiary);
-      color: #ffffff;
+    .day-title-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .sunday-frame .day-top-ribbon {
-      background: var(--accent-primary);
-      color: #090812;
+    .day-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3.5px 11px;
+      border-radius: 6px;
+      letter-spacing: 0.03em;
     }
 
-    [data-theme="print-playbill"] .sunday-frame .day-top-ribbon {
-      color: #faf7f2;
+    .saturday-frame .day-pill {
+      background: rgba(245, 197, 24, 0.14);
+      color: #fde047;
+      border: 1px solid rgba(245, 197, 24, 0.32);
     }
 
-    .day-top-ribbon span {
-      display: block;
-      transform: skewX(calc(-1 * var(--ribbon-skew)));
-      font-family: var(--font-condensed);
-      font-weight: 800;
-      font-size: 0.8rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+    .sunday-frame .day-pill {
+      background: rgba(34, 211, 238, 0.14);
+      color: #67e8f9;
+      border: 1px solid rgba(34, 211, 238, 0.32);
     }
 
     .day-heading {
-      font-family: var(--font-display);
-      font-size: clamp(1.3rem, 2.8vw, 1.75rem);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: var(--row-divider);
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .saturday-frame .day-heading {
-      color: var(--accent-primary);
-    }
-
-    .sunday-frame .day-heading {
-      color: var(--accent-secondary);
-    }
-
-    [data-theme="noir-editorial"] .sunday-frame .day-heading {
-      color: var(--accent-primary);
+      font-size: clamp(1.2rem, 2.5vw, 1.45rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text-white);
     }
 
     .day-sub {
-      font-family: var(--font-condensed);
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 0.14em;
-      color: var(--text-dim);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     /* 2-Column Show Grid Inside Each Day */
@@ -871,59 +428,68 @@
     }
 
     .shows-grid.single-col {
-      grid-template-columns: minmax(0, 760px);
+      grid-template-columns: minmax(0, 740px);
       justify-content: center;
     }
 
-    /* ==================== SHOW CARDS & ACT LIST ==================== */
+    /* ==================== SHOW CARDS & PLAYBILL DOTTED LEADERS ==================== */
     .show-card {
       background: var(--bg-card);
-      border: var(--card-border);
-      border-radius: 10px;
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     }
 
     .show-card-header {
-      padding: 13px 16px 11px;
-      text-align: center;
+      padding: 14px 18px 12px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
       background: var(--bg-card-header);
-      border-bottom: var(--card-border);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
     }
 
-    .show-label {
-      font-family: var(--font-condensed);
-      font-weight: 700;
-      font-size: 0.82rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-      color: var(--accent-secondary);
-    }
-
-    .show-card.grand-finale .show-label,
-    .show-card.late-evening .show-label {
-      color: var(--accent-primary);
+    .show-header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
     }
 
     .show-time {
-      font-family: var(--font-condensed);
+      font-size: 1.25rem;
       font-weight: 800;
-      font-size: 1.55rem;
-      line-height: 1.1;
-      letter-spacing: 0.04em;
-      color: var(--text-title);
-      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+      color: var(--text-white);
+    }
+
+    .show-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .show-card.early-matinee .show-label {
+      color: #67e8f9;
+    }
+
+    .show-card.late-evening .show-label {
+      color: #fda4af;
+    }
+
+    .show-card.grand-finale .show-label {
+      color: #fde047;
     }
 
     .show-doors {
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       font-weight: 500;
-      color: var(--text-dim);
-      letter-spacing: 0.02em;
+      color: var(--text-muted);
     }
 
-    /* Act Lineup List */
+    /* Playbill Act List */
     .act-list {
       list-style: none;
       padding: 4px 0;
@@ -935,9 +501,9 @@
       display: flex;
       align-items: baseline;
       gap: 11px;
-      padding: 8.5px 16px;
+      padding: 8.5px 18px;
       background: transparent;
-      border-bottom: var(--row-divider);
+      border-bottom: 1px solid var(--row-divider);
       transition: background 0.12s ease;
     }
 
@@ -956,152 +522,160 @@
     .act-order {
       flex: 0 0 24px;
       height: 20px;
-      background: rgba(148, 163, 184, 0.12);
-      color: var(--text-muted);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: 4px;
-      font-family: var(--font-body);
-      font-weight: 700;
+      background: rgba(245, 197, 24, 0.1);
+      color: #fde047;
+      border: 1px solid rgba(245, 197, 24, 0.24);
+      border-radius: 5px;
       font-size: 0.72rem;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
 
+    .sunday-frame .act-order {
+      background: rgba(34, 211, 238, 0.1);
+      color: #67e8f9;
+      border-color: rgba(34, 211, 238, 0.24);
+    }
+
     .act-details {
       flex: 1;
       min-width: 0;
-    }
-
-    .act-title {
-      font-family: var(--font-body);
-      font-weight: 700;
-      font-size: 0.93rem;
-      color: var(--text-title);
-      line-height: 1.3;
-      margin-bottom: 1px;
-    }
-
-    .act-performers {
-      font-size: 0.81rem;
-      font-weight: 500;
-      color: var(--text-dim);
-      line-height: 1.38;
-      word-break: break-word;
-    }
-
-    /* Playbill Dotted-Leader Program Mode (Optional Layout Toggle) */
-    body.playbill-leaders .act-details {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 8px;
-      flex-wrap: wrap;
     }
 
-    body.playbill-leaders .act-title {
-      margin-bottom: 0;
+    .act-title {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-white);
+      line-height: 1.35;
       flex-shrink: 0;
     }
 
-    body.playbill-leaders .act-leader-dots {
-      flex: 1 1 24px;
-      border-bottom: 1px dotted rgba(148, 163, 184, 0.32);
-      margin: 0 4px;
-      min-width: 16px;
-    }
-
-    [data-theme="print-playbill"] body.playbill-leaders .act-leader-dots,
-    body.playbill-leaders[data-theme="print-playbill"] .act-leader-dots {
-      border-bottom-color: rgba(28, 25, 23, 0.25);
-    }
-
-    body.playbill-leaders .act-performers {
-      text-align: right;
-      max-width: 62%;
-    }
-
     .act-leader-dots {
-      display: none;
+      flex: 1 1 20px;
+      border-bottom: 1px dotted rgba(148, 163, 184, 0.28);
+      margin: 0 4px;
+      min-width: 14px;
     }
 
-    body.playbill-leaders .act-leader-dots {
-      display: block;
+    .act-performers {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 1.38;
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
     }
 
     mark.hl {
-      background: var(--accent-primary);
+      background: var(--comic-gold);
       color: #090812;
       padding: 0 3px;
-      border-radius: 2px;
-      font-weight: 800;
-    }
-
-    [data-theme="print-playbill"] mark.hl {
-      color: #ffffff;
+      border-radius: 3px;
+      font-weight: 700;
     }
 
     .empty-msg {
       padding: 26px 16px;
       text-align: center;
       color: var(--text-dim);
-      font-family: var(--font-condensed);
-      font-size: 1rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
-    /* ==================== BOTTOM CALLOUT & FOOTER BAR ==================== */
+    /* ==================== CLOSING CALLOUT (NON-REPETITIVE CTA) ==================== */
     .bottom-callout {
       text-align: center;
-      margin-top: 24px;
-      padding-top: 14px;
+      margin-top: 28px;
+      padding: 20px 18px 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
     }
 
-    .bottom-callout .bolt-line {
-      font-family: var(--font-condensed);
-      font-weight: 800;
-      font-size: clamp(0.9rem, 2vw, 1.08rem);
-      letter-spacing: 0.13em;
-      color: var(--accent-primary);
-      text-transform: uppercase;
-      margin-bottom: 4px;
+    .callout-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fde047;
+      letter-spacing: 0.04em;
+    }
+
+    .callout-pill svg {
+      width: 14px;
+      height: 14px;
+      color: var(--comic-gold);
     }
 
     .bottom-callout .sub-line {
-      font-size: 0.86rem;
-      font-weight: 600;
+      font-size: 0.88rem;
+      font-weight: 500;
       color: var(--text-muted);
+      margin-bottom: 4px;
     }
 
+    .reserve-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--comic-cyan);
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .reserve-link:hover {
+      color: #ffffff;
+      background: rgba(34, 211, 238, 0.12);
+    }
+
+    .reserve-link svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.15s ease;
+    }
+
+    .reserve-link:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ==================== REFINED FOOTER BAR ==================== */
     .flyer-footer-bar {
-      background: var(--footer-bg);
-      color: var(--footer-text);
-      padding: 14px 24px;
+      background: rgba(15, 13, 28, 0.95);
+      border-top: 1px solid rgba(245, 197, 24, 0.28);
+      color: var(--text-white);
+      padding: 16px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      border-top: var(--footer-border);
     }
 
     .footer-left .brand {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      letter-spacing: 0.04em;
-      line-height: 1.05;
-      color: var(--footer-text);
-      text-transform: uppercase;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      color: var(--text-white);
     }
 
     .footer-left .sub {
-      font-family: var(--font-condensed);
-      font-weight: 800;
-      font-size: 0.82rem;
-      letter-spacing: 0.1em;
-      color: var(--footer-sub);
-      text-transform: uppercase;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--comic-gold);
     }
 
     .footer-right {
@@ -1109,51 +683,49 @@
     }
 
     .footer-right .url {
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      letter-spacing: 0.04em;
-      line-height: 1.1;
-      color: var(--footer-text);
-      text-transform: uppercase;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-white);
       text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-right .url:hover {
+      color: var(--comic-cyan);
     }
 
     .footer-right .social {
-      font-family: var(--font-condensed);
-      font-weight: 800;
       font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      color: var(--footer-text);
-      opacity: 0.88;
-      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .footer-right .social a {
-      color: inherit;
+      color: var(--text-light);
+      font-weight: 600;
       text-decoration: underline;
       text-underline-offset: 2px;
+      transition: color 0.15s ease;
     }
 
     .footer-right .social a:hover {
-      color: var(--footer-sub);
-    }
-
-    body.hide-switcher .theme-Dock {
-      display: none;
+      color: var(--comic-gold);
     }
 
     @media print {
       body {
         padding: 0;
-        background: #ffffff;
+        background: #0b0916;
       }
-      .theme-Dock,
       .controls-section,
-      .tickets-cta {
+      .tickets-cta,
+      .reserve-link {
         display: none !important;
       }
       .flyer-frame {
         box-shadow: none;
+        border: none;
         max-width: 100%;
       }
     }
@@ -1171,15 +743,15 @@
       }
     }
 
-    @media (max-width: 540px) {
+    @media (max-width: 560px) {
       body {
         padding: 8px;
       }
       .content-wrap {
-        padding: 24px 12px 20px;
+        padding: 26px 14px 22px;
       }
       .day-frame {
-        padding: 22px 12px 16px;
+        padding: 18px 12px 16px;
       }
       .controls-section {
         padding: 12px;
@@ -1187,136 +759,81 @@
       .search-box {
         max-width: 100%;
       }
-      body.playbill-leaders .act-performers {
+      .act-details {
+        flex-direction: column;
+        gap: 2px;
+      }
+      .act-leader-dots {
+        display: none;
+      }
+      .act-performers {
         max-width: 100%;
         text-align: left;
-      }
-      body.playbill-leaders .act-leader-dots {
-        display: none;
       }
     }
   </style>
 </head>
 <body>
-  <!-- DESIGN & PROGRAM THEME SWITCHER BAR -->
-  <aside class="theme-Dock" aria-label="Color Scheme and Program Design Switcher">
-    <div class="theme-dock-top">
-      <div class="theme-dock-title">
-        <span>🎨 Program &amp; Lineup Design Explorer</span>
-        <span class="badge">6 Styles</span>
-      </div>
-      <div class="layout-toggles">
-        <button id="toggleStackedBtn" class="layout-btn active" type="button">Stacked Rows</button>
-        <button id="toggleLeadersBtn" class="layout-btn" type="button">Playbill Dotted Leaders</button>
-        <button id="printProgramBtn" class="layout-btn" type="button">🖨️ Print / Save PDF</button>
-      </div>
-    </div>
-
-    <div class="theme-grid" role="radiogroup" aria-label="Choose a visual theme">
-      <button class="theme-chip active" data-set-theme="comic-poster" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#0b0916"></span>
-          <span class="swatch-half" style="background:#f6dc1e"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">1. Comic Flyer</div>
-          <div class="theme-chip-desc">Midnight, Gold &amp; Cyan</div>
-        </span>
-      </button>
-
-      <button class="theme-chip" data-set-theme="playbill-gala" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#0e0d12"></span>
-          <span class="swatch-half" style="background:#d4af37"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">2. Theater Playbill</div>
-          <div class="theme-chip-desc">Obsidian &amp; Champagne Gold</div>
-        </span>
-      </button>
-
-      <button class="theme-chip" data-set-theme="good-vs-evil" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#38bdf8"></span>
-          <span class="swatch-half" style="background:#f43f5e"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">3. Good vs. Evil</div>
-          <div class="theme-chip-desc">Sapphire &amp; Crimson Split</div>
-        </span>
-      </button>
-
-      <button class="theme-chip" data-set-theme="violet-stage" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#1b0f2b"></span>
-          <span class="swatch-half" style="background:#f0abfc"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">4. Stage Spotlight</div>
-          <div class="theme-chip-desc">Deep Plum &amp; Rose Gold</div>
-        </span>
-      </button>
-
-      <button class="theme-chip" data-set-theme="noir-editorial" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#0c0c0e"></span>
-          <span class="swatch-half" style="background:#ef4444"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">5. Minimalist Noir</div>
-          <div class="theme-chip-desc">Monochrome &amp; Scarlet</div>
-        </span>
-      </button>
-
-      <button class="theme-chip" data-set-theme="print-playbill" type="button">
-        <span class="swatch-pair">
-          <span class="swatch-half" style="background:#faf7f2"></span>
-          <span class="swatch-half" style="background:#991b1b"></span>
-        </span>
-        <span class="theme-chip-text">
-          <div class="theme-chip-name">6. Ivory Print Program</div>
-          <div class="theme-chip-desc">Warm Paper &amp; Burgundy</div>
-        </span>
-      </button>
-    </div>
-  </aside>
-
   <div class="flyer-frame">
     <div class="halftone-layer" aria-hidden="true"></div>
 
     <div class="content-wrap">
-      <!-- HEADER -->
+      <!-- HERO HEADER -->
       <header class="hero-header">
-        <div class="presents-ribbon">
-          <span>REVEL ROOM STUDIOS PRESENTS:</span>
+        <div class="presents-badge">
+          <span class="presents-dot" aria-hidden="true"></span>
+          <span>Revel Room Studios Presents</span>
         </div>
 
         <div class="main-title-wrap">
           <h1 class="comic-title">HEROES &amp; VILLAINS</h1>
         </div>
 
-        <div class="showcase-ribbon">
-          <span>STUDENT &amp; INSTRUCTOR SHOWCASE &bull; OFFICIAL LINEUP</span>
+        <div class="showcase-subtitle">
+          <span>Student &amp; Instructor Showcase</span>
+          <span class="divider-dot" aria-hidden="true">&middot;</span>
+          <span>Official Lineup</span>
         </div>
 
-        <p class="tagline-secondary">LYRA &bull; AERIAL SILKS &bull; FLYING POLE &bull; STRAPS &bull; POLE &bull; CHAIR &bull; HEELS</p>
+        <div class="apparatus-line" aria-label="Featured Apparatuses">
+          <span>Lyra</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Aerial Silks</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Flying Pole</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Straps</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Pole</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Chair</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span>Heels</span>
+        </div>
 
         <a class="tickets-cta" href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener">
-          <span>&#9733; PURCHASE TICKETS &#9733;</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+          </svg>
+          <span>Purchase Tickets</span>
         </a>
       </header>
 
       <!-- INTERACTIVE SHOW FILTER & SEARCH -->
       <section class="controls-section" aria-label="Show filters and performer search">
         <div class="filter-pills" role="tablist">
-          <button class="filter-btn active" data-filter="all" type="button"><span>ALL 4 SHOWS</span></button>
-          <button class="filter-btn" data-filter="sat_early" type="button"><span>SAT 3:00 PM</span></button>
-          <button class="filter-btn" data-filter="sat_late" type="button"><span>SAT 7:00 PM</span></button>
-          <button class="filter-btn" data-filter="sun_early" type="button"><span>SUN 3:00 PM</span></button>
-          <button class="filter-btn" data-filter="sun_late" type="button"><span>SUN 7:00 PM</span></button>
+          <button class="filter-btn active" data-filter="all" type="button">All 4 Shows</button>
+          <button class="filter-btn" data-filter="sat_early" type="button">Sat 3:00 PM</button>
+          <button class="filter-btn" data-filter="sat_late" type="button">Sat 7:00 PM</button>
+          <button class="filter-btn" data-filter="sun_early" type="button">Sun 3:00 PM</button>
+          <button class="filter-btn" data-filter="sun_late" type="button">Sun 7:00 PM</button>
         </div>
 
         <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
           <input
             id="searchInput"
             class="search-input"
@@ -1331,12 +848,20 @@
       <!-- DAYS & SHOWS -->
       <main id="daysWrapper" class="days-wrapper"></main>
 
-      <!-- BOTTOM CALLOUT -->
+      <!-- CLOSING CALLOUT -->
       <div class="bottom-callout">
-        <p class="bolt-line">&#9889; 29 UNIQUE ACTS &bull; COMMUNITY SHOWCASE &#9889;</p>
-        <p class="sub-line">Come cheer on friends, celebrate community, and experience high-flying drama!</p>
-        <a class="tickets-cta" href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener">
-          <span>&#9733; PURCHASE TICKETS &#9733;</span>
+        <div class="callout-pill">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/>
+          </svg>
+          <span>29 Unique Acts &middot; Community Showcase</span>
+        </div>
+        <p class="sub-line">Come cheer on friends, celebrate community, and experience high-flying drama.</p>
+        <a class="reserve-link" href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener">
+          <span>Ready to watch? Reserve your seat</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
         </a>
       </div>
     </div>
@@ -1344,12 +869,12 @@
     <!-- FOOTER BAR -->
     <footer class="flyer-footer-bar">
       <div class="footer-left">
-        <div class="brand">REVEL ROOM STUDIOS</div>
-        <div class="sub">STUDENT &amp; INSTRUCTOR SHOWCASE 2026</div>
+        <div class="brand">Revel Room Studios</div>
+        <div class="sub">Student &amp; Instructor Showcase 2026</div>
       </div>
       <div class="footer-right">
-        <a class="url" href="https://www.revelroomstudios.com" target="_blank" rel="noopener">WWW.REVELROOMSTUDIOS.COM</a>
-        <div class="social">SAN JOSE &bull; FOLLOW <a href="https://www.instagram.com/revelroomstudios/" target="_blank" rel="noopener">@REVELROOMSTUDIOS</a></div>
+        <a class="url" href="https://www.revelroomstudios.com" target="_blank" rel="noopener">revelroomstudios.com</a>
+        <div class="social">San Jose &middot; Follow <a href="https://www.instagram.com/revelroomstudios/" target="_blank" rel="noopener">@revelroomstudios</a></div>
       </div>
     </footer>
   </div>
@@ -1393,14 +918,14 @@
       {
         id: "saturday",
         frameClass: "saturday-frame",
-        ribbon: "★ DAY ONE • SATURDAY SHOWCASE ★",
-        dateHeading: "SATURDAY, NOVEMBER 14, 2026",
-        subHeading: "TWO SHOWS",
+        dayPill: "Day One",
+        dateHeading: "Saturday, November 14, 2026",
+        subHeading: "Two Shows",
         shows: [
           {
             key: "sat_early",
             cardClass: "early-matinee",
-            label: "EARLY MATINEE",
+            label: "Early Matinee",
             time: "3:00 PM",
             doors: "Doors Open at 2:30 PM",
             sequence: [6, 18, 1, 25, 21, 15, 14, 16, 5, 13, 19, 8, 11]
@@ -1408,7 +933,7 @@
           {
             key: "sat_late",
             cardClass: "late-evening",
-            label: "LATE EVENING",
+            label: "Late Evening",
             time: "7:00 PM",
             doors: "Doors Open at 6:30 PM",
             sequence: [9, 7, 6, 4, 3, 26, 22, 12, 24, 17, 29, 28]
@@ -1418,14 +943,14 @@
       {
         id: "sunday",
         frameClass: "sunday-frame",
-        ribbon: "★ DAY TWO • SUNDAY SHOWCASE ★",
-        dateHeading: "SUNDAY, NOVEMBER 15, 2026",
-        subHeading: "TWO SHOWS",
+        dayPill: "Day Two",
+        dateHeading: "Sunday, November 15, 2026",
+        subHeading: "Two Shows",
         shows: [
           {
             key: "sun_early",
             cardClass: "early-matinee",
-            label: "EARLY MATINEE",
+            label: "Early Matinee",
             time: "3:00 PM",
             doors: "Doors Open at 2:30 PM",
             sequence: [14, 4, 10, 27, 1, 20, 5, 21, 15, 2, 8, 17]
@@ -1433,7 +958,7 @@
           {
             key: "sun_late",
             cardClass: "grand-finale",
-            label: "GRAND FINALE",
+            label: "Grand Finale",
             time: "7:00 PM",
             doors: "Doors Open at 6:30 PM",
             sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 27, 20, 28]
@@ -1506,8 +1031,10 @@
           return `
             <article class="show-card ${show.cardClass}" data-show="${show.key}">
               <div class="show-card-header">
-                <div class="show-label">${escapeHtml(show.label)}</div>
-                <div class="show-time">${escapeHtml(show.time)}</div>
+                <div class="show-header-left">
+                  <div class="show-time">${escapeHtml(show.time)}</div>
+                  <div class="show-label">${escapeHtml(show.label)}</div>
+                </div>
                 <div class="show-doors">${escapeHtml(show.doors)}</div>
               </div>
               ${listContent}
@@ -1517,9 +1044,11 @@
 
         return `
           <section class="day-frame ${day.frameClass}">
-            <div class="day-top-ribbon"><span>${escapeHtml(day.ribbon)}</span></div>
-            <div class="day-heading">
-              <span>${escapeHtml(day.dateHeading)}</span>
+            <div class="day-header-row">
+              <div class="day-title-group">
+                <span class="day-pill">${escapeHtml(day.dayPill)}</span>
+                <h2 class="day-heading">${escapeHtml(day.dateHeading)}</h2>
+              </div>
               <span class="day-sub">${escapeHtml(day.subHeading)}</span>
             </div>
             <div class="shows-grid ${singleColClass}">
@@ -1528,49 +1057,6 @@
           </section>
         `;
       }).join("");
-    }
-
-    // Theme Switcher Logic
-    function applyTheme(themeId) {
-      document.documentElement.setAttribute("data-theme", themeId);
-      document.querySelectorAll(".theme-chip").forEach(chip => {
-        chip.classList.toggle("active", chip.dataset.setTheme === themeId);
-      });
-      // Automatically turn on playbill dotted leaders for Playbill Gala & Ivory Print Program
-      if (themeId === "playbill-gala" || themeId === "print-playbill") {
-        setLeaderMode(true);
-      }
-      try {
-        const url = new URL(window.location.href);
-        url.searchParams.set("theme", themeId);
-        window.history.replaceState({}, "", url);
-      } catch (e) {}
-    }
-
-    function setLeaderMode(enabled) {
-      document.body.classList.toggle("playbill-leaders", enabled);
-      document.getElementById("toggleLeadersBtn").classList.toggle("active", enabled);
-      document.getElementById("toggleStackedBtn").classList.toggle("active", !enabled);
-    }
-
-    document.querySelectorAll(".theme-chip").forEach(chip => {
-      chip.addEventListener("click", () => applyTheme(chip.dataset.setTheme));
-    });
-
-    document.getElementById("toggleStackedBtn").addEventListener("click", () => setLeaderMode(false));
-    document.getElementById("toggleLeadersBtn").addEventListener("click", () => setLeaderMode(true));
-    document.getElementById("printProgramBtn").addEventListener("click", () => window.print());
-
-    // URL Parameter Support (?theme=playbill-gala&leaders=1&clean=1)
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("clean") === "1") {
-      document.body.classList.add("hide-switcher");
-    }
-    if (params.get("theme")) {
-      applyTheme(params.get("theme"));
-    }
-    if (params.get("leaders") === "1") {
-      setLeaderMode(true);
     }
 
     // Filter Buttons

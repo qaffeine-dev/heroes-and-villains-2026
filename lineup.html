@@ -181,6 +181,42 @@
       color: var(--text-cream);
       text-transform: uppercase;
       opacity: 0.9;
+      margin-bottom: 16px;
+    }
+
+    .tickets-cta {
+      display: inline-block;
+      background-color: var(--comic-yellow);
+      background-image: radial-gradient(circle, rgba(217, 119, 6, 0.28) 1.5px, transparent 1.8px);
+      background-size: 7px 7px;
+      color: #090812;
+      border: 2.5px solid #000000;
+      box-shadow: 4px 4px 0 #000000;
+      padding: 8px 30px;
+      transform: skewX(-12deg);
+      text-decoration: none;
+      transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .tickets-cta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transform: skewX(12deg);
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(1rem, 2.2vw, 1.22rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tickets-cta:hover {
+      background-color: #ffe84d;
+      transform: skewX(-12deg) translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #000000, 0 0 18px rgba(246, 220, 30, 0.45);
+    }
+
+    .bottom-callout .tickets-cta {
+      margin-top: 14px;
     }
 
     /* ==================== FILTER & SEARCH CONTROLS ==================== */
@@ -684,6 +720,10 @@
         </div>
 
         <p class="tagline-secondary">LYRA &bull; AERIAL SILKS &bull; FLYING POLE &bull; STRAPS &bull; POLE &bull; CHAIR &bull; HEELS</p>
+
+        <a class="tickets-cta" href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener">
+          <span>&#9733; PURCHASE TICKETS &#9733;</span>
+        </a>
       </header>
 
       <!-- INTERACTIVE SHOW FILTER & SEARCH -->
@@ -715,6 +755,9 @@
       <div class="bottom-callout">
         <p class="bolt-line">&#9889; 29 UNIQUE ACTS &bull; COMMUNITY SHOWCASE &#9889;</p>
         <p class="sub-line">Come cheer on friends, celebrate community, and experience high-flying drama!</p>
+        <a class="tickets-cta" href="https://events.humanitix.com/revel-room-heroes-villains" target="_blank" rel="noopener">
+          <span>&#9733; PURCHASE TICKETS &#9733;</span>
+        </a>
       </div>
     </div>
 

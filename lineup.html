@@ -3,390 +3,1016 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Revel: Heroes &amp; Villains — Show Lineup</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Heroes &amp; Villains 2026 — Official Show Lineup | Revel Room Studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg-void: #05040a;
+      --bg-canvas: #0b0916;
+      --bg-panel: #131024;
+      --bg-card: #1b1830;
+      --bg-row: rgba(255, 255, 255, 0.03);
+      --bg-row-alt: rgba(255, 255, 255, 0.065);
+      --bg-row-hover: rgba(0, 200, 255, 0.11);
+
+      --comic-yellow: #f6dc1e;
+      --comic-gold: #ffae19;
+      --comic-orange: #f56e18;
+      --comic-red: #ef3b2d;
+      --comic-cyan: #00c8ff;
+      --comic-purple: #a855f7;
+
+      --text-white: #ffffff;
+      --text-cream: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-dim: #94a3b8;
+      --border-card: #b8b4cc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-void);
+      color: var(--text-white);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Light Mode Overrides */
-    body.light-mode {
-      background-color: #f8fafc !important;
-      color: #0f172a !important;
+    /* Flyer Outer White Frame */
+    .flyer-frame {
+      max-width: 1220px;
+      margin: 0 auto;
+      background-color: var(--bg-canvas);
+      border: 2.5px solid #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
     }
-    body.light-mode .card-surface {
-      background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
-      box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.06) !important;
+
+    /* Ben-Day Comic Halftone Corner & Edge Overlays */
+    .halftone-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(circle, rgba(0, 200, 255, 0.22) 2px, transparent 2.5px),
+        radial-gradient(circle, rgba(168, 85, 247, 0.18) 2px, transparent 2.5px),
+        radial-gradient(circle, rgba(246, 220, 30, 0.14) 2px, transparent 2.5px),
+        radial-gradient(circle, rgba(239, 59, 45, 0.16) 2px, transparent 2.5px);
+      background-size: 12px 12px;
+      background-position: 0 0, 6px 6px, 0 6px, 6px 0;
+      mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, transparent 45%, #000 100%);
+      -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, transparent 45%, #000 100%);
     }
-    body.light-mode .show-header-sat {
-      background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
-      border-color: #C7D2FE !important;
+
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      padding: 32px 24px 28px;
     }
-    body.light-mode .show-header-sun {
-      background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%) !important;
-      border-color: #E9D5FF !important;
+
+    /* ==================== COMIC FLYER HEADER ==================== */
+    .hero-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
     }
-    body.light-mode .text-title {
-      color: #0f172a !important;
+
+    /* Top Yellow Slanted Ribbon: REVEL ROOM STUDIOS PRESENTS: */
+    .presents-ribbon {
+      background-color: var(--comic-yellow);
+      background-image: radial-gradient(circle, rgba(217, 119, 6, 0.28) 1.5px, transparent 1.8px);
+      background-size: 7px 7px;
+      color: #090812;
+      border: 2.5px solid #000000;
+      box-shadow: 4px 4px 0 #000000;
+      padding: 5px 38px;
+      transform: skewX(-14deg);
+      display: inline-block;
+      margin-bottom: 14px;
     }
-    body.light-mode .text-subtitle {
-      color: #475569 !important;
+
+    .presents-ribbon span {
+      display: block;
+      transform: skewX(14deg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.95rem, 2.2vw, 1.28rem);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
-    body.light-mode .text-performer {
-      color: #334155 !important;
+
+    /* Main Comic Book 3D Title: HEROES & VILLAINS */
+    .main-title-wrap {
+      position: relative;
+      margin: 2px 0 12px;
+      padding: 4px 12px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
-    body.light-mode .act-row-odd {
-      background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
+
+    .comic-title {
+      font-family: 'Anton', Impact, 'Arial Black', sans-serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(2.9rem, 8.6vw, 6.2rem);
+      line-height: 0.96;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      position: relative;
+      display: inline-block;
+      padding: 0 10px;
+      background:
+        radial-gradient(circle, rgba(180, 25, 0, 0.28) 1.7px, transparent 2px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #fff05a 0%, #ffbe24 38%, #ff7b14 72%, #e63517 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-stroke: 2.5px #000000;
+      filter:
+        drop-shadow(3px 3px 0px #000000)
+        drop-shadow(6px 6px 0px #000000)
+        drop-shadow(0px 8px 20px rgba(245, 110, 24, 0.35));
     }
-    body.light-mode .act-row-even {
-      background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
+
+    /* Cyan Slanted Ribbon: AN AERIAL & POLE ACROBATICS SHOWCASE */
+    .showcase-ribbon {
+      background-color: var(--comic-cyan);
+      background-image: radial-gradient(circle, rgba(0, 110, 165, 0.25) 1.5px, transparent 1.8px);
+      background-size: 7px 7px;
+      color: #ffffff;
+      border: 2.5px solid #000000;
+      box-shadow: 4px 4px 0 #000000;
+      padding: 6px 44px;
+      transform: skewX(14deg);
+      display: inline-block;
+      margin-bottom: 14px;
+      max-width: 95%;
     }
-    body.light-mode .slot-badge {
-      background-color: #e2e8f0 !important;
-      color: #1e293b !important;
+
+    .showcase-ribbon span {
+      display: block;
+      transform: skewX(-14deg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.95rem, 2.3vw, 1.32rem);
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      text-shadow: 1.5px 1.5px 0 #052c42;
     }
-    body.light-mode .intermission-row {
-      background-color: #ecfdf5 !important;
-      border-color: #6ee7b7 !important;
-      color: #065f46 !important;
+
+    .tagline-primary {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.95rem, 2.1vw, 1.18rem);
+      letter-spacing: 0.12em;
+      color: var(--comic-yellow);
+      text-transform: uppercase;
+      margin-bottom: 5px;
     }
-    body.light-mode .games-row {
-      background-color: #f5f3ff !important;
-      border-color: #c4b5fd !important;
-      color: #5b21b6 !important;
+
+    .tagline-secondary {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.78rem, 1.7vw, 0.92rem);
+      letter-spacing: 0.18em;
+      color: var(--text-cream);
+      text-transform: uppercase;
+      opacity: 0.9;
     }
-    body.light-mode .tab-inactive {
-      background-color: #ffffff !important;
-      color: #334155 !important;
-      border-color: #cbd5e1 !important;
+
+    /* ==================== 5-PANEL COMIC ACCENT STRIP ==================== */
+    .comic-divider-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin: 20px 0 24px;
+      padding: 5px;
+      background: #ffffff;
+      border: 1px solid #ffffff;
     }
-    body.light-mode .tab-inactive:hover {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
+
+    .strip-panel {
+      height: 28px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: 8px 8px;
     }
-    body.light-mode .search-input {
-      background-color: #ffffff !important;
-      border-color: #cbd5e1 !important;
-      color: #0f172a !important;
+
+    .strip-panel.p1 {
+      background-color: #044369;
+      background-image: radial-gradient(circle, rgba(0, 200, 255, 0.45) 2px, transparent 2.2px);
     }
-    body.light-mode .theme-btn {
-      background-color: #ffffff !important;
-      border-color: #cbd5e1 !important;
-      color: #1e293b !important;
+    .strip-panel.p2 {
+      background-color: #6b3804;
+      background-image: radial-gradient(circle, rgba(255, 174, 25, 0.45) 2px, transparent 2.2px);
+    }
+    .strip-panel.p3 {
+      background-color: #4c117a;
+      background-image: radial-gradient(circle, rgba(216, 115, 255, 0.45) 2px, transparent 2.2px);
+    }
+    .strip-panel.p4 {
+      background-color: #5e4b04;
+      background-image: radial-gradient(circle, rgba(246, 220, 30, 0.45) 2px, transparent 2.2px);
+    }
+    .strip-panel.p5 {
+      background-color: #6e0d14;
+      background-image: radial-gradient(circle, rgba(239, 59, 45, 0.45) 2px, transparent 2.2px);
+    }
+
+    .strip-badge {
+      background: #0a0912;
+      border: 1.5px solid #ffffff;
+      color: #ffffff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      padding: 1px 10px;
+      transform: skewX(-12deg);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .strip-badge span {
+      display: inline-block;
+      transform: skewX(12deg);
+    }
+
+    /* ==================== FILTER & SEARCH CONTROLS ==================== */
+    .controls-section {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 26px;
+      padding: 14px 18px;
+      background: var(--bg-panel);
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      border-radius: 10px;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      appearance: none;
+      background: var(--bg-card);
+      color: var(--text-white);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 7px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.96rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transform: skewX(-10deg);
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn span {
+      display: inline-block;
+      transform: skewX(10deg);
+    }
+
+    .filter-btn:hover {
+      border-color: var(--comic-cyan);
+      color: var(--comic-cyan);
+    }
+
+    .filter-btn.active {
+      background: var(--comic-yellow);
+      color: #090812;
+      border-color: #000000;
+      box-shadow: 3px 3px 0 #000000;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1 1 250px;
+      max-width: 350px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #090812;
+      color: #ffffff;
+      border: 2px solid var(--comic-cyan);
+      padding: 9px 34px 9px 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      outline: none;
+      border-radius: 6px;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .search-input:focus {
+      border-color: var(--comic-yellow);
+      box-shadow: 0 0 0 3px rgba(246, 220, 30, 0.2);
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--comic-yellow);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      padding: 4px;
+    }
+
+    .clear-search.visible {
+      display: block;
+    }
+
+    /* ==================== DAY BOXES (FLYER STYLE) ==================== */
+    .days-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .day-frame {
+      background: var(--bg-panel);
+      border-radius: 12px;
+      padding: 22px 20px 22px;
+      position: relative;
+    }
+
+    .day-frame.saturday-frame {
+      border: 2.5px solid var(--comic-gold);
+      box-shadow: inset 0 0 28px rgba(255, 174, 25, 0.07);
+    }
+
+    .day-frame.sunday-frame {
+      border: 2.5px solid var(--comic-cyan);
+      box-shadow: inset 0 0 28px rgba(0, 200, 255, 0.07);
+    }
+
+    .day-frame.hidden {
+      display: none;
+    }
+
+    /* Top Centered Ribbon on Day Frame */
+    .day-top-ribbon {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%) skewX(-14deg);
+      padding: 4px 28px;
+      border: 2px solid #000000;
+      box-shadow: 3px 3px 0 #000000;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .saturday-frame .day-top-ribbon {
+      background: var(--comic-red);
+      color: #ffffff;
+    }
+
+    .sunday-frame .day-top-ribbon {
+      background: var(--comic-yellow);
+      color: #090812;
+    }
+
+    .day-top-ribbon span {
+      display: block;
+      transform: skewX(14deg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .day-heading {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(1.45rem, 3.2vw, 1.95rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .saturday-frame .day-heading {
+      color: var(--comic-yellow);
+    }
+
+    .sunday-frame .day-heading {
+      color: var(--comic-cyan);
+    }
+
+    .day-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    /* 2-Column Show Grid Inside Each Day */
+    .shows-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      align-items: start;
+    }
+
+    .shows-grid.single-col {
+      grid-template-columns: minmax(0, 760px);
+      justify-content: center;
+    }
+
+    /* Individual Show Box (Matches Flyer Inner Cards) */
+    .show-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-card);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .show-card.hidden {
+      display: none;
+    }
+
+    .show-card-header {
+      padding: 16px 18px 14px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0.22) 100%);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .show-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.96rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .show-card.early-matinee .show-label {
+      color: var(--comic-cyan);
+    }
+
+    .show-card.late-evening .show-label {
+      color: #ff6b6b;
+    }
+
+    .show-card.grand-finale .show-label {
+      color: var(--comic-yellow);
+    }
+
+    .show-time {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 2.15rem;
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .show-doors {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+
+    /* Act Lineup List */
+    .act-list {
+      list-style: none;
+      padding: 8px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .act-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--bg-row);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 7px;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .act-item:nth-child(even) {
+      background: var(--bg-row-alt);
+    }
+
+    .act-item:hover {
+      background: var(--bg-row-hover);
+      border-color: rgba(0, 200, 255, 0.45);
+      transform: translateX(2px);
+    }
+
+    .act-order {
+      flex: 0 0 32px;
+      height: 28px;
+      background: var(--comic-yellow);
+      color: #090812;
+      border: 1.5px solid #000000;
+      box-shadow: 2px 2px 0 #000000;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: skewX(-10deg);
+      margin-top: 1px;
+    }
+
+    .act-order span {
+      transform: skewX(10deg);
+    }
+
+    .sunday-frame .act-order {
+      background: var(--comic-cyan);
+      color: #051926;
+    }
+
+    .act-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .act-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.18rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 3px;
+    }
+
+    .act-performers {
+      font-size: 0.87rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.42;
+      word-break: break-word;
+    }
+
+    mark.hl {
+      background: var(--comic-yellow);
+      color: #090812;
+      padding: 0 3px;
+      border-radius: 2px;
+      font-weight: 800;
+    }
+
+    .empty-msg {
+      padding: 26px 16px;
+      text-align: center;
+      color: var(--text-dim);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ==================== FLYER BOTTOM CALLOUT & YELLOW BAR ==================== */
+    .bottom-callout {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 14px;
+    }
+
+    .bottom-callout .bolt-line {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.9rem, 2vw, 1.08rem);
+      letter-spacing: 0.13em;
+      color: var(--comic-yellow);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .bottom-callout .sub-line {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-cream);
+      opacity: 0.9;
+    }
+
+    /* Iconic Yellow Flyer Footer Bar */
+    .flyer-footer-bar {
+      background: var(--comic-yellow);
+      color: #090812;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-top: 3px solid #000000;
+    }
+
+    .footer-left .brand {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      color: #090812;
+      text-transform: uppercase;
+    }
+
+    .footer-left .sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.84rem;
+      letter-spacing: 0.1em;
+      color: #b91c1c;
+      text-transform: uppercase;
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    .footer-right .url {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      color: #090812;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .footer-right .social {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: #1e293b;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 860px) {
+      .shows-grid {
+        grid-template-columns: 1fr;
+      }
+      .comic-divider-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .comic-divider-strip .strip-panel:nth-child(4),
+      .comic-divider-strip .strip-panel:nth-child(5) {
+        display: none;
+      }
+      .flyer-footer-bar {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-right {
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 540px) {
+      body {
+        padding: 8px;
+      }
+      .content-wrap {
+        padding: 24px 12px 20px;
+      }
+      .day-frame {
+        padding: 22px 12px 16px;
+      }
+      .controls-section {
+        padding: 12px;
+      }
+      .search-box {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+<body>
+  <div class="flyer-frame">
+    <div class="halftone-layer" aria-hidden="true"></div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-
-    <!-- Header -->
-    <header class="card-surface bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-7 mb-6 shadow-xl">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-2">
-            <span>🎭 Official Show Lineup</span>
-            <span>•</span>
-            <span>Nov 14–15, 2026</span>
-          </div>
-          <h1 class="text-title text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Revel: Heroes &amp; Villains
-          </h1>
-          <p class="text-subtitle text-xs sm:text-sm text-slate-400 mt-1">
-            Select a show below or search by performer or act name.
-          </p>
+    <div class="content-wrap">
+      <!-- COMIC FLYER HEADER -->
+      <header class="hero-header">
+        <div class="presents-ribbon">
+          <span>REVEL ROOM STUDIOS PRESENTS:</span>
         </div>
 
-        <div class="flex items-center gap-2 self-start sm:self-center">
-          <button onclick="toggleTheme()" class="theme-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-            <span id="theme-icon">☀️</span>
-            <span id="theme-label">Light Mode</span>
-          </button>
+        <div class="main-title-wrap">
+          <h1 class="comic-title">HEROES &amp; VILLAINS</h1>
         </div>
+
+        <div class="showcase-ribbon">
+          <span>AN AERIAL &amp; POLE ACROBATICS SHOWCASE &bull; OFFICIAL LINEUP</span>
+        </div>
+
+        <p class="tagline-primary">&#9733; OVER 25 JAW-DROPPING ACTS &bull; GOOD VS. EVIL LIVE ON STAGE &#9733;</p>
+        <p class="tagline-secondary">LYRA &bull; AERIAL SILKS &bull; FLYING POLE &bull; STRAPS &bull; POLE ARTISTRY &bull; CHAIR &amp; HEELS</p>
+      </header>
+
+      <!-- 5-PANEL COMIC ACCENT STRIP -->
+      <div class="comic-divider-strip" aria-hidden="true">
+        <div class="strip-panel p1"><div class="strip-badge"><span>FLYING POLE</span></div></div>
+        <div class="strip-panel p2"><div class="strip-badge"><span>STRAPS</span></div></div>
+        <div class="strip-panel p3"><div class="strip-badge"><span>AERIAL SILKS</span></div></div>
+        <div class="strip-panel p4"><div class="strip-badge"><span>LYRA HOOP</span></div></div>
+        <div class="strip-panel p5"><div class="strip-badge"><span>POLE &amp; CHAIR</span></div></div>
       </div>
 
-      <!-- Controls: Show Filter Tabs + Search -->
-      <div class="mt-5 pt-4 border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <!-- Show Filter Tabs -->
-        <div class="flex flex-wrap items-center gap-1.5" id="filter-tabs">
-          <button onclick="setShowFilter('all')" data-filter="all" class="filter-tab px-3.5 py-2 rounded-xl text-xs font-bold transition border bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20">
-            All 4 Shows
-          </button>
-          <button onclick="setShowFilter('sat_early')" data-filter="sat_early" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
-            Sat Early (3PM)
-          </button>
-          <button onclick="setShowFilter('sat_late')" data-filter="sat_late" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
-            Sat Late (7PM)
-          </button>
-          <button onclick="setShowFilter('sun_early')" data-filter="sun_early" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
-            Sun Early (3PM)
-          </button>
-          <button onclick="setShowFilter('sun_late')" data-filter="sun_late" class="filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white">
-            Sun Late (7PM)
-          </button>
+      <!-- INTERACTIVE SHOW FILTER & SEARCH -->
+      <section class="controls-section" aria-label="Show filters and performer search">
+        <div class="filter-pills" role="tablist">
+          <button class="filter-btn active" data-filter="all" type="button"><span>ALL 4 SHOWS</span></button>
+          <button class="filter-btn" data-filter="sat_early" type="button"><span>SAT 3:00 PM</span></button>
+          <button class="filter-btn" data-filter="sat_late" type="button"><span>SAT 7:00 PM</span></button>
+          <button class="filter-btn" data-filter="sun_early" type="button"><span>SUN 3:00 PM</span></button>
+          <button class="filter-btn" data-filter="sun_late" type="button"><span>SUN 7:00 PM</span></button>
         </div>
 
-        <!-- Performer / Act Search -->
-        <div class="relative w-full md:w-64">
+        <div class="search-box">
           <input
-            type="text"
-            id="search-input"
-            oninput="renderShows()"
-            placeholder="Search performer or act..."
-            class="search-input w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-3.5 pr-8 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+            id="searchInput"
+            class="search-input"
+            type="search"
+            placeholder="Find a performer or act..."
+            autocomplete="off"
           />
-          <button
-            id="clear-search-btn"
-            onclick="clearSearch()"
-            class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs font-bold"
-            title="Clear search"
-          >
-            ✕
-          </button>
+          <button id="clearSearch" class="clear-search" type="button" title="Clear search">&times;</button>
         </div>
+      </section>
+
+      <!-- DAYS & SHOWS -->
+      <main id="daysWrapper" class="days-wrapper"></main>
+
+      <!-- BOTTOM CALLOUT -->
+      <div class="bottom-callout">
+        <p class="bolt-line">&#9889; 29 UNIQUE ACTS &bull; AERIALS, POLE, HEELS &amp; CHAIR &bull; LOCAL ARTISTS SHOWCASE &#9889;</p>
+        <p class="sub-line">Come cheer on friends, celebrate community, and experience high-flying drama!</p>
       </div>
-    </header>
+    </div>
 
-    <!-- Shows Grid -->
-    <main id="shows-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-start">
-      <!-- Populated by JS -->
-    </main>
-
+    <!-- FLYER YELLOW FOOTER BAR -->
+    <footer class="flyer-footer-bar">
+      <div class="footer-left">
+        <div class="brand">REVEL ROOM STUDIOS</div>
+        <div class="sub">AERIAL &amp; POLE ACROBATICS SHOWCASE 2026</div>
+      </div>
+      <div class="footer-right">
+        <a class="url" href="https://www.revelroomstudios.com" target="_blank" rel="noopener">WWW.REVELROOMSTUDIOS.COM</a>
+        <div class="social">SAN FRANCISCO BAY AREA &bull; FOLLOW @REVELROOMSTUDIOS</div>
+      </div>
+    </footer>
   </div>
 
   <script>
-    // Act Catalog (Act Name & Performers only — no cameos, no rigging, no notes)
+    // Main performers only (no cameos, no rigging changes, no notes, no availability, no games, no intermission)
     const ACTS = {
-      1:  { name: "Harley Quinn",           performers: ["Angel"] },
-      2:  { name: "Teen Titans",            performers: ["Lisa Z", "Dorothy T"] },
-      3:  { name: "Lord Farquaad & Dragon", performers: ["Rissa", "Asia"] },
-      4:  { name: "Blind Mag",              performers: ["Elly Z"] },
-      5:  { name: "Poison Ivan",            performers: ["Brian F"] },
-      6:  { name: "Joker",                  performers: ["Christina W"] },
-      7:  { name: "Sukuna",                 performers: ["Jonathan M"] },
-      8:  { name: "Pink Panther",           performers: ["Alice K"] },
-      9:  { name: "Team Rocket",            performers: ["Ashley C", "Quan T"] },
-      10: { name: "Black & White Swans",    performers: ["Ye W", "Jie Z"] },
-      11: { name: "Sailor Scouts",          performers: ["Andy P", "Charlotte C", "Cat T", "Michelle L", "Sandy W"] },
-      12: { name: "Ursula",                 performers: ["Patricia H"] },
-      13: { name: "Ursula",                 performers: ["Paige L"] },
-      14: { name: "Spiderman",              performers: ["Austin T"] },
-      15: { name: "Prison Break",           performers: ["Emily C", "Erica C", "Zoe", "Kim G"] },
-      16: { name: "Mulan & Ping",           performers: ["Kim N", "Jen J"] },
-      17: { name: "PowerPuff Girls",        performers: ["Louise R", "Amiel R", "Claudelle V", "Joyi L"] },
-      18: { name: "Angel Dust",             performers: ["Karen S"] },
-      19: { name: "Lois & Clark",           performers: ["Cece", "Josh J"] },
-      20: { name: "Organ Donor",            performers: ["Jenn L"] },
-      21: { name: "Mama Morton",            performers: ["Selina"] },
-      22: { name: "Ratatouille",            performers: ["Josh P"] },
-      23: { name: "Rumi",                   performers: ["Christine S"] },
-      24: { name: "Assassin",               performers: ["Cheng J"] },
-      25: { name: "Snakes of Medusa",       performers: ["Kitty", "Derikka", "Heartley", "Emma", "Chloe", "Anna", "Anne", "Mackenzie"] },
-      26: { name: "Obsession",              performers: ["Kristine G", "Scott S"] },
-      27: { name: "The Devil",              performers: ["Sal"] },
-      28: { name: "Masked Enigma",          performers: ["Masa"] },
-      29: { name: "Poison Ivy",             performers: ["Luna"] }
+      1:  { name: "Two Sides, Same Flame", performers: ["Amelie C", "Cinthia T"] },
+      2:  { name: "Chaos & Cackle", performers: ["Christine T"] },
+      3:  { name: "Web of Shadows", performers: ["Claudelle V"] },
+      4:  { name: "Agent of Shadow", performers: ["Cinthia T"] },
+      5:  { name: "Dark Temptation", performers: ["Tammy C", "Chika B", "Lilia C"] },
+      6:  { name: "Mulan", performers: ["Tiffany L", "Kathy L", "Karen L", "Christine T", "Elizabeth A", "Melody G", "Tammy C", "Rachel Z", "Joyi L"] },
+      7:  { name: "Man of Steel", performers: ["James M"] },
+      8:  { name: "Symbiote Six", performers: ["Rachel C", "Louise R", "Jennifer L", "Danielle B", "Claudia C", "Sora T"] },
+      9:  { name: "Gotham Siren", performers: ["Amelie C"] },
+      10: { name: "Amazonian Huntress", performers: ["Melody G"] },
+      11: { name: "Coven of The Wicked", performers: ["Tammy C", "Chika B", "Jenni N", "Elizabeth A", "Joyi L", "Claudelle V", "Amiel R", "Tiffany L"] },
+      12: { name: "Siren's Call", performers: ["Jenni N", "Karen L"] },
+      13: { name: "Cruella's Fur Fantasy", performers: ["Tiffany L", "Melody G", "Rachel Z", "Rachel C", "Jennifer L"] },
+      14: { name: "Pink Vigilante", performers: ["Lisa D"] },
+      15: { name: "Sailor Senshi", performers: ["Jenni N", "Elizabeth A", "Lisa D", "Grace C", "Stephanie G"] },
+      16: { name: "Demon Queens", performers: ["Rachel Z", "Diana R"] },
+      17: { name: "PowerPuff Girls", performers: ["Louise R", "Amiel R", "Claudelle V", "Joyi L"] },
+      18: { name: "Sinister Charm", performers: ["Amiel R"] },
+      19: { name: "Mother Knows Best", performers: ["Joyi L"] },
+      20: { name: "Popstar Heroines", performers: ["Tiffany L", "Karen L", "Joyi L"] },
+      21: { name: "Bitter Symphony", performers: ["Tiffanie A", "Michelle W"] },
+      22: { name: "Red Ronin", performers: ["Kathy L"] },
+      23: { name: "Pop Royals", performers: ["Tiffanie A", "Tammy C", "Chika B", "Amelie C"] },
+      24: { name: "Assassin", performers: ["Elizabeth A"] },
+      25: { name: "All Stars", performers: ["Louise R", "Chika B"] },
+      26: { name: "Phoenix Reborn", performers: ["Joyi L"] },
+      27: { name: "Golden Lasso", performers: ["Rachel Z"] },
+      28: { name: "Avatar Elements", performers: ["Kathy L", "Joyi L", "Jenni N", "James M"] },
+      29: { name: "Tomb Raider", performers: ["Michelle W"] }
     };
 
-    // QT - Flow #2 Lineup
-    const SHOWS = [
+    // QT - Flow #2 preset lineup (acts only — no games or intermission)
+    const DAYS = [
       {
-        key: "sat_early",
-        day: "Saturday, Nov 14",
-        title: "Saturday Early",
-        time: "3:00 PM",
-        accent: "sat",
-        lineup: [6, 18, 1, "GAMES", 25, 21, 15, "INTERMISSION", 14, 16, 5, "GAMES", 19, 12, 8, 11]
+        id: "saturday",
+        frameClass: "saturday-frame",
+        ribbon: "★ DAY ONE • SATURDAY SHOWCASE ★",
+        dateHeading: "SATURDAY, NOVEMBER 14, 2026",
+        subHeading: "TWO PERFORMANCES",
+        shows: [
+          {
+            key: "sat_early",
+            cardClass: "early-matinee",
+            label: "EARLY MATINEE",
+            time: "3:00 PM",
+            doors: "Doors Open at 2:30 PM • All Ages • Family Friendly",
+            sequence: [6, 18, 1, 25, 21, 15, 14, 16, 5, 19, 12, 8, 11]
+          },
+          {
+            key: "sat_late",
+            cardClass: "late-evening",
+            label: "LATE EVENING",
+            time: "7:00 PM",
+            doors: "Doors Open at 6:30 PM • Prime Nighttime Showcase",
+            sequence: [9, 7, 6, 4, 3, 26, 22, 17, 24, 13, 29, 28]
+          }
+        ]
       },
       {
-        key: "sat_late",
-        day: "Saturday, Nov 14",
-        title: "Saturday Late",
-        time: "7:00 PM",
-        accent: "sat",
-        lineup: [9, 7, 6, "GAMES", 4, 3, 26, "INTERMISSION", 22, 17, 24, "GAMES", 13, 29, 28]
-      },
-      {
-        key: "sun_early",
-        day: "Sunday, Nov 15",
-        title: "Sunday Early",
-        time: "3:00 PM",
-        accent: "sun",
-        lineup: [14, 4, 10, "GAMES", 27, 1, "INTERMISSION", 20, 5, 21, 15, "GAMES", 2, 8, 17]
-      },
-      {
-        key: "sun_late",
-        day: "Sunday, Nov 15",
-        title: "Sunday Late",
-        time: "7:00 PM",
-        accent: "sun",
-        lineup: [9, 7, 11, "GAMES", 13, 10, 25, "INTERMISSION", 2, 23, "GAMES", 3, 26, 20, 28]
+        id: "sunday",
+        frameClass: "sunday-frame",
+        ribbon: "★ DAY TWO • SUNDAY SHOWCASE ★",
+        dateHeading: "SUNDAY, NOVEMBER 15, 2026",
+        subHeading: "TWO PERFORMANCES",
+        shows: [
+          {
+            key: "sun_early",
+            cardClass: "early-matinee",
+            label: "EARLY MATINEE",
+            time: "3:00 PM",
+            doors: "Doors Open at 2:30 PM • All Ages • Family Friendly",
+            sequence: [14, 4, 10, 27, 1, 20, 5, 21, 15, 2, 8, 17]
+          },
+          {
+            key: "sun_late",
+            cardClass: "grand-finale",
+            label: "GRAND FINALE",
+            time: "7:00 PM",
+            doors: "Doors Open at 6:30 PM • Closing Weekend Spectacular",
+            sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 20, 28]
+          }
+        ]
       }
     ];
 
     let activeFilter = "all";
+    let searchQuery = "";
 
-    function setShowFilter(filterKey) {
-      activeFilter = filterKey;
-      document.querySelectorAll(".filter-tab").forEach(btn => {
-        const isSelected = btn.getAttribute("data-filter") === filterKey;
-        if (isSelected) {
-          btn.className = "filter-tab px-3.5 py-2 rounded-xl text-xs font-bold transition border bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20";
-        } else {
-          btn.className = "filter-tab tab-inactive px-3 py-2 rounded-xl text-xs font-semibold transition border bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white";
-        }
-      });
-      renderShows();
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
     }
 
-    function clearSearch() {
-      const input = document.getElementById("search-input");
-      if (input) input.value = "";
-      renderShows();
+    function highlightText(text, query) {
+      const safe = escapeHtml(text);
+      if (!query) return safe;
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedQuery})`, 'gi');
+      return safe.replace(regex, '<mark class="hl">$1</mark>');
     }
 
-    function renderShows() {
-      const grid = document.getElementById("shows-grid");
-      const searchInput = document.getElementById("search-input");
-      const clearBtn = document.getElementById("clear-search-btn");
-      const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+    function renderLineup() {
+      const wrapper = document.getElementById("daysWrapper");
+      const q = searchQuery.trim().toLowerCase();
 
-      if (clearBtn) {
-        clearBtn.classList.toggle("hidden", !query);
-      }
+      wrapper.innerHTML = DAYS.map(day => {
+        const visibleShows = day.shows.filter(show => activeFilter === "all" || activeFilter === show.key);
+        if (visibleShows.length === 0) return "";
 
-      const visibleShows = SHOWS.filter(s => activeFilter === "all" || s.key === activeFilter);
+        const singleColClass = visibleShows.length === 1 ? "single-col" : "";
 
-      if (visibleShows.length === 1) {
-        grid.className = "max-w-xl mx-auto grid grid-cols-1 gap-5 items-start";
-      } else {
-        grid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-start";
-      }
+        const showsHtml = visibleShows.map(show => {
+          let orderCounter = 0;
+          const itemsHtml = [];
 
-      grid.innerHTML = visibleShows.map(show => {
-        let slotNum = 0;
-        let gameNum = 0;
-        let matchCount = 0;
+          show.sequence.forEach(actId => {
+            const act = ACTS[actId];
+            if (!act) return;
+            orderCounter++;
+            const orderFormatted = String(orderCounter).padStart(2, "0");
 
-        const rowsHtml = show.lineup.map(item => {
-          if (item === "INTERMISSION") {
-            if (query) return "";
-            return `
-              <div class="intermission-row my-1.5 py-1.5 px-3 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-center text-[11px] font-bold tracking-wider uppercase">
-                ⏸️ Intermission
-              </div>
-            `;
-          }
-          if (item === "GAMES") {
-            gameNum++;
-            if (query) return "";
-            return `
-              <div class="games-row my-1.5 py-1.5 px-3 rounded-lg bg-purple-950/50 border border-purple-500/40 text-purple-300 text-center text-[11px] font-bold tracking-wider uppercase">
-                🎲 Games #${gameNum}
-              </div>
-            `;
-          }
+            const performersStr = act.performers.join(", ");
+            if (q) {
+              const matches =
+                act.name.toLowerCase().includes(q) ||
+                performersStr.toLowerCase().includes(q);
+              if (!matches) return;
+            }
 
-          slotNum++;
-          const act = ACTS[item];
-          if (!act) return "";
+            itemsHtml.push(`
+              <li class="act-item">
+                <div class="act-order"><span>${orderFormatted}</span></div>
+                <div class="act-details">
+                  <div class="act-title">${highlightText(act.name, searchQuery.trim())}</div>
+                  <div class="act-performers">${highlightText(performersStr, searchQuery.trim())}</div>
+                </div>
+              </li>
+            `);
+          });
 
-          const performersStr = act.performers.join(", ");
-          const matchesSearch = !query ||
-            act.name.toLowerCase().includes(query) ||
-            performersStr.toLowerCase().includes(query);
-
-          if (!matchesSearch) return "";
-          matchCount++;
-
-          const rowBgClass = slotNum % 2 === 1
-            ? "act-row-odd bg-slate-900/90"
-            : "act-row-even bg-slate-800/50";
+          const listContent = itemsHtml.length > 0
+            ? `<ol class="act-list">${itemsHtml.join("")}</ol>`
+            : `<div class="empty-msg">No matching acts or performers in this show</div>`;
 
           return `
-            <div class="${rowBgClass} border border-slate-800/90 rounded-xl px-3 py-2.5 flex items-start gap-2.5 transition">
-              <span class="slot-badge w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                ${slotNum}
-              </span>
-              <div class="min-w-0 flex-1">
-                <div class="text-title font-bold text-sm text-white leading-snug">
-                  ${act.name}
-                </div>
-                <div class="text-performer text-xs text-slate-300 mt-0.5 leading-relaxed">
-                  ${performersStr}
-                </div>
+            <article class="show-card ${show.cardClass}" data-show="${show.key}">
+              <div class="show-card-header">
+                <div class="show-label">${escapeHtml(show.label)}</div>
+                <div class="show-time">${escapeHtml(show.time)}</div>
+                <div class="show-doors">${escapeHtml(show.doors)}</div>
               </div>
-            </div>
+              ${listContent}
+            </article>
           `;
         }).join("");
 
-        const totalActs = show.lineup.filter(x => typeof x === "number").length;
-        const headerStyle = show.accent === "sat"
-          ? "show-header-sat bg-gradient-to-br from-indigo-950/90 to-slate-900 border-indigo-500/30"
-          : "show-header-sun bg-gradient-to-br from-purple-950/90 to-slate-900 border-purple-500/30";
-
-        const emptySearchHtml = (query && matchCount === 0)
-          ? `<div class="text-subtitle text-center py-6 text-xs text-slate-500">No matching acts in this show.</div>`
-          : "";
-
         return `
-          <section class="card-surface bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
-            <div class="${headerStyle} border-b px-4 py-3.5 flex items-center justify-between">
-              <div>
-                <div class="text-subtitle text-[11px] font-semibold uppercase tracking-wider text-indigo-300/90">
-                  ${show.day}
-                </div>
-                <h2 class="text-title text-base font-extrabold text-white mt-0.5">
-                  ${show.title} <span class="font-semibold text-indigo-300">• ${show.time}</span>
-                </h2>
-              </div>
-              <span class="slot-badge px-2.5 py-1 rounded-full bg-slate-900/90 text-slate-300 text-[11px] font-bold border border-slate-700/70">
-                ${totalActs} Acts
-              </span>
+          <section class="day-frame ${day.frameClass}">
+            <div class="day-top-ribbon"><span>${escapeHtml(day.ribbon)}</span></div>
+            <div class="day-heading">
+              <span>${escapeHtml(day.dateHeading)}</span>
+              <span class="day-sub">${escapeHtml(day.subHeading)}</span>
             </div>
-
-            <div class="p-3 space-y-1.5">
-              ${rowsHtml}
-              ${emptySearchHtml}
+            <div class="shows-grid ${singleColClass}">
+              ${showsHtml}
             </div>
           </section>
         `;
       }).join("");
     }
 
-    const THEME_KEY = "revel_hv_lineup_theme_v1";
-
-    function applyTheme(mode) {
-      const isLight = mode === "light";
-      document.body.classList.toggle("light-mode", isLight);
-      const icon = document.getElementById("theme-icon");
-      const label = document.getElementById("theme-label");
-      if (icon) icon.textContent = isLight ? "🌙" : "☀️";
-      if (label) label.textContent = isLight ? "Dark Mode" : "Light Mode";
-    }
-
-    function toggleTheme() {
-      const isLight = document.body.classList.contains("light-mode");
-      const next = isLight ? "dark" : "light";
-      applyTheme(next);
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      try {
-        const saved = localStorage.getItem(THEME_KEY);
-        applyTheme(saved === "light" ? "light" : "dark");
-      } catch (e) {
-        applyTheme("dark");
-      }
-      renderShows();
+    // Filter Buttons
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter;
+        renderLineup();
+      });
     });
+
+    // Search Input
+    const searchInput = document.getElementById("searchInput");
+    const clearBtn = document.getElementById("clearSearch");
+
+    searchInput.addEventListener("input", e => {
+      searchQuery = e.target.value;
+      clearBtn.classList.toggle("visible", searchQuery.length > 0);
+      renderLineup();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      clearBtn.classList.remove("visible");
+      searchInput.focus();
+      renderLineup();
+    });
+
+    renderLineup();
   </script>
 </body>
 </html>

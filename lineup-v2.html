@@ -605,8 +605,6 @@
       gap: 12px;
       padding: 9px 18px;
       border-bottom: 1px solid var(--row-divider);
-      border-left: 3px solid transparent;
-      transition: transform 0.14s ease, background-color 0.14s ease, border-left-color 0.14s ease;
     }
 
     .act-item:last-child {
@@ -615,18 +613,6 @@
 
     .act-item:nth-child(even) {
       background: var(--bg-row-even);
-    }
-
-    .show-card.early-matinee .act-item:hover {
-      background: var(--hero-hover-bg);
-      border-left-color: var(--hero-gold);
-      transform: translateX(3px);
-    }
-
-    .show-card.late-evening .act-item:hover {
-      background: var(--villain-hover-bg);
-      border-left-color: var(--villain-emerald);
-      transform: translateX(3px);
     }
 
     .act-order {

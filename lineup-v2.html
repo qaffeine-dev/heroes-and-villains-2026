@@ -6,13 +6,13 @@
   <title>Heroes &amp; Villains 2026 — Official Stage Program | Revel Room Studios</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     /* ==========================================================================
        EDITORIAL STAGE PROGRAM & GRAPHIC-NOVEL BROADSHEET
        - Open architectural layout (zero rounded cards, zero nested boxes, zero pills)
        - Bespoke "Stage Curtain Noir & Bruised Violet" palette (zero stock Tailwind)
-       - Disciplined 3+1 type system: Anton, Barlow Condensed, Cormorant Garamond Italic, Plus Jakarta Sans
+       - Unified 3-font system: Anton, Barlow Condensed, Plus Jakarta Sans
        - Full-bleed hero show banners with overlaid stage-lit typography
        ========================================================================== */
     :root,
@@ -101,9 +101,6 @@
       container-type: inline-size;
       border-left: 1px solid var(--rule-subtle);
       border-right: 1px solid var(--rule-subtle);
-      background-image:
-        radial-gradient(ellipse 55% 28% at 15% 0%, rgba(179, 36, 54, 0.16) 0%, transparent 70%),
-        radial-gradient(ellipse 55% 28% at 85% 0%, rgba(108, 45, 199, 0.16) 0%, transparent 70%);
     }
 
     /* Subtle Print Grain Texture (No Halftone Dots) */
@@ -158,30 +155,23 @@
       background: transparent;
       color: var(--text-secondary);
       border: none;
-      border-bottom: 1px solid transparent;
-      padding: 2px 0;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      padding: 2px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      justify-content: center;
       flex-shrink: 0;
-      transition: color 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     .mode-toggle-btn:hover {
-      color: var(--hero-gold-bright);
-      border-bottom-color: var(--hero-gold-bright);
+      opacity: 0.8;
+      transform: scale(1.08);
     }
 
     .mode-toggle-btn svg {
-      width: 13px;
-      height: 13px;
+      width: 16px;
+      height: 16px;
     }
 
     .mode-toggle-btn .icon-sun { display: inline-block; color: #f2b866; }
@@ -540,11 +530,11 @@
     }
 
     .day-sub {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 600;
-      font-size: 1.22rem;
-      letter-spacing: 0.03em;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: var(--hero-gold-bright);
     }
 
@@ -591,7 +581,7 @@
 
     .show-photo-banner {
       position: relative;
-      height: 165px;
+      height: 275px;
       overflow: hidden;
       background: #07050a;
       border-bottom: 3px solid var(--hero-gold);
@@ -613,8 +603,8 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(12, 8, 17, 0.05) 0%, rgba(12, 8, 17, 0.45) 48%, rgba(12, 8, 17, 0.94) 100%),
-        linear-gradient(90deg, rgba(12, 8, 17, 0.82) 0%, transparent 65%);
+        linear-gradient(180deg, transparent 48%, rgba(12, 8, 17, 0.5) 74%, rgba(12, 8, 17, 0.92) 100%),
+        linear-gradient(90deg, rgba(12, 8, 17, 0.55) 0%, transparent 55%);
       pointer-events: none;
     }
 
@@ -679,14 +669,14 @@
     }
 
     .show-doors {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 600;
-      font-size: 0.98rem;
-      letter-spacing: 0.02em;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: #e6dfd5;
       line-height: 1;
-      margin-top: 3px;
+      margin-top: 4px;
       text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95);
     }
 
@@ -837,12 +827,12 @@
     }
 
     .special-thanks-sub {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 600;
-      font-size: 1.12rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
       line-height: 1.1;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: var(--hero-gold-bright);
     }
 
@@ -1071,11 +1061,12 @@
         white-space: nowrap;
       }
       .day-sub {
-        font-size: 0.88rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
         white-space: nowrap;
       }
       .show-photo-banner {
-        height: 150px;
+        height: 235px;
       }
       .show-title-lockup {
         left: 14px;
@@ -1099,9 +1090,10 @@
         line-height: 1;
       }
       .show-doors {
-        font-size: 0.9rem;
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
         line-height: 1;
-        margin-top: 3px;
+        margin-top: 4px;
       }
       .cast-act-title {
         font-size: 1.04rem;
@@ -1138,7 +1130,8 @@
         font-size: 1.05rem;
       }
       .special-thanks-sub {
-        font-size: 0.95rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
       }
       .thanks-names {
         font-size: 0.8rem;
@@ -1196,7 +1189,7 @@
           <span>Official 2026 Program</span>
         </div>
 
-        <button class="mode-toggle-btn" id="modeToggleBtn" type="button" aria-label="Toggle Light and Dark Mode">
+        <button class="mode-toggle-btn" id="modeToggleBtn" type="button" title="Toggle Light and Dark Mode" aria-label="Toggle Light and Dark Mode">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="4"></circle>
             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
@@ -1204,7 +1197,6 @@
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
           </svg>
-          <span id="modeToggleLabel">Light Mode</span>
         </button>
       </div>
 
@@ -1423,7 +1415,7 @@
             doors: "Doors Open at 2:30 PM",
             themeClass: "early-matinee",
             photo: "assets/perf-1-flying-pole.jpg",
-            photoPos: "center 24%",
+            photoPos: "center 30%",
             photoCredit: "Featured: Mulan & Ping (Flying Pole)",
             sequence: [6, 18, 1, 25, 21, 15, 14, 16, 5, 13, 19, 8, 11]
           },
@@ -1434,7 +1426,7 @@
             doors: "Doors Open at 6:30 PM",
             themeClass: "late-evening",
             photo: "assets/perf-5-pole-chair.jpg",
-            photoPos: "center 28%",
+            photoPos: "center 24%",
             photoCredit: "Featured: Nikki & Bear (Pole & Chair)",
             sequence: [9, 7, 6, 4, 3, 26, 22, 12, 24, 17, 29, 28]
           }
@@ -1455,7 +1447,7 @@
             doors: "Doors Open at 2:30 PM",
             themeClass: "early-matinee",
             photo: "assets/perf-3-silks.jpg",
-            photoPos: "center 32%",
+            photoPos: "center 45%",
             photoCredit: "Featured: Prison Break (Aerial Silks)",
             sequence: [14, 4, 10, 27, 1, 20, 5, 21, 15, 2, 8, 17]
           },
@@ -1466,7 +1458,7 @@
             doors: "Doors Open at 6:30 PM",
             themeClass: "late-evening",
             photo: "assets/perf-2-straps.jpg",
-            photoPos: "center 22%",
+            photoPos: "center 20%",
             photoCredit: "Featured: Masked Enigma (Straps)",
             sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 27, 20, 28]
           }
@@ -1620,12 +1612,10 @@
     // LIGHT / DARK MODE TOGGLE (SUPPORTS ?mode=light OR ?mode=dark URL PARAM)
     // =========================================================================
     const modeToggleBtn = document.getElementById("modeToggleBtn");
-    const modeToggleLabel = document.getElementById("modeToggleLabel");
 
     function applyThemeMode(mode) {
       const normalized = mode === "light" ? "light" : "dark";
       document.documentElement.setAttribute("data-mode", normalized);
-      modeToggleLabel.textContent = normalized === "light" ? "Dark Mode" : "Light Mode";
       try {
         localStorage.setItem("revel_lineup_v2_theme", normalized);
       } catch (e) {}
@@ -1633,7 +1623,8 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("viewport") === "mobile") {
-      document.body.style.maxWidth = "390px";
+      document.body.style.maxWidth = "min(100%, 430px)";
+      document.body.style.margin = "0 auto";
     }
     const paramMode = urlParams.get("mode");
     let savedMode = null;

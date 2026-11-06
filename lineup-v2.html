@@ -325,27 +325,16 @@
       right: 10px;
       bottom: 10px;
       z-index: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
       pointer-events: none;
     }
 
     .panel-caption .apparatus-tag {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.68rem;
+      font-size: 0.86rem;
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #fde047;
-    }
-
-    .panel-caption .act-credit {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.05rem;
-      letter-spacing: 0.06em;
       color: #ffffff;
-      line-height: 1;
       text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
     }
 
@@ -609,24 +598,9 @@
       pointer-events: none;
     }
 
-    .show-photo-caption {
-      position: absolute;
-      right: 10px;
-      bottom: 7px;
-      z-index: 2;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.82);
-      background: rgba(5, 3, 8, 0.65);
-      padding: 2px 7px;
-    }
-
     .show-title-lockup {
       display: flex;
-      align-items: baseline;
+      align-items: flex-end;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
@@ -634,14 +608,14 @@
 
     .show-time-group {
       display: flex;
-      align-items: baseline;
+      align-items: flex-end;
       gap: 14px;
     }
 
     .show-time {
       font-family: 'Anton', sans-serif;
       font-size: clamp(2.3rem, 4vw, 3.1rem);
-      line-height: 0.9;
+      line-height: 0.78;
       letter-spacing: 0.03em;
     }
 
@@ -656,6 +630,8 @@
     .show-edition-stack {
       display: flex;
       flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 3px;
     }
 
     .show-label {
@@ -682,7 +658,8 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-muted);
-      margin-top: 3px;
+      line-height: 0.9;
+      margin-top: 5px;
     }
 
     /* ==================== THEATRICAL CAST PROGRAM LIST (NOT A DATABASE) ==================== */
@@ -971,38 +948,33 @@
       <section class="photo-strip-wrapper" aria-label="Featured Showcase Performers">
         <div class="photo-strip-frame">
           <figure class="photo-panel">
-            <img src="assets/perf-1-flying-pole.jpg" alt="Mulan & Ping performing on Flying Pole" loading="eager" />
+            <img src="assets/perf-1-flying-pole.jpg" alt="Flying Pole performance" loading="eager" />
             <figcaption class="panel-caption">
               <span class="apparatus-tag">Flying Pole</span>
-              <span class="act-credit">Mulan &amp; Ping</span>
             </figcaption>
           </figure>
           <figure class="photo-panel">
-            <img src="assets/perf-2-straps.jpg" alt="Masked Enigma performing on Aerial Straps" loading="eager" />
+            <img src="assets/perf-2-straps.jpg" alt="Straps performance" loading="eager" />
             <figcaption class="panel-caption">
               <span class="apparatus-tag">Straps</span>
-              <span class="act-credit">Masked Enigma</span>
             </figcaption>
           </figure>
           <figure class="photo-panel">
-            <img src="assets/perf-3-silks.jpg" alt="Prison Break performing on Aerial Silks" loading="eager" />
+            <img src="assets/perf-3-silks.jpg" alt="Aerial Silks performance" loading="eager" />
             <figcaption class="panel-caption">
               <span class="apparatus-tag">Aerial Silks</span>
-              <span class="act-credit">Prison Break</span>
             </figcaption>
           </figure>
           <figure class="photo-panel">
-            <img src="assets/perf-4-lyra.jpg" alt="Rumi performing on Lyra Hoop" loading="eager" />
+            <img src="assets/perf-4-lyra.jpg" alt="Lyra performance" loading="eager" />
             <figcaption class="panel-caption">
-              <span class="apparatus-tag">Lyra Hoop</span>
-              <span class="act-credit">Rumi</span>
+              <span class="apparatus-tag">Lyra</span>
             </figcaption>
           </figure>
           <figure class="photo-panel">
-            <img src="assets/perf-5-pole-chair.jpg" alt="Nikki & Bear performing Pole and Chair duet" loading="eager" />
+            <img src="assets/perf-5-pole-chair.jpg" alt="Pole and Chair performance" loading="eager" />
             <figcaption class="panel-caption">
               <span class="apparatus-tag">Pole &amp; Chair</span>
-              <span class="act-credit">Nikki &amp; Bear</span>
             </figcaption>
           </figure>
         </div>
@@ -1264,8 +1236,7 @@
             <article class="show-column ${show.themeClass}">
               <header class="show-header-block">
                 <div class="show-photo-banner">
-                  <img src="${show.photo}" alt="${escapeHtml(show.photoCredit)}" style="object-position: ${show.photoPos};" loading="lazy" />
-                  <span class="show-photo-caption">${escapeHtml(show.photoCredit)}</span>
+                  <img src="${show.photo}" alt="${escapeHtml(show.label)}" style="object-position: ${show.photoPos};" loading="lazy" />
                 </div>
                 <div class="show-title-lockup">
                   <div class="show-time-group">

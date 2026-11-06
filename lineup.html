@@ -425,13 +425,13 @@
       justify-content: center;
     }
 
-    /* Individual Show Box (Matches Flyer Inner Cards) */
+    /* Individual Show Box (Matches Flyer Inner Cards, Toned Down for Readability) */
     .show-card {
       background: var(--bg-card);
-      border: 2px solid var(--border-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
 
     .show-card.hidden {
@@ -439,19 +439,20 @@
     }
 
     .show-card-header {
-      padding: 16px 18px 14px;
+      padding: 13px 16px 11px;
       text-align: center;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0.22) 100%);
-      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .show-label {
       font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 0.96rem;
-      letter-spacing: 0.16em;
+      font-weight: 700;
+      font-size: 0.84rem;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
       margin-bottom: 2px;
+      opacity: 0.9;
     }
 
     .show-card.early-matinee .show-label {
@@ -459,7 +460,7 @@
     }
 
     .show-card.late-evening .show-label {
-      color: #ff6b6b;
+      color: #fca5a5;
     }
 
     .show-card.grand-finale .show-label {
@@ -467,75 +468,71 @@
     }
 
     .show-time {
-      font-family: 'Anton', Impact, sans-serif;
-      font-size: 2.15rem;
-      line-height: 1.05;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.65rem;
+      line-height: 1.1;
       letter-spacing: 0.04em;
-      color: #ffffff;
-      margin-bottom: 4px;
+      color: #f8fafc;
+      margin-bottom: 2px;
     }
 
     .show-doors {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.03em;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
     }
 
     /* Act Lineup List */
     .act-list {
       list-style: none;
-      padding: 8px 10px 12px;
+      padding: 4px 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
     }
 
     .act-item {
       display: flex;
-      align-items: flex-start;
+      align-items: baseline;
       gap: 12px;
-      padding: 10px 12px;
-      background: var(--bg-row);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 7px;
-      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      padding: 9px 16px;
+      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+      transition: background 0.12s ease;
+    }
+
+    .act-item:last-child {
+      border-bottom: none;
     }
 
     .act-item:nth-child(even) {
-      background: var(--bg-row-alt);
+      background: rgba(255, 255, 255, 0.022);
     }
 
     .act-item:hover {
-      background: var(--bg-row-hover);
-      border-color: rgba(0, 200, 255, 0.45);
-      transform: translateX(2px);
+      background: rgba(255, 255, 255, 0.055);
     }
 
     .act-order {
-      flex: 0 0 32px;
-      height: 28px;
-      background: var(--comic-yellow);
-      color: #090812;
-      border: 1.5px solid #000000;
-      box-shadow: 2px 2px 0 #000000;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 0.95rem;
-      display: flex;
+      flex: 0 0 26px;
+      height: 22px;
+      background: rgba(246, 220, 30, 0.1);
+      color: #fde047;
+      border: 1px solid rgba(246, 220, 30, 0.25);
+      border-radius: 5px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.74rem;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      transform: skewX(-10deg);
-      margin-top: 1px;
-    }
-
-    .act-order span {
-      transform: skewX(10deg);
     }
 
     .sunday-frame .act-order {
-      background: var(--comic-cyan);
-      color: #051926;
+      background: rgba(0, 200, 255, 0.1);
+      color: #7dd3fc;
+      border-color: rgba(0, 200, 255, 0.25);
     }
 
     .act-details {
@@ -544,21 +541,20 @@
     }
 
     .act-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 1.18rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #ffffff;
-      line-height: 1.15;
-      margin-bottom: 3px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      color: #f1f5f9;
+      line-height: 1.3;
+      margin-bottom: 1px;
     }
 
     .act-performers {
-      font-size: 0.87rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      line-height: 1.42;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      line-height: 1.4;
       word-break: break-word;
     }
 

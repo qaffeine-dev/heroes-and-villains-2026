@@ -1,8 +1,11 @@
-# Heroes & Villains 2026 — Showcase Lineup & Rigging Scheduler (`heroes-and-villains-2026`)
+# Heroes & Villains 2026 — Showcase Lineup & Stage Program (`heroes-and-villains-2026`)
 
-An interactive production scheduler, conflict validator, and rigging changeover optimizer for the **Revel: Heroes & Villains 2026** aerial and pole showcase (November 14–15, 2026).
+> 🎭 **Official Stage Program:** [https://revel-heroes-villains-2026.pages.dev](https://revel-heroes-villains-2026.pages.dev)  
+> 🔗 **GitHub Pages (Redirects automatically):** [https://qaffeine-dev.github.io/heroes-and-villains-2026/](https://qaffeine-dev.github.io/heroes-and-villains-2026/)
 
-- **Live App (GitHub Pages):** [https://qaffeine-dev.github.io/heroes-and-villains-2026/](https://qaffeine-dev.github.io/heroes-and-villains-2026/)
+An interactive production scheduler, conflict validator, rigging changeover optimizer, and digital stage program for the **Revel: Heroes & Villains 2026** aerial and pole showcase (November 14–15, 2026).
+
+- **Official Stage Program:** [https://revel-heroes-villains-2026.pages.dev](https://revel-heroes-villains-2026.pages.dev)
 - **Repository:** [https://github.com/qaffeine-dev/heroes-and-villains-2026](https://github.com/qaffeine-dev/heroes-and-villains-2026)
 
 ---
@@ -61,13 +64,22 @@ An interactive production scheduler, conflict validator, and rigging changeover 
 
 ---
 
+## Stage Program & Digital Lineup
+
+The official public-facing program is served live at:
+**[https://revel-heroes-villains-2026.pages.dev](https://revel-heroes-villains-2026.pages.dev)**
+
+Source code is available in [`lineup-v2.html`](./lineup-v2.html).
+
+---
+
 ## Local Quickstart
 
-Open [`index.html`](./index.html) directly in any browser:
+Open [`lineup-v2.html`](./lineup-v2.html) directly in any browser:
 
 ```bash
 # On macOS
-open index.html
+open lineup-v2.html
 ```
 
 Or serve locally via Python:
@@ -77,15 +89,3 @@ python3 -m http.server 8000
 ```
 
 Then visit `http://localhost:8000`.
-
----
-
-## Deployment (`heroes-and-villains-2026`)
-
-This project is deployed as a static single-file web application on **GitHub Pages** from the `main` branch of [`qaffeine-dev/heroes-and-villains-2026`](https://github.com/qaffeine-dev/heroes-and-villains-2026):
-
-```bash
-git add index.html README.md
-git commit -m "Update scheduler and documentation"
-git push origin main
-```

@@ -21,10 +21,10 @@ An interactive production scheduler, conflict validator, rigging changeover opti
 - **📊 All Active Shows (Side-by-Side View):**
   - Compare all 4 shows side by side in **Read-Only** or **Editable** mode.
   - Drag and drop acts within a show or across different shows, add/remove **🎲 Games** breaks, toggle **⏸️ Intermission**, and view aggregate weekend stats (total acts, Solo/Group split, total rigging changeovers, and conflict summaries).
-- **🎭 Dress Rehearsal (All 29 Acts — Continuous Single-Day Tab):**
-  - Independent single-day continuous lineup containing all **29 acts** (`?tab=dress_rehearsal`).
+- **🎭 Dress Rehearsal (All 28 Acts — Continuous Single-Day Tab):**
+  - Independent single-day continuous lineup containing all **28 acts** (`?tab=dress_rehearsal`).
   - Mirrors the act blocks and rigging transitions of **QT - Flow #2** (`5` total rigging changeovers, `0` performer/cameo buffer conflicts) so the rigging crew and performers can rehearse the exact show flow without affecting the 4-show weekend counts or availability checks.
-  - Includes a **↺ Reset QT - Flow #2 Order** button to restore the default 29-act rehearsal order at any time.
+  - Includes a **↺ Reset QT - Flow #2 Order** button to restore the default 28-act rehearsal order at any time.
 
 ### 2. Automated 3-Point Rigging Engine & Manual Shift Controls
 - Evaluates the 3 binary stage rigging points (**Front | Mid | Back**) for each act (`Aerial/Floor`, `Pole`, or flexible `Any`).
@@ -49,7 +49,7 @@ An interactive production scheduler, conflict validator, rigging changeover opti
 
 ### 4. Built-In Presets, Locking & Shareable Read-Only Links
 - **Built-In 4-Show Presets:**
-  - **`QT - Flow #2`** — Primary 4-show production schedule (`50` total performances across 4 shows, `15` rigging changes, `2` Games breaks + `1` Intermission per show, `0` hard conflicts).
+  - **`QT - Flow #2`** — Primary 4-show production schedule (`49` total performances across 4 shows, `15` rigging changes, `2` Games breaks + `1` Intermission per show, `0` hard conflicts).
   - **`QT - Energy Flow`** — Energy-paced 4-show schedule (🔒 locked by default).
   - **`QT - Energy Flow (Min Rigging)`** — Rigging-minimized variant of `QT - Energy Flow`.
   - **`Min Rigging (Honors Prefs)`** & **`QT - Min Rig Honor Prefs`** — Minimum-rigging 4-show schedule (`11` total rigging changes, `0` hard conflicts, `0` day-preference violations).

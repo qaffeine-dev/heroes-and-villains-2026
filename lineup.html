@@ -645,6 +645,12 @@
       letter-spacing: 0.01em;
     }
 
+    .show-sold-out {
+      color: var(--comic-red);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
     .show-card.early-matinee .show-label {
       color: var(--early-label);
     }
@@ -1142,6 +1148,7 @@
             label: "Late Evening",
             time: "7:00 PM",
             doors: "Doors Open at 6:30 PM",
+            soldOut: true,
             sequence: [9, 7, 11, 13, 10, 25, 2, 23, 3, 26, 27, 20, 28]
           }
         ]
@@ -1214,7 +1221,7 @@
               <div class="show-card-header">
                 <div class="show-header-left">
                   <div class="show-time">${escapeHtml(show.time)}</div>
-                  <div class="show-label">${escapeHtml(show.label)}</div>
+                  <div class="show-label">${escapeHtml(show.label)}${show.soldOut ? ' <span class="show-sold-out">&middot; Sold Out</span>' : ''}</div>
                 </div>
                 <div class="show-doors">${escapeHtml(show.doors)}</div>
               </div>

@@ -668,6 +668,10 @@
       color: #c8a6ff;
     }
 
+    .show-sold-out {
+      color: var(--hero-accent);
+    }
+
     .show-doors {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
@@ -1456,6 +1460,7 @@
             time: "7:00 PM",
             label: "Late Evening",
             doors: "Doors Open at 6:30 PM",
+            soldOut: true,
             themeClass: "late-evening",
             photo: "assets/perf-2-straps.jpg",
             photoPos: "center 20%",
@@ -1552,7 +1557,7 @@
                     <div class="show-time-group">
                       <div class="show-time">${escapeHtml(show.time)}</div>
                       <div class="show-edition-stack">
-                        <span class="show-label">${escapeHtml(show.label)}</span>
+                        <span class="show-label">${escapeHtml(show.label)}${show.soldOut ? ' <span class="show-sold-out">&middot; Sold Out</span>' : ''}</span>
                         <span class="show-doors">${escapeHtml(show.doors)}</span>
                       </div>
                     </div>

@@ -163,23 +163,6 @@
       align-items: center;
     }
 
-    .search-box {
-      flex: 1;
-      min-width: 190px;
-      max-width: 280px;
-    }
-    .search-box input {
-      width: 100%;
-      min-height: 40px;
-      padding: 8px 12px;
-      border-radius: 5px;
-      border: 1px solid var(--rule-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
     /* ==================== MAIN CUE SHEET ==================== */
     .cue-container {
       max-width: 960px;
@@ -489,9 +472,6 @@
         <button class="pill-btn" data-show="sun_late">Sun 7:00 PM</button>
         <button class="pill-btn" data-show="all">All Shows</button>
       </div>
-      <div class="search-box">
-        <input type="search" id="searchInput" placeholder="Filter act, performer, cameo..." />
-      </div>
     </div>
   </header>
 
@@ -562,7 +542,6 @@
     const LS_DONE = "revel_hv_emcee_done";
 
     let currentShow = localStorage.getItem(LS_SHOW) || "sat_early";
-    let searchQuery = "";
     let allRiggingOpen = false;
     let doneSet = new Set(JSON.parse(localStorage.getItem(LS_DONE) || "[]"));
 
@@ -665,16 +644,6 @@
       let all = [];
       for (const s of targetShows) {
         all = all.concat(buildShowItems(s));
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        all = all.filter(it => {
-          if (it.kind !== "act") return false;
-          const hay = (
-            "act " + it.act.id + " " + it.act.name + " " + it.act.performers + " " + it.act.cameos
-          ).toLowerCase();
-          return hay.includes(q);
-        });
       }
       return all;
     }
@@ -826,11 +795,6 @@
         render();
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
-    });
-
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-      searchQuery = e.target.value;
-      render();
     });
 
     document.getElementById("toggleAllRigBtn").addEventListener("click", (e) => {
